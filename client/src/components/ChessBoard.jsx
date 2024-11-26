@@ -30,7 +30,7 @@ export default function ChessBoard() {
 
     //backend will decide which color user will play
     //for now,assume user is white
-    const [playerColor, setPlayerColor] = useState(colors.white);
+    const [playerColor, setPlayerColor] = useState(colors.black);
 
     //set the color once
     const [colorChangeCount, setColorChangeCount] = useState(1);
