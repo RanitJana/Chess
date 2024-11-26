@@ -60,7 +60,7 @@ export default function ChessBoard() {
     return (
         chessboard.map((row, rowIdx) => {
             return (
-                <div className="grid grid-cols-8 max-w-[40rem] w-full" key={rowIdx} >
+                <div className="grid grid-cols-8 max-w-[35rem] w-full" key={rowIdx} >
                     {
                         row.map((piece, pieceIdx) => {
                             let color = ((pieceIdx + rowIdx) & 1) ? "rgb(119,151,86)" : "rgb(239,238,211)";

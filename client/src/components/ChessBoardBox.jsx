@@ -109,6 +109,7 @@ function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, set
 
     };
 
+    //function to handle pawn promotion
     const handlePawnPromotion = (e, idx) => {
 
         //create a new chess board to change reference which is needed for useState 
@@ -155,12 +156,12 @@ function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, set
             {
                 currPiece.moves?.some(([row1, col1]) => row === row1 && col === col1) ? (
                     chessboard[row][col] != ' ' ?
-                        <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-full rounded-full border-[6px]"
-                            style={{ borderColor: "rgba(8, 7, 6, 0.33)" }}
+                        <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[95%] h-[95%] rounded-full border-[5px]"
+                            style={{ borderColor: "rgba(8, 7, 6, 0.2)" }}
                         ></div>
                         :
-                        <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-5 h-5 rounded-full"
-                            style={{ backgroundColor: "rgba(8, 7, 6, 0.33)" }}
+                        <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-full max-w-[35%] max-h-[35%] rounded-full"
+                            style={{ backgroundColor: "rgba(8, 7, 6, 0.2)" }}
                         ></div>
                 )
                     : ""
