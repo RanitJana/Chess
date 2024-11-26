@@ -1,16 +1,36 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import pieceMove, { getColor } from '../utils/PieceMove.js';
 import clearPieceMove from '../utils/ClearPieceMove.js';
 
-function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, setCurrPiece, row, col, playerColor, movePossible, setMovePossible }) {
+function ChessBoardBox(
+    {
+        color,
+        piece,
+        chessboard,
+        setChessboard,
+        currPiece,
+        setCurrPiece,
+        row,
+        col,
+        playerColor,
+        movePossible,
+        setMovePossible,
+        movingPiece,
+        setMovingPiece
+    }
+) {
 
     //set the image of pieces
     const [imgPath, setImgPath] = useState("");
 
     //promotion pawn's possible pieces
     const [pawnUpdatePieces, setPawnUpdatePieces] = useState(['queen-w', 'rook-w', 'bishop-w', 'knight-w']);
+
+    //active transition
+    const [moveInfo, setMoveInfo] = useState(null);
 
     useEffect(() => {
 
@@ -48,28 +68,57 @@ function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, set
 
     }, [piece, chessboard, currPiece, playerColor]);
 
+    useEffect(() => {
+        function movePiece() {
+            if (!movingPiece || movingPiece.from.row != row || movingPiece.from.col != col) return;
+
+            let x = (movingPiece.to.col - movingPiece.from.col) * 100;
+            let y = (movingPiece.to.row - movingPiece.from.row) * 100;
+
+            setMoveInfo({ x, y });
+
+            setTimeout(() => {
+                setMoveInfo(null);
+            }, 300);
+
+        }
+        movePiece();
+
+    }, [movingPiece])
+
 
     //a function to handle the piece movement and update chessboard
     function handlePlacePiece() {
         // if (!currPiece.row || !currPiece.col) return;
+        setMovingPiece({
+            from: { row: currPiece.row, col: currPiece.col },
+            to: { row, col }
+        })
 
         //clear the showed possible places from the ui
         const clearedBoard = clearPieceMove(chessboard);
 
         //move the piece
-        clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
         clearedBoard[currPiece.row][currPiece.col] = ' ';
 
-        //check if pawn promotion
-        if (row == 0 && (clearedBoard[row][col] == 'p' || clearedBoard[row][col] == "P")) {
-            setMovePossible(false);
-        }
+        //delay a little to show animation
+        setTimeout(() => {
+            clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
 
-        //set the current choosed piece's info as nothing
-        setCurrPiece({ row: null, col: null, moves: null });
+            //check if pawn promotion
+            if (row == 0 && (clearedBoard[row][col] == 'p' || clearedBoard[row][col] == "P")) {
+                setMovePossible(false);
+            }
 
-        //render the new chessboard
-        setChessboard(clearedBoard);
+            //set the current choosed piece's info as nothing
+            setCurrPiece({ row: null, col: null, moves: null });
+
+            //render the new chessboard
+            setChessboard(clearedBoard);
+
+            setMovingPiece(null);
+
+        }, 100);
     }
 
     //a function to get info about a piece's possible movement paths
@@ -149,9 +198,10 @@ function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, set
             <img
                 src={imgPath}
                 alt=""
-                className="max-w-full"
+                className="max-w-full absolute"
                 draggable
                 onDragStart={handleDisplayPossibleMoves}
+                style={moveInfo ? { transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`, transition: "all 0.1s linear" } : {}}
             />
             {
                 currPiece.moves?.some(([row1, col1]) => row === row1 && col === col1) ? (
@@ -168,14 +218,17 @@ function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, set
             }
             {
                 row == 0 && (chessboard[row][col] == 'p' || chessboard[row][col] == 'P') && (
-                    <ul className='absolute w-full left-0 top-0 z-10 box shadow-lg shadow-black' >
+                    <ul
+                        className='absolute w-full left-0 top-0 z-10 box shadow-lg shadow-black'
+                        style={{ backgroundImage: "url('/images/wood.jpg')", }}
+                    >
                         {
                             pawnUpdatePieces.map((val, idx) => {
                                 return (
                                     <li
                                         onClick={(e) => handlePawnPromotion(e, idx)}
                                         key={idx}
-                                        style={{ backgroundColor: idx & 1 ? "rgb(119,151,86)" : "rgb(239,238,211)" }}
+                                        style={{ backgroundColor: idx & 1 ? "rgba(135, 50, 0, .5)" : "rgba(135, 50, 0, .0)" }}
                                         className='relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]'
                                     >
                                         <img src={"/images/" + val + ".svg"} alt="" />

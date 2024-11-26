@@ -30,7 +30,7 @@ export default function ChessBoard() {
 
     //backend will decide which color user will play
     //for now,assume user is white
-    const [playerColor, setPlayerColor] = useState(colors.black);
+    const [playerColor, setPlayerColor] = useState(colors.white);
 
     //set the color once
     const [colorChangeCount, setColorChangeCount] = useState(1);
@@ -57,39 +57,55 @@ export default function ChessBoard() {
         moves: null
     });
 
+    // To store moving piece animation
+    const [movingPiece, setMovingPiece] = useState(null);
+
     return (
-        chessboard.map((row, rowIdx) => {
-            return (
-                <div className="grid grid-cols-8 max-w-[35rem] w-full" key={rowIdx} >
-                    {
-                        row.map((piece, pieceIdx) => {
-                            let color = ((pieceIdx + rowIdx) & 1) ? "rgb(119,151,86)" : "rgb(239,238,211)";
-                            return (
-                                <ChessBoardBox
-                                    key={pieceIdx}
+        <div
+            className="p-4 w-[100dvws] shadow-inner max-w-[35rem]"
+            style={{ backgroundImage: "url('/images/wood.jpg')", }}
+        >
+            {
+                chessboard.map((row, rowIdx) => {
+                    return (
+                        <div className="grid grid-cols-8 w-full" key={rowIdx}
+                            style={{ backgroundImage: "url('/images/wood.jpg')", }}
 
-                                    movePossible={movePossible}
-                                    setMovePossible={setMovePossible}
+                        >
+                            {
+                                row.map((piece, pieceIdx) => {
+                                    let color = ((pieceIdx + rowIdx) & 1) ? "rgba(135, 50, 0, .5)" : "rgba(135, 50, 0, .0)";
+                                    return (
+                                        <ChessBoardBox
+                                            key={pieceIdx}
 
-                                    chessboard={chessboard}
-                                    setChessboard={setChessboard}
+                                            setMovingPiece={setMovingPiece}
+                                            movingPiece={movingPiece}
 
-                                    currPiece={currPiece}
-                                    setCurrPiece={setCurrPiece}
+                                            movePossible={movePossible}
+                                            setMovePossible={setMovePossible}
 
-                                    playerColor={playerColor}
+                                            chessboard={chessboard}
+                                            setChessboard={setChessboard}
 
-                                    row={rowIdx}
-                                    col={pieceIdx}
+                                            currPiece={currPiece}
+                                            setCurrPiece={setCurrPiece}
 
-                                    color={color}
-                                    piece={piece}
-                                />
-                            )
-                        })
-                    }
-                </div>
-            )
-        })
+                                            playerColor={playerColor}
+
+                                            row={rowIdx}
+                                            col={pieceIdx}
+
+                                            color={color}
+                                            piece={piece}
+                                        />
+                                    )
+                                })
+                            }
+                        </div >
+                    )
+                })
+            }
+        </div>
     )
 }

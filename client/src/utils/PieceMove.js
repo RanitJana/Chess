@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 //a function to get a piece's color where capitals are white and small are black otherwise null
+import { kingCheck, kingCheckMate } from "./KingCheck.js";
+
 const getColor = function (chessboard, row, col) {
     if (row < 0 || row > 7 || col < 0 || col > 7) return null;
     let piece = chessboard[row][col];
@@ -14,10 +16,7 @@ export { getColor }
 
 //function to calculate a pawns's possible move
 //en passant move is not written in this logic***********
-const pawn = function (chessboard, row, col) {
-
-    //get the color of the pawn to decide to take opposite color piece if possible
-    let pawnColor = getColor(chessboard, row, col);
+const pawn = function (chessboard, row, col, pawnColor) {
 
     let move1 = [row - 1, col];//single step
     let move2 = [row - 2, col];//initial double step;
@@ -59,10 +58,7 @@ const pawn = function (chessboard, row, col) {
 }
 
 //function to calculate a knight's possible move
-const knight = function (chessboard, row, col) {
-
-    //get knight color
-    const knightColor = getColor(chessboard, row, col);
+const knight = function (chessboard, row, col, knightColor) {
 
     //allmoves
     let move1 = [row - 2, col + 1];
@@ -103,16 +99,16 @@ const knight = function (chessboard, row, col) {
 
     return finalMoves;
 }
+export { knight }
 
 //function to calculate a queen's possible move
-const queen = function (chessboard, row, col) {
-    return [...bishop(chessboard, row, col), ...rook(chessboard, row, col)];
+const queen = function (chessboard, row, col, queenColor) {
+    return [...bishop(chessboard, row, col, queenColor), ...rook(chessboard, row, col, queenColor)];
 }
+export { queen }
 
 //function to calculate a bishop's possible move
-const bishop = function (chessboard, row, col) {
-    //get the color of the bishop
-    const bishopColor = getColor(chessboard, row, col);
+const bishop = function (chessboard, row, col, bishopColor) {
 
     let finalMoves = [];
 
@@ -156,10 +152,7 @@ const bishop = function (chessboard, row, col) {
 }
 
 //function to calcuate a rook's possible move
-const rook = function (chessboard, row, col) {
-
-    //get the color of the rook
-    const rookColor = getColor(chessboard, row, col);
+const rook = function (chessboard, row, col, rookColor) {
 
     let finalMoves = [];
 
@@ -202,9 +195,7 @@ const rook = function (chessboard, row, col) {
 }
 
 
-const king = function (chessboard, row, col) {
-
-    const kingColor = getColor(chessboard, row, col);
+const king = function (chessboard, row, col, kingColor) {
 
     const finalMoves = [];
 
@@ -218,14 +209,15 @@ const king = function (chessboard, row, col) {
 export default function pieceMove(chessboard, row, col) {
 
     //no need to check if row and col is out of bound
-    let piece = chessboard[row][col];
+    const piece = chessboard[row][col], pieceColor = getColor(chessboard, row, col);
 
-    if (piece == 'p' || piece == 'P') return pawn(chessboard, row, col);
-    if (piece == 'q' || piece == 'Q') return queen(chessboard, row, col);
-    if (piece == 'n' || piece == 'N') return knight(chessboard, row, col);
-    if (piece == 'b' || piece == 'B') return bishop(chessboard, row, col);
-    if (piece == 'r' || piece == 'R') return rook(chessboard, row, col);
-    if (piece == 'k' || piece == 'K') return king(chessboard, row, col);
+
+    if (piece == 'p' || piece == 'P') return pawn(chessboard, row, col, pieceColor);
+    if (piece == 'q' || piece == 'Q') return queen(chessboard, row, col, pieceColor);
+    if (piece == 'n' || piece == 'N') return knight(chessboard, row, col, pieceColor);
+    if (piece == 'b' || piece == 'B') return bishop(chessboard, row, col, pieceColor);
+    if (piece == 'r' || piece == 'R') return rook(chessboard, row, col, pieceColor);
+    if (piece == 'k' || piece == 'K') return king(chessboard, row, col, pieceColor);
 
     return [];
 }
