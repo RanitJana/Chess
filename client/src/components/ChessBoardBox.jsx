@@ -136,12 +136,22 @@ function ChessBoardBox({ color, piece, chessboard, setChessboard, currPiece, set
     }
 
     return (
+
         <span
             style={{ backgroundColor: color }}
             className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
             onClick={handlePieceMove}
+            //below is necessarry to allow drop
+            onDragOver={e => e.preventDefault()}
+            onDrop={handlePieceMove}
         >
-            <img src={imgPath} alt="" className="max-w-full" />
+            <img
+                src={imgPath}
+                alt=""
+                className="max-w-full"
+                draggable
+                onDragStart={handleDisplayPossibleMoves}
+            />
             {
                 currPiece.moves?.some(([row1, col1]) => row === row1 && col === col1) ? (
                     chessboard[row][col] != ' ' ?
