@@ -1,24 +1,23 @@
 /* eslint-disable no-unused-vars */
-import { getColor, queen, knight } from "./PieceMove.js"
+import { getColor, queen, knight } from "./PieceMove.js";
 
 //this function will return  true if the position is safe
 const kingCheck = (chessboard, row, col, kingColor) => {
+  let allMoves = [
+    ...queen(chessboard, row, col, kingColor),
+    ...knight(chessboard, row, col, kingColor),
+  ];
 
-    let allMoves = [...queen(chessboard, row, col, kingColor), ...knight(chessboard, row, col, kingColor)]
+  let pieceColor;
 
-    let pieceColor;
-    
-    let threatPieces = allMoves.filter(([row, col]) => {
-        pieceColor = getColor(chessboard, row, col);
-        return (pieceColor && pieceColor != kingColor);
-    })
+  let threatPieces = allMoves.filter(([row, col]) => {
+    pieceColor = getColor(chessboard, row, col);
+    return pieceColor && pieceColor != kingColor;
+  });
 
-    return threatPieces;
+  return threatPieces;
+};
 
-}
+const kingCheckMate = (chessboard, row, col, kingColor) => {};
 
-const kingCheckMate = (chessboard, row, col, kingColor) => {
-
-}
-
-export { kingCheck, kingCheckMate }
+export { kingCheck, kingCheckMate };

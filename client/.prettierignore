@@ -1,0 +1,9 @@
+.env
+*.config.*
+node_modules
+public
+.gitignore
+*.html
+.prettierrc
+*.css
+package*.json
