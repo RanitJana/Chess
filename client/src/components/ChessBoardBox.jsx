@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
+import { captureSound, moveSound } from "../utils/Sounds.js";
 
 function ChessBoardBox({
   color,
@@ -12,6 +13,7 @@ function ChessBoardBox({
   setChessboard,
   currPiece,
   setCurrPiece,
+  allMoves,
   row,
   col,
   playerColor,
@@ -33,6 +35,9 @@ function ChessBoardBox({
 
   //active transition
   const [moveInfo, setMoveInfo] = useState(null);
+
+  //is dragging
+  const [isDragging, setDragging] = useState(false);
 
   useEffect(() => {
     //assign image path and must use default to set the path to empty to remove previous path
@@ -94,8 +99,10 @@ function ChessBoardBox({
     assignValue();
   }, [piece, chessboard, currPiece, playerColor]);
 
+  //a hook that will invoke a function to calculate moving position of a piece
   useEffect(() => {
     function movePiece() {
+      //if any piece is not moving or not the desired cell where the animation will occur, then return
       if (
         !movingPiece ||
         movingPiece.from.row != row ||
@@ -103,15 +110,19 @@ function ChessBoardBox({
       )
         return;
 
+      //get the delta x and delta y
       let x = (movingPiece.to.col - movingPiece.from.col) * 100;
       let y = (movingPiece.to.row - movingPiece.from.row) * 100;
 
+      //set the value
       setMoveInfo({ x, y });
 
+      //reset the value after a dealy to give user a better animation
       setTimeout(() => {
         setMoveInfo(null);
       }, 300);
     }
+
     movePiece();
   }, [movingPiece]);
 
@@ -122,6 +133,11 @@ function ChessBoardBox({
       from: { row: currPiece.row, col: currPiece.col },
       to: { row, col },
     });
+
+    //decide sound type
+    const color = getColor(chessboard, row, col);
+    let sound = "move";
+    if (color && color != playerColor) sound = "capture";
 
     //clear the showed possible places from the ui
     const clearedBoard = clearPieceMove(chessboard);
@@ -146,6 +162,15 @@ function ChessBoardBox({
 
       //render the new chessboard
       setChessboard(clearedBoard);
+
+      //play audio
+      switch (sound) {
+        case "move":
+          moveSound();
+          break;
+        case "capture":
+          captureSound();
+      }
 
       setMovingPiece(null);
     }, 100);
@@ -209,6 +234,33 @@ function ChessBoardBox({
     setMovePossible(true);
   };
 
+  const handleDragStart = (e) => {
+    //get width and height of the target element
+    const { width, height } = e.target.getBoundingClientRect();
+
+    // Create an off-screen custom image
+    const customImage = document.createElement("img");
+    customImage.src = `${imgPath}`;
+    customImage.style.width = `${width}px`;
+    customImage.style.height = `${height}px`;
+    customImage.style.position = "absolute";
+    customImage.style.zIndex = "-100"; // Hide it off-screen
+
+    // Add to DOM temporarily
+    document.body.appendChild(customImage);
+
+    // Use the custom image as the drag image
+    e.dataTransfer.setDragImage(customImage, width / 2, height / 2);
+
+    // Cleanup the custom image after setting it
+    setTimeout(() => {
+      document.body.removeChild(customImage);
+    }, 0);
+
+    setDragging(true);
+    handleDisplayPossibleMoves();
+  };
+
   return (
     <span
       style={{ backgroundColor: color }}
@@ -218,20 +270,34 @@ function ChessBoardBox({
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
     >
+      {allMoves.length ? (
+        (allMoves.slice(-1)[0].from.row == row &&
+          allMoves.slice(-1)[0].from.col == col) ||
+        (allMoves.slice(-1)[0].to.row == row &&
+          allMoves.slice(-1)[0].to.col == col) ? (
+          <div className="absolute h-full w-full bg-[#f2ff007e]"></div>
+        ) : (
+          ""
+        )
+      ) : (
+        ""
+      )}
       <img
         src={imgPath}
         alt=""
         className="max-w-full absolute"
         draggable
-        onDragStart={handleDisplayPossibleMoves}
-        style={
-          moveInfo
+        onDragStart={handleDragStart}
+        onDragEnd={() => setDragging(false)}
+        style={{
+          ...(moveInfo
             ? {
                 transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
                 transition: "all 0.1s linear",
               }
-            : {}
-        }
+            : {}),
+          opacity: isDragging ? "0" : "1",
+        }}
       />
       {currPiece.moves?.some(([row1, col1]) => row === row1 && col === col1) ? (
         chessboard[row][col] != " " ? (

@@ -53,8 +53,32 @@ export default function ChessBoard() {
     moves: null,
   });
 
-  // To store moving piece animation
+  // To store moving piece animation of the user and also for the opponent which will be got using backend
   const [movingPiece, setMovingPiece] = useState(null);
+  /*
+  e.g.:
+   setMovingPiece({
+      from: { row: currPiece.row, col: currPiece.col },
+      to: { row, col },
+    });
+  */
+
+  //contain all moves including opponents
+  const [allMoves, setAllmoves] = useState([]);
+
+  //a hook that will invoke a function to store the data of moves
+  useEffect(() => {
+    const appendMoveInfo = () => {
+      //for safety, if no moving piece is found then return
+      if (!movingPiece) return;
+
+      //create an array to hold the data and set the details
+      let newMoveArray = [...allMoves, movingPiece];
+      setAllmoves(() => newMoveArray);
+    };
+
+    appendMoveInfo();
+  }, [movingPiece]);
 
   return (
     <div
@@ -80,6 +104,7 @@ export default function ChessBoard() {
                   movingPiece={movingPiece}
                   movePossible={movePossible}
                   setMovePossible={setMovePossible}
+                  allMoves={allMoves}
                   chessboard={chessboard}
                   setChessboard={setChessboard}
                   currPiece={currPiece}
