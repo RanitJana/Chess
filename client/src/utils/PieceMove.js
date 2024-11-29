@@ -94,38 +94,50 @@ const bishop = function (chessboard, row, col, bishopColor) {
   //top-right corner
   let r = row - 1,
     c = col + 1;
+
+  let destinationColor;
+
+  //loop until valid row and col
   for (; r >= 0 && c < 8; r--, c++) {
-    const posColor = getColor(chessboard, r, c);
-    if (posColor == bishopColor) break;
+
+    //get destination color
+    destinationColor = getColor(chessboard, r, c);
+
+    //if both color is same then the current and next position is unreachable, so break the loop
+    if (destinationColor == bishopColor) break;
+
+    //valid move
+    //if the position is occupied by opponent's piece then add position and break 
+    //otherwise for empty cell just loop for next position
     finalMoves.push([r, c]);
-    if (posColor && posColor != bishopColor) break;
+    if (destinationColor && destinationColor != bishopColor) break;
   }
 
   //top-left corner
   (r = row - 1), (c = col - 1);
   for (; r >= 0 && c >= 0; r--, c--) {
-    const posColor = getColor(chessboard, r, c);
-    if (posColor == bishopColor) break;
+    destinationColor = getColor(chessboard, r, c);
+    if (destinationColor == bishopColor) break;
     finalMoves.push([r, c]);
-    if (posColor && posColor != bishopColor) break;
+    if (destinationColor && destinationColor != bishopColor) break;
   }
 
   //bottom-left corner
   (r = row + 1), (c = col - 1);
   for (; r < 8 && c >= 0; r++, c--) {
-    const posColor = getColor(chessboard, r, c);
-    if (posColor == bishopColor) break;
+    destinationColor = getColor(chessboard, r, c);
+    if (destinationColor == bishopColor) break;
     finalMoves.push([r, c]);
-    if (posColor && posColor != bishopColor) break;
+    if (destinationColor && destinationColor != bishopColor) break;
   }
 
   //bottom-right corner
   (r = row + 1), (c = col + 1);
   for (; r < 8 && c < 8; r++, c++) {
-    const posColor = getColor(chessboard, r, c);
-    if (posColor == bishopColor) break;
+    destinationColor = getColor(chessboard, r, c);
+    if (destinationColor == bishopColor) break;
     finalMoves.push([r, c]);
-    if (posColor && posColor != bishopColor) break;
+    if (destinationColor && destinationColor != bishopColor) break;
   }
 
   return finalMoves;
@@ -138,53 +150,56 @@ const rook = function (chessboard, row, col, rookColor) {
   //top
   let r = row - 1,
     c;
+
+  let destinationColor;
   for (; r >= 0; r--) {
-    const posColor = getColor(chessboard, r, col);
-    if (posColor == rookColor) break;
+    destinationColor = getColor(chessboard, r, col);
+    if (destinationColor == rookColor) break;
     finalMoves.push([r, col]);
-    if (posColor && posColor != rookColor) break;
+    if (destinationColor && destinationColor != rookColor) break;
   }
 
   //bottom
   r = row + 1;
   for (; r < 8; r++) {
-    const posColor = getColor(chessboard, r, col);
-    if (posColor == rookColor) break;
+    destinationColor = getColor(chessboard, r, col);
+    if (destinationColor == rookColor) break;
     finalMoves.push([r, col]);
-    if (posColor && posColor != rookColor) break;
+    if (destinationColor && destinationColor != rookColor) break;
   }
 
   //right
   c = col + 1;
   for (; c < 8; c++) {
-    const posColor = getColor(chessboard, row, c);
-    if (posColor == rookColor) break;
+    destinationColor = getColor(chessboard, row, c);
+    if (destinationColor == rookColor) break;
     finalMoves.push([row, c]);
-    if (posColor && posColor != rookColor) break;
+    if (destinationColor && destinationColor != rookColor) break;
   }
 
   //left
   (r = row), (c = col - 1);
   for (; c >= 0; c--) {
-    const posColor = getColor(chessboard, row, c);
-    if (posColor == rookColor) break;
+    destinationColor = getColor(chessboard, row, c);
+    if (destinationColor == rookColor) break;
     finalMoves.push([row, c]);
-    if (posColor && posColor != rookColor) break;
+    if (destinationColor && destinationColor != rookColor) break;
   }
   return finalMoves;
 };
 
 const king = function (chessboard, row, col, kingColor) {
   let finalMoves = [];
-  let posColor;
+  let destinationColor;
 
   //top
   let r = row - 1,
     c = col - 1;
   for (let i = 0; i < 3; i++) {
-    posColor = getColor(chessboard, r, c);
 
-    if (posColor != kingColor && r >= 0 && c >= 0 && c < 8) finalMoves.push([r, c]);
+    destinationColor = getColor(chessboard, r, c);
+
+    if (destinationColor != kingColor && r >= 0 && c >= 0 && c < 8) finalMoves.push([r, c]);
     c++;
   }
 
@@ -192,31 +207,39 @@ const king = function (chessboard, row, col, kingColor) {
   r = row + 1,
     c = col - 1;
   for (let i = 0; i < 3; i++) {
-    posColor = getColor(chessboard, r, c);
-    if (posColor != kingColor && r < 8 && c >= 0 && c < 8) finalMoves.push([r, c]);
+
+    destinationColor = getColor(chessboard, r, c);
+
+    if (destinationColor != kingColor && r < 8 && c >= 0 && c < 8) finalMoves.push([r, c]);
     c++;
   }
 
   //left 
-  posColor = getColor(chessboard, row, col - 1);
-  if (posColor != kingColor && c >= 0) finalMoves.push([row, col - 1]);
+  destinationColor = getColor(chessboard, row, col - 1);
+  if (destinationColor != kingColor && c >= 0) finalMoves.push([row, col - 1]);
 
   //right
-  posColor = getColor(chessboard, row, col + 1);
-  if (posColor != kingColor && c < 8) finalMoves.push([row, col + 1]);
+  destinationColor = getColor(chessboard, row, col + 1);
+  if (destinationColor != kingColor && c < 8) finalMoves.push([row, col + 1]);
 
+  //create a copy of current chessboard which will help us to decide the danger positions
   let newChessBoard = chessboard.map(row => row.slice());
 
+  //filter out safe positions
   finalMoves = finalMoves.filter(([r, c]) => {
 
+    //place the king's position to valid cell
     newChessBoard[r][c] = chessboard[row][col];
     newChessBoard[row][col] = ' ';
 
+    //check if the position is danger free or not
     let checks = kingCheck(newChessBoard, r, c, kingColor);
 
+    //make the board same as previous
     newChessBoard[r][c] = ' ';
     newChessBoard[row][col] = chessboard[row][col];
 
+    //return true is the position is danger free
     return checks.length == 0;
   })
 
