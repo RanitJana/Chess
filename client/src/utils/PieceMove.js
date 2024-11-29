@@ -12,8 +12,6 @@ const getColor = function (chessboard, row, col) {
   return null;
 };
 
-export { getColor };
-
 //function to calculate a pawns's possible move
 //en passant move is not written in this logic***********
 const pawn = function (chessboard, row, col, pawnColor) {
@@ -59,45 +57,27 @@ const pawn = function (chessboard, row, col, pawnColor) {
 //function to calculate a knight's possible move
 const knight = function (chessboard, row, col, knightColor) {
   //allmoves
-  let move1 = [row - 2, col + 1];
-  let move2 = [row - 1, col + 2];
-  let move3 = [row + 1, col + 2];
-  let move4 = [row + 2, col + 1];
-  let move5 = [row + 2, col - 1];
-  let move6 = [row + 1, col - 2];
-  let move7 = [row - 1, col - 2];
-  let move8 = [row - 2, col - 1];
+  let moves = [
+    [row - 2, col + 1],
+    [row - 1, col + 2],
+    [row + 1, col + 2],
+    [row + 2, col + 1],
+    [row + 2, col - 1],
+    [row + 1, col - 2],
+    [row - 1, col - 2],
+    [row - 2, col - 1]
+  ]
 
-  let finalMoves = [];
+  let destinationColor;
 
-  //if the position does not include similar color then it is a possible move
-  let destinationColor = getColor(chessboard, move1[0], move1[1]);
-  if (destinationColor != knightColor) finalMoves.push(move1);
-
-  destinationColor = getColor(chessboard, move2[0], move2[1]);
-  if (destinationColor != knightColor) finalMoves.push(move2);
-
-  destinationColor = getColor(chessboard, move3[0], move3[1]);
-  if (destinationColor != knightColor) finalMoves.push(move3);
-
-  destinationColor = getColor(chessboard, move4[0], move4[1]);
-  if (destinationColor != knightColor) finalMoves.push(move4);
-
-  destinationColor = getColor(chessboard, move5[0], move5[1]);
-  if (destinationColor != knightColor) finalMoves.push(move5);
-
-  destinationColor = getColor(chessboard, move6[0], move6[1]);
-  if (destinationColor != knightColor) finalMoves.push(move6);
-
-  destinationColor = getColor(chessboard, move7[0], move7[1]);
-  if (destinationColor != knightColor) finalMoves.push(move7);
-
-  destinationColor = getColor(chessboard, move8[0], move8[1]);
-  if (destinationColor != knightColor) finalMoves.push(move8);
+  //filter out valid moves-> if destination cell is empty of opposite color
+  let finalMoves = moves.filter(([r, c]) => {
+    destinationColor = getColor(chessboard, r, c);
+    return destinationColor != knightColor;
+  })
 
   return finalMoves;
 };
-export { knight };
 
 //function to calculate a queen's possible move
 const queen = function (chessboard, row, col, queenColor) {
@@ -106,7 +86,6 @@ const queen = function (chessboard, row, col, queenColor) {
     ...rook(chessboard, row, col, queenColor),
   ];
 };
-export { queen };
 
 //function to calculate a bishop's possible move
 const bishop = function (chessboard, row, col, bishopColor) {
@@ -196,11 +175,50 @@ const rook = function (chessboard, row, col, rookColor) {
 };
 
 const king = function (chessboard, row, col, kingColor) {
-  const finalMoves = [];
+  let finalMoves = [];
+  let posColor;
 
   //top
   let r = row - 1,
     c = col - 1;
+  for (let i = 0; i < 3; i++) {
+    posColor = getColor(chessboard, r, c);
+
+    if (posColor != kingColor && r >= 0 && c >= 0 && c < 8) finalMoves.push([r, c]);
+    c++;
+  }
+
+  //bottom
+  r = row + 1,
+    c = col - 1;
+  for (let i = 0; i < 3; i++) {
+    posColor = getColor(chessboard, r, c);
+    if (posColor != kingColor && r < 8 && c >= 0 && c < 8) finalMoves.push([r, c]);
+    c++;
+  }
+
+  //left 
+  posColor = getColor(chessboard, row, col - 1);
+  if (posColor != kingColor && c >= 0) finalMoves.push([row, col - 1]);
+
+  //right
+  posColor = getColor(chessboard, row, col + 1);
+  if (posColor != kingColor && c < 8) finalMoves.push([row, col + 1]);
+
+  let newChessBoard = chessboard.map(row => row.slice());
+
+  finalMoves = finalMoves.filter(([r, c]) => {
+
+    newChessBoard[r][c] = chessboard[row][col];
+    newChessBoard[row][col] = ' ';
+
+    let checks = kingCheck(newChessBoard, r, c, kingColor);
+
+    newChessBoard[r][c] = ' ';
+    newChessBoard[row][col] = chessboard[row][col];
+
+    return checks.length == 0;
+  })
 
   return finalMoves;
 };
@@ -226,3 +244,5 @@ export default function pieceMove(chessboard, row, col) {
 
   return [];
 }
+
+export { getColor, knight, queen };
