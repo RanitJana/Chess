@@ -1,6 +1,7 @@
 import { kingCheck } from "./KingCheck.js";
 import getKingPos from "./KingPos.js";
 
+//check if possible moves can endenger the king
 export default function filterPieceMovesToPreventCheck(
   chessboard,
   finalMoves,
@@ -12,15 +13,15 @@ export default function filterPieceMovesToPreventCheck(
   if (chessboard[row][col] == "K" && chessboard[row][col] == "k")
     return finalMoves;
 
-  //create a copy to get the threat to the king
-  const newChessBoard = chessboard.map((row) => [...row]);
-
   //get king's position
-  const kingPos = getKingPos(newChessBoard, color);
+  const kingPos = getKingPos(chessboard, color);
 
   return finalMoves.filter(([r1, c1]) => {
     //if somehow the location out of range then just return true
     if (r1 < 0 || r1 > 7 || c1 < 0 || c1 > 7) return true;
+
+    //create a copy to get the threat to the king
+    const newChessBoard = chessboard.map((row) => [...row]);
 
     //move the piece
     newChessBoard[row][col] = " ";

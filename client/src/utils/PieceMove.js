@@ -268,7 +268,14 @@ export default function pieceMove(chessboard, row, col, checkKingSafe = false) {
   else if (piece == "k" || piece == "K")
     finalMoves = king(chessboard, row, col, pieceColor);
 
-  if (checkKingSafe) {
+  if (
+    checkKingSafe &&
+    chessboard[row][col] != "K" &&
+    chessboard[row][col] != "k"
+  ) {
+    //if king is in danger and if current piece is able to protect it or not;
+    finalMoves = isKingCheck(chessboard, finalMoves, row, col, pieceColor);
+
     //check if possible moves can endenger the king
     finalMoves = filterPieceMovesToPreventCheck(
       chessboard,
@@ -277,9 +284,6 @@ export default function pieceMove(chessboard, row, col, checkKingSafe = false) {
       col,
       pieceColor
     );
-
-    //if king is in danger and if current piece is able to protect it or not;
-    finalMoves = isKingCheck(chessboard, finalMoves, row, col, pieceColor);
   }
 
   return finalMoves;
