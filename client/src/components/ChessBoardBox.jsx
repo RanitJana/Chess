@@ -270,6 +270,7 @@ function ChessBoardBox({
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
     >
+      {/* recent piece move mark */}
       {allMoves.length ? (
         (allMoves.slice(-1)[0].from.row == row &&
           allMoves.slice(-1)[0].from.col == col) ||
@@ -282,6 +283,7 @@ function ChessBoardBox({
       ) : (
         ""
       )}
+      {/* piece images */}
       <img
         src={imgPath}
         alt=""
@@ -337,6 +339,31 @@ function ChessBoardBox({
             })}
           </ul>
         )}
+      {/* numbering */}
+      {col == 0 && (
+        <span
+          className="absolute left-[2px] top-1 font-semibold text-sm"
+          style={{
+            color:
+              color == "rgba(135, 50, 0, .5)" ? "white" : "rgba(135, 50, 0)",
+          }}
+        >
+          {playerColor == "white" ? 8 - row : row + 1}
+        </span>
+      )}
+      {row == 7 && (
+        <span
+          className="absolute right-[1px] bottom-[-4px] font-semibold text-sm"
+          style={{
+            color:
+              color == "rgba(135, 50, 0, .5)" ? "white" : "rgba(135, 50, 0)",
+          }}
+        >
+          {playerColor == "white"
+            ? String.fromCharCode(97 + col)
+            : String.fromCharCode(104 - col)}
+        </span>
+      )}
     </span>
   );
 }

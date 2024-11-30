@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import ChessBoardBox from "./ChessBoardBox";
-import roateBoard from "../utils/RotateBoard";
+import ChessBoardBox from "./ChessBoardBox.jsx";
+import roateBoard from "../utils/RotateBoard.js";
 
 export default function ChessBoard() {
   const colors = {
@@ -82,7 +82,7 @@ export default function ChessBoard() {
 
   return (
     <div
-      className="p-4 w-[100dvws] shadow-inner max-w-[35rem]"
+      className="relative p-[min(4%,1rem)] w-[100dvw] shadow-inner max-w-[35rem]"
       style={{ backgroundImage: "url('/images/wood.jpg')" }}
     >
       {chessboard.map((row, rowIdx) => {
