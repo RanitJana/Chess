@@ -190,7 +190,7 @@ function ChessBoardBox({
     const clearedBoard = clearPieceMove(chessboard);
 
     //get the possible moves
-    const moves = pieceMove(clearedBoard, row, col);
+    const moves = pieceMove(clearedBoard, row, col, true);
 
     //if no move is possible then nothing to desplay in ui
     if (moves.length == 0) return;
@@ -244,7 +244,7 @@ function ChessBoardBox({
     customImage.style.width = `${width}px`;
     customImage.style.height = `${height}px`;
     customImage.style.position = "absolute";
-    customImage.style.zIndex = "-100"; // Hide it off-screen
+    customImage.style.top = "-100px"; // Hide it off-screen
 
     // Add to DOM temporarily
     document.body.appendChild(customImage);

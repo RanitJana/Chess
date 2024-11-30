@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
 //a function to get a piece's color where capitals are white and small are black otherwise null
+import isKingCheck from "./IsKingCheck.js";
 import { kingCheck, kingCheckMate } from "./KingCheck.js";
+import filterPieceMovesToPreventCheck from "./KingCheckPrevent.js";
+import getKingPos from "./KingPos.js";
 
 const getColor = function (chessboard, row, col) {
   if (row < 0 || row > 7 || col < 0 || col > 7) return null;
@@ -65,8 +68,8 @@ const knight = function (chessboard, row, col, knightColor) {
     [row + 2, col - 1],
     [row + 1, col - 2],
     [row - 1, col - 2],
-    [row - 2, col - 1]
-  ]
+    [row - 2, col - 1],
+  ];
 
   let destinationColor;
 
@@ -74,7 +77,7 @@ const knight = function (chessboard, row, col, knightColor) {
   let finalMoves = moves.filter(([r, c]) => {
     destinationColor = getColor(chessboard, r, c);
     return destinationColor != knightColor;
-  })
+  });
 
   return finalMoves;
 };
@@ -99,7 +102,6 @@ const bishop = function (chessboard, row, col, bishopColor) {
 
   //loop until valid row and col
   for (; r >= 0 && c < 8; r--, c++) {
-
     //get destination color
     destinationColor = getColor(chessboard, r, c);
 
@@ -107,7 +109,7 @@ const bishop = function (chessboard, row, col, bishopColor) {
     if (destinationColor == bishopColor) break;
 
     //valid move
-    //if the position is occupied by opponent's piece then add position and break 
+    //if the position is occupied by opponent's piece then add position and break
     //otherwise for empty cell just loop for next position
     finalMoves.push([r, c]);
     if (destinationColor && destinationColor != bishopColor) break;
@@ -188,6 +190,7 @@ const rook = function (chessboard, row, col, rookColor) {
   return finalMoves;
 };
 
+//function to calculate the king's possible moves
 const king = function (chessboard, row, col, kingColor) {
   let finalMoves = [];
   let destinationColor;
@@ -196,25 +199,24 @@ const king = function (chessboard, row, col, kingColor) {
   let r = row - 1,
     c = col - 1;
   for (let i = 0; i < 3; i++) {
-
     destinationColor = getColor(chessboard, r, c);
 
-    if (destinationColor != kingColor && r >= 0 && c >= 0 && c < 8) finalMoves.push([r, c]);
+    if (destinationColor != kingColor && r >= 0 && c >= 0 && c < 8)
+      finalMoves.push([r, c]);
     c++;
   }
 
   //bottom
-  r = row + 1,
-    c = col - 1;
+  (r = row + 1), (c = col - 1);
   for (let i = 0; i < 3; i++) {
-
     destinationColor = getColor(chessboard, r, c);
 
-    if (destinationColor != kingColor && r < 8 && c >= 0 && c < 8) finalMoves.push([r, c]);
+    if (destinationColor != kingColor && r < 8 && c >= 0 && c < 8)
+      finalMoves.push([r, c]);
     c++;
   }
 
-  //left 
+  //left
   destinationColor = getColor(chessboard, row, col - 1);
   if (destinationColor != kingColor && c >= 0) finalMoves.push([row, col - 1]);
 
@@ -223,49 +225,64 @@ const king = function (chessboard, row, col, kingColor) {
   if (destinationColor != kingColor && c < 8) finalMoves.push([row, col + 1]);
 
   //create a copy of current chessboard which will help us to decide the danger positions
-  let newChessBoard = chessboard.map(row => row.slice());
+  let newChessBoard = chessboard.map((row) => [...row]);
 
   //filter out safe positions
   finalMoves = finalMoves.filter(([r, c]) => {
-
     //place the king's position to valid cell
     newChessBoard[r][c] = chessboard[row][col];
-    newChessBoard[row][col] = ' ';
+    newChessBoard[row][col] = " ";
 
     //check if the position is danger free or not
     let checks = kingCheck(newChessBoard, r, c, kingColor);
 
     //make the board same as previous
-    newChessBoard[r][c] = ' ';
+    newChessBoard[r][c] = " ";
     newChessBoard[row][col] = chessboard[row][col];
 
     //return true is the position is danger free
     return checks.length == 0;
-  })
+  });
 
   return finalMoves;
 };
 
 //this function will return an array of positions
-export default function pieceMove(chessboard, row, col) {
+export default function pieceMove(chessboard, row, col, checkKingSafe = false) {
   //no need to check if row and col is out of bound
   const piece = chessboard[row][col],
     pieceColor = getColor(chessboard, row, col);
 
-  if (piece == "p" || piece == "P")
-    return pawn(chessboard, row, col, pieceColor);
-  if (piece == "q" || piece == "Q")
-    return queen(chessboard, row, col, pieceColor);
-  if (piece == "n" || piece == "N")
-    return knight(chessboard, row, col, pieceColor);
-  if (piece == "b" || piece == "B")
-    return bishop(chessboard, row, col, pieceColor);
-  if (piece == "r" || piece == "R")
-    return rook(chessboard, row, col, pieceColor);
-  if (piece == "k" || piece == "K")
-    return king(chessboard, row, col, pieceColor);
+  let finalMoves = [];
 
-  return [];
+  if (piece == "p" || piece == "P")
+    finalMoves = pawn(chessboard, row, col, pieceColor);
+  else if (piece == "q" || piece == "Q")
+    finalMoves = queen(chessboard, row, col, pieceColor);
+  else if (piece == "n" || piece == "N")
+    finalMoves = knight(chessboard, row, col, pieceColor);
+  else if (piece == "b" || piece == "B")
+    finalMoves = bishop(chessboard, row, col, pieceColor);
+  else if (piece == "r" || piece == "R")
+    finalMoves = rook(chessboard, row, col, pieceColor);
+  else if (piece == "k" || piece == "K")
+    finalMoves = king(chessboard, row, col, pieceColor);
+
+  if (checkKingSafe) {
+    //check if possible moves can endenger the king
+    finalMoves = filterPieceMovesToPreventCheck(
+      chessboard,
+      finalMoves,
+      row,
+      col,
+      pieceColor
+    );
+
+    //if king is in danger and if current piece is able to protect it or not;
+    finalMoves = isKingCheck(chessboard, finalMoves, row, col, pieceColor);
+  }
+
+  return finalMoves;
 }
 
 export { getColor, knight, queen };
