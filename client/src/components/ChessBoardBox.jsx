@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
+import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
 import { captureSound, moveSound } from "../utils/Sounds.js";
 
 function ChessBoardBox({
@@ -45,42 +46,42 @@ function ChessBoardBox({
       switch (piece) {
         //black pices
         case "r":
-          setImgPath("/images/rook-b.svg");
+          setImgPath("/images/rook-b.png");
           break;
         case "p":
-          setImgPath("/images/pawn-b.svg");
+          setImgPath("/images/pawn-b.png");
           break;
         case "n":
-          setImgPath("/images/knight-b.svg");
+          setImgPath("/images/knight-b.png");
           break;
         case "b":
-          setImgPath("/images/bishop-b.svg");
+          setImgPath("/images/bishop-b.png");
           break;
         case "q":
-          setImgPath("/images/queen-b.svg");
+          setImgPath("/images/queen-b.png");
           break;
         case "k":
-          setImgPath("/images/nrking-b.svg");
+          setImgPath("/images/nrking-b.png");
           break;
 
         //white pices
         case "R":
-          setImgPath("/images/rook-w.svg");
+          setImgPath("/images/rook-w.png");
           break;
         case "P":
-          setImgPath("/images/pawn-w.svg");
+          setImgPath("/images/pawn-w.png");
           break;
         case "N":
-          setImgPath("/images/knight-w.svg");
+          setImgPath("/images/knight-w.png");
           break;
         case "B":
-          setImgPath("/images/bishop-w.svg");
+          setImgPath("/images/bishop-w.png");
           break;
         case "Q":
-          setImgPath("/images/queen-w.svg");
+          setImgPath("/images/queen-w.png");
           break;
         case "K":
-          setImgPath("/images/nrking-w.svg");
+          setImgPath("/images/nrking-w.png");
           break;
 
         //default
@@ -239,7 +240,10 @@ function ChessBoardBox({
     const { width, height } = e.target.getBoundingClientRect();
 
     // Create an off-screen custom image
-    const customImage = document.createElement("img");
+    const customImage = document.createElement("div");
+    customImage.innerHTML = `
+    <img src='${imgPath}' />
+    `;
     customImage.src = `${imgPath}`;
     customImage.style.width = `${width}px`;
     customImage.style.height = `${height}px`;
@@ -255,7 +259,7 @@ function ChessBoardBox({
     // Cleanup the custom image after setting it
     setTimeout(() => {
       document.body.removeChild(customImage);
-    }, 0);
+    }, 100);
 
     setDragging(true);
     handleDisplayPossibleMoves();
@@ -270,24 +274,11 @@ function ChessBoardBox({
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
     >
-      {/* recent piece move mark */}
-      {allMoves.length ? (
-        (allMoves.slice(-1)[0].from.row == row &&
-          allMoves.slice(-1)[0].from.col == col) ||
-        (allMoves.slice(-1)[0].to.row == row &&
-          allMoves.slice(-1)[0].to.col == col) ? (
-          <div className="absolute h-full w-full bg-[#f2ff007e]"></div>
-        ) : (
-          ""
-        )
-      ) : (
-        ""
-      )}
       {/* piece images */}
       <img
         src={imgPath}
         alt=""
-        className="max-w-full absolute"
+        className="max-w-full absolute z-10"
         draggable
         onDragStart={handleDragStart}
         onDragEnd={() => setDragging(false)}
@@ -301,27 +292,22 @@ function ChessBoardBox({
           opacity: isDragging ? "0" : "1",
         }}
       />
-      {currPiece.moves?.some(([row1, col1]) => row === row1 && col === col1) ? (
-        chessboard[row][col] != " " ? (
-          <div
-            className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[95%] h-[95%] rounded-full border-[5px]"
-            style={{ borderColor: "rgba(8, 7, 6, 0.2)" }}
-          ></div>
-        ) : (
-          <div
-            className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-full max-w-[35%] max-h-[35%] rounded-full"
-            style={{ backgroundColor: "rgba(8, 7, 6, 0.2)" }}
-          ></div>
-        )
-      ) : (
-        ""
-      )}
+
+      {/* numbering with pawn promotion */}
+      <ChessBoardBoxNumbering
+        allMoves={allMoves}
+        row={row}
+        col={col}
+        currPiece={currPiece}
+        color={color}
+        playerColor={playerColor}
+        chessboard={chessboard}
+      />
+
+      {/* pawn promotion logic */}
       {row == 0 &&
         (chessboard[row][col] == "p" || chessboard[row][col] == "P") && (
-          <ul
-            className="absolute w-full left-0 top-0 z-10 box shadow-lg shadow-black"
-            style={{ backgroundImage: "url('/images/wood.jpg')" }}
-          >
+          <ul className="absolute w-full left-0 top-0 z-20 box shadow-lg shadow-black">
             {pawnUpdatePieces.map((val, idx) => {
               return (
                 <li
@@ -329,41 +315,16 @@ function ChessBoardBox({
                   key={idx}
                   style={{
                     backgroundColor:
-                      idx & 1 ? "rgba(135, 50, 0, .5)" : "rgba(135, 50, 0, .0)",
+                      idx & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)",
                   }}
                   className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
                 >
-                  <img src={"/images/" + val + ".svg"} alt="" />
+                  <img src={"/images/" + val + ".png"} alt="" />
                 </li>
               );
             })}
           </ul>
         )}
-      {/* numbering */}
-      {col == 0 && (
-        <span
-          className="absolute left-[2px] top-1 font-semibold text-sm"
-          style={{
-            color:
-              color == "rgba(135, 50, 0, .5)" ? "white" : "rgba(135, 50, 0)",
-          }}
-        >
-          {playerColor == "white" ? 8 - row : row + 1}
-        </span>
-      )}
-      {row == 7 && (
-        <span
-          className="absolute right-[1px] bottom-[-4px] font-semibold text-sm"
-          style={{
-            color:
-              color == "rgba(135, 50, 0, .5)" ? "white" : "rgba(135, 50, 0)",
-          }}
-        >
-          {playerColor == "white"
-            ? String.fromCharCode(97 + col)
-            : String.fromCharCode(104 - col)}
-        </span>
-      )}
     </span>
   );
 }

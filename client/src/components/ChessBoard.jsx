@@ -82,21 +82,21 @@ export default function ChessBoard() {
 
   return (
     <div
-      className="relative p-[min(4%,1rem)] w-[100dvw] shadow-inner max-w-[35rem]"
-      style={{ backgroundImage: "url('/images/wood.jpg')" }}
+      className="relative w-[100dvw] shadow-inner max-w-[35rem]"
+      // style={{ background: "url('/images/200.png') center / cover no-repeat" }}
     >
       {chessboard.map((row, rowIdx) => {
         return (
           <div
             className="grid grid-cols-8 w-full"
             key={rowIdx}
-            style={{ backgroundImage: "url('/images/wood.jpg')" }}
+            // style={{ backgroundImage: "url('/images/wood.jpg')" }}
           >
             {row.map((piece, pieceIdx) => {
               let color =
                 (pieceIdx + rowIdx) & 1
-                  ? "rgba(135, 50, 0, .5)"
-                  : "rgba(135, 50, 0, .0)";
+                  ? "rgb(115,149,82)"
+                  : "rgb(234,237,208)";
               return (
                 <ChessBoardBox
                   key={pieceIdx}
