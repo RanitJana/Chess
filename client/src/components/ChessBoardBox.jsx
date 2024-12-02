@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
@@ -236,33 +236,34 @@ function ChessBoardBox({
   };
 
   const handleDragStart = (e) => {
-    //get width and height of the target element
+
     const { width, height } = e.target.getBoundingClientRect();
 
-    // Create an off-screen custom image
-    const customImage = document.createElement("div");
-    customImage.innerHTML = `
-    <img src='${imgPath}' />
-    `;
-    customImage.src = `${imgPath}`;
-    customImage.style.width = `${width}px`;
-    customImage.style.height = `${height}px`;
-    customImage.style.position = "absolute";
-    customImage.style.top = "-100px"; // Hide it off-screen
+    // Create a new image element for the drag image
+    let newImg = document.createElement("img");
+    newImg.src = imgPath;
 
-    // Add to DOM temporarily
-    document.body.appendChild(customImage);
+    newImg.style.width = `${width}px`;
+    newImg.style.height = `${height}px`;
+    newImg.style.pointerEvents = 'none'; // Ensure it doesn’t interfere with drag
+    newImg.style.position = 'absolute';  // Avoid layout interference
+    newImg.style.top = '-100px';
+    newImg.style.opacity = '1';          // Make sure it's fully visible
 
-    // Use the custom image as the drag image
-    e.dataTransfer.setDragImage(customImage, width / 2, height / 2);
+    // Append the image to the document body temporarily
+    document.body.appendChild(newImg);
 
-    // Cleanup the custom image after setting it
-    setTimeout(() => {
-      document.body.removeChild(customImage);
-    }, 100);
+    // Set the drag image to the newly created image
+    e.dataTransfer.setDragImage(newImg, width / 2, height / 2);
 
-    setDragging(true);
+    // Set dragging state
+    setDragging(() => true);
     handleDisplayPossibleMoves();
+
+    setTimeout(() => {
+      document.body.removeChild(newImg);
+    }, 100)
+
   };
 
   return (
@@ -279,15 +280,14 @@ function ChessBoardBox({
         src={imgPath}
         alt=""
         className="max-w-full absolute z-10"
-        draggable
         onDragStart={handleDragStart}
         onDragEnd={() => setDragging(false)}
         style={{
           ...(moveInfo
             ? {
-                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-                transition: "all 0.1s linear",
-              }
+              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+              transition: "transform 0.1s linear",
+            }
             : {}),
           opacity: isDragging ? "0" : "1",
         }}
