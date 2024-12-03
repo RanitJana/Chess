@@ -1,15 +1,20 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import auth from "../hooks/auth.js";
 import toast from "react-hot-toast";
 import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
+import { useAuthContext } from "../context/AuthContext.jsx";
 
 export default function Login() {
+
   const [info, setInfo] = useState({
     email: "",
     password: "",
   });
+
+  const { setAuth } = useAuthContext();
 
   const [isSubmit, setSubmit] = useState(false);
 
@@ -26,12 +31,16 @@ export default function Login() {
     try {
       setSubmit(true);
 
-      const { success, message } = await auth(
+      const response = await auth(
         "http://localhost:7096/api/v1/login",
         { email: info.email, password: info.password }
       );
+      const { success, message } = response?.data;
+
       if (success) {
         toast.success(message);
+        localStorage.setItem("user", JSON.stringify(response));
+        setAuth(response);
         navigate("/");
       } else toast.error(message);
     } catch (error) {
@@ -83,7 +92,9 @@ export default function Login() {
           >
             Forgot password?
           </Link>
-          <Button isSubmit={isSubmit} value="Log In" />
+          <Button isSubmit={isSubmit}>
+            <p>Log In</p>
+          </Button>
         </div>
         <Link
           to="/signup"

@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import auth from "../hooks/auth.js";
@@ -29,7 +30,7 @@ export default function Login() {
     try {
       setSubmit(true);
 
-      const { success, message } = await auth(
+      const response = await auth(
         "http://localhost:7096/api/v1/signup",
         {
           name: info.name,
@@ -38,6 +39,7 @@ export default function Login() {
           confirmPassword: info.confirmPassword,
         }
       );
+      const { success, message } = response?.data;
       if (success) {
         toast.success(message);
         navigate("/login");
@@ -113,7 +115,9 @@ export default function Login() {
               infoName={"confirmPassword"}
             />
           </div>
-          <Button isSubmit={isSubmit} value="Sign Up" />
+          <Button isSubmit={isSubmit}>
+            <p>Sign Up</p>
+          </Button>
         </div>
         <Link
           to="/login"

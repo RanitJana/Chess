@@ -14,16 +14,20 @@ export function useSocketContext() {
 export default function SocketContext({ children }) {
   //all games info array
   const [games, setGames] = useState([]);
+  const [totalOnline, setTotalOnline] = useState(0);
 
   useEffect(() => {
-    socket.on("connect", () => {
-      socket.emit("hi", "kire");
+
+    socket.on("total-online", (data) => {
+      setTotalOnline(data);
     });
 
     return () => {
-      socket.off("connect");
+      // Clean up the event listener when the component unmounts
+      socket.off("total-online");
     };
+    
   }, []);
 
-  return <socketContext.Provider value={{}}>{children}</socketContext.Provider>;
+  return <socketContext.Provider value={{ totalOnline }}>{children}</socketContext.Provider>;
 }

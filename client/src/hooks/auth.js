@@ -6,9 +6,9 @@ async function auth(url, body) {
       withCredentials: true,
     });
 
-    return response?.data;
+    return response;
   } catch (error) {
-    return error?.response?.data;
+    return error?.response;
   }
 }
 

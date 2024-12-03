@@ -1,8 +1,19 @@
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
-import router from "./context/Routing.jsx";
-import { RouterProvider } from "react-router-dom";
+
+import AuthContext from "./context/AuthContext.jsx";
+import SocketContext from "./context/SocketContext.jsx";
+import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+  <>
+    <BrowserRouter >
+      <AuthContext>
+        <SocketContext>
+          <App />
+        </SocketContext>
+      </AuthContext>
+    </BrowserRouter>
+  </>
 );

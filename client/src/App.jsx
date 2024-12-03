@@ -1,17 +1,28 @@
-import SocketContext from "./context/SocketContext.jsx";
-import AuthContext from "./context/AuthContext.jsx";
-import { Outlet } from "react-router";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
+import Home from "./pages/Home.jsx";
+import Game from "./pages/Game.jsx";
+import Login from "./pages/Login.jsx";
+import SignUp from "./pages/SignUp.jsx";
+import { useAuthContext } from "./context/AuthContext.jsx";
+
 export default function App() {
+
+  const { isAuth } = useAuthContext();
+
   return (
     <div className="bg-[hsl(40,7%,18%)] min-h-[100dvh]">
+      <Routes>
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+
+        <Route path="/" element={isAuth ? <Home /> : <Navigate to={'/login'} />} />
+        <Route path="/game/:gameId" element={isAuth ? <Game /> : <Navigate to={'/login'} />} />
+        <Route path="*" element={<Navigate to={'/login'} />} />
+      </Routes>
       <Toaster />
-      <AuthContext>
-        <SocketContext>
-          <Outlet />
-        </SocketContext>
-      </AuthContext>
     </div>
   );
 }

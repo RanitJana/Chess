@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { useContext, createContext } from "react";
+import { useContext, createContext, useState } from "react";
 
 const authContext = createContext();
 
@@ -9,5 +9,8 @@ export function useAuthContext() {
 }
 
 export default function AuthContext({ children }) {
-  return <authContext.Provider value={{}}>{children}</authContext.Provider>;
+
+  const [isAuth, setAuth] = useState(JSON.parse(localStorage.getItem("user")) || false);
+
+  return <authContext.Provider value={{ isAuth, setAuth }}>{children}</authContext.Provider>;
 }

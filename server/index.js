@@ -19,12 +19,21 @@ connectDB()
       },
     });
 
+    let totalOnline = 0;
+
     io.on("connection", (socket) => {
-      console.log("a user connected", socket.id);
-      socket.on("hi", (value) => {
-        console.log(value);
+      // Increment total online when a user connects
+      totalOnline++;
+      io.emit("total-online", totalOnline); // Broadcast the updated total
+
+      // Decrement total online when a user disconnects
+      socket.on("disconnect", () => {
+        totalOnline--;
+        io.emit("total-online", totalOnline); // Broadcast the updated total
+        
       });
     });
+
 
     server.listen(port, () => {
       console.log(`Server started at port : ${port}\nhttp://localhost:${port}`);
