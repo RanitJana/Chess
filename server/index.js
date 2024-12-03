@@ -31,5 +31,5 @@ connectDB()
     });
   })
   .catch((error) => {
-    console.log("DB connection faileds");
+    console.log("DB connection failed");
   });

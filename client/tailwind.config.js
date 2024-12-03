@@ -8,7 +8,12 @@ export default {
     extend: {
       colors: {
         light: "rgb(234,237,208)",
-        dark: "rgb(115,149,82)"
+        dark: "rgb(115,149,82)",
+        blackDarkest: "rgb(33,31,28)",
+        blackDark: "rgb(38,37,32)",
+        blackLight: "rgb(48,46,43)",
+        buttonLight: "rgb(128,182,77)",
+        buttonDark: "rgb(69,116,61)"
       },
 
     },

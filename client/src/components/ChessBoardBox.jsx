@@ -236,7 +236,6 @@ function ChessBoardBox({
   };
 
   const handleDragStart = (e) => {
-
     const { width, height } = e.target.getBoundingClientRect();
 
     // Create a new image element for the drag image
@@ -245,10 +244,10 @@ function ChessBoardBox({
 
     newImg.style.width = `${width}px`;
     newImg.style.height = `${height}px`;
-    newImg.style.pointerEvents = 'none'; // Ensure it doesn’t interfere with drag
-    newImg.style.position = 'absolute';  // Avoid layout interference
-    newImg.style.top = '-100px';
-    newImg.style.opacity = '1';          // Make sure it's fully visible
+    newImg.style.pointerEvents = "none"; // Ensure it doesn’t interfere with drag
+    newImg.style.position = "absolute"; // Avoid layout interference
+    newImg.style.top = "-100px";
+    newImg.style.opacity = "1"; // Make sure it's fully visible
 
     // Append the image to the document body temporarily
     document.body.appendChild(newImg);
@@ -262,8 +261,7 @@ function ChessBoardBox({
 
     setTimeout(() => {
       document.body.removeChild(newImg);
-    }, 100)
-
+    }, 100);
   };
 
   return (
@@ -285,9 +283,9 @@ function ChessBoardBox({
         style={{
           ...(moveInfo
             ? {
-              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-              transition: "transform 0.1s linear",
-            }
+                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+                transition: "transform 0.1s linear",
+              }
             : {}),
           opacity: isDragging ? "0" : "1",
         }}
