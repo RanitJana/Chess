@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameMove, gameSingle } from "../api/game.js";
 import { useParams } from "react-router";
+import { socket } from "../socket.js";
 
 function convertTo2DArray(chessString) {
   const rows = [];
@@ -54,6 +55,7 @@ export default function ChessBoard() {
           else if (color == "black" && game.userMove == 1) setUserMove(true);
           else setUserMove(false);
         }
+        socket.emit("join-game", gameId);
       } catch (error) {
         console.error("Error fetching game info:", error);
       }
@@ -91,10 +93,25 @@ export default function ChessBoard() {
           setUserMove(true);
         else setUserMove(false);
       }
+
+      socket.emit("move-done", boardString);
     } catch (error) {
       console.error("Error updating moves:", error);
     }
   }
+
+  useEffect(() => {
+    socket.on("opponent-move", (val) => {
+      if (playerColor == "black") val = val.split("").reverse().join("");
+
+      setChessboard(convertTo2DArray(val));
+      setUserMove(true);
+    });
+
+    return () => {
+      socket.off("opponent-move"); // Clean up on unmount
+    };
+  }, []);
 
   // Append new move when movingPiece changes
   useEffect(() => {

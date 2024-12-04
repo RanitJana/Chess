@@ -10,17 +10,30 @@ const realTimeInit = function (server) {
   let totalOnline = 0;
 
   io.on("connection", (socket) => {
+    let roomId; // To track which room this socket belongs to
+
     // Increment total online when a user connects
     totalOnline++;
     io.emit("total-online", totalOnline); // Broadcast the updated total
 
-    // Decrement total online when a user disconnects
+    // Handle room joining
+    socket.on("join-game", (gameId) => {
+      roomId = gameId; // Assign the room ID
+      socket.join(gameId); // Join the specific game room
+      console.log(`Socket ${socket.id} joined room ${gameId}`);
+    });
+
+    // Handle moves
+    socket.on("move-done", (clearedBoard) => {
+      // Send the cleared board to everyone else in the room (opponent)
+      socket.to(roomId).emit("opponent-move", clearedBoard);
+    });
+
+    // Handle disconnection
     socket.on("disconnect", () => {
       totalOnline--;
       io.emit("total-online", totalOnline); // Broadcast the updated total
     });
-
-    // socket.on("game-init")
   });
 };
 
