@@ -29,6 +29,10 @@ const gameSchema = new Schema(
       type: Number,
       default: 0,
     },
+    userMove: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

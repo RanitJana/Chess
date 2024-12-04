@@ -3,8 +3,8 @@ import app from "./app.js";
 import { _env } from "./constants.js";
 
 import { createServer } from "http";
-import { Server } from "socket.io";
 import connectDB from "./db/index.js";
+import realTimeInit from "./socket.js";
 
 connectDB()
   .then(() => {
@@ -13,27 +13,8 @@ connectDB()
     const port = _env.PORT | 3000;
 
     const server = createServer(app);
-    const io = new Server(server, {
-      cors: {
-        origin: "http://localhost:5173",
-      },
-    });
 
-    let totalOnline = 0;
-
-    io.on("connection", (socket) => {
-      // Increment total online when a user connects
-      totalOnline++;
-      io.emit("total-online", totalOnline); // Broadcast the updated total
-
-      // Decrement total online when a user disconnects
-      socket.on("disconnect", () => {
-        totalOnline--;
-        io.emit("total-online", totalOnline); // Broadcast the updated total
-        
-      });
-    });
-
+    realTimeInit(server);
 
     server.listen(port, () => {
       console.log(`Server started at port : ${port}\nhttp://localhost:${port}`);

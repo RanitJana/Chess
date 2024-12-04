@@ -1,14 +1,13 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import auth from "../hooks/auth.js";
+import { login } from "../api/auth.js";
 import toast from "react-hot-toast";
 import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 
 export default function Login() {
-
   const [info, setInfo] = useState({
     email: "",
     password: "",
@@ -31,10 +30,10 @@ export default function Login() {
     try {
       setSubmit(true);
 
-      const response = await auth(
-        "http://localhost:7096/api/v1/login",
-        { email: info.email, password: info.password }
-      );
+      const response = await login({
+        email: info.email,
+        password: info.password,
+      });
       const { success, message } = response?.data;
 
       if (success) {

@@ -9,8 +9,13 @@ export function useAuthContext() {
 }
 
 export default function AuthContext({ children }) {
+  const [isAuth, setAuth] = useState(
+    JSON.parse(localStorage.getItem("user")) || false
+  );
 
-  const [isAuth, setAuth] = useState(JSON.parse(localStorage.getItem("user")) || false);
-
-  return <authContext.Provider value={{ isAuth, setAuth }}>{children}</authContext.Provider>;
+  return (
+    <authContext.Provider value={{ isAuth, setAuth }}>
+      {children}
+    </authContext.Provider>
+  );
 }

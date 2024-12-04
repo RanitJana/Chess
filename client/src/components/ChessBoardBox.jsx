@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
@@ -22,6 +22,9 @@ function ChessBoardBox({
   setMovePossible,
   movingPiece,
   setMovingPiece,
+  isUserMove,
+  setUserMove,
+  updateMoves,
 }) {
   //set the image of pieces
   const [imgPath, setImgPath] = useState("");
@@ -174,6 +177,8 @@ function ChessBoardBox({
       }
 
       setMovingPiece(null);
+      setUserMove(false);
+      updateMoves(clearedBoard);
     }, 100);
   }
 
@@ -203,7 +208,7 @@ function ChessBoardBox({
   //handle piece related operation
   const handlePieceMove = () => {
     //if pawn needs promotion
-    if (movePossible == false) return;
+    if (movePossible == false || !isUserMove) return;
 
     //if the clicked cell is a possible movement of a piece which must present in the currPiece state then user is trying to move the piece to that location
     //otherwise if the cell is occupied by user's piece then user is trying to get info about possible movements of that piece
@@ -214,6 +219,7 @@ function ChessBoardBox({
 
   //function to handle pawn promotion
   const handlePawnPromotion = (e, idx) => {
+    if (!isUserMove) return;
     //create a new chess board to change reference which is needed for useState
     let newChessBoard = chessboard.map((row) => [...row]);
 

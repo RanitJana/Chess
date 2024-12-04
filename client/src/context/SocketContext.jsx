@@ -17,7 +17,6 @@ export default function SocketContext({ children }) {
   const [totalOnline, setTotalOnline] = useState(0);
 
   useEffect(() => {
-
     socket.on("total-online", (data) => {
       setTotalOnline(data);
     });
@@ -26,8 +25,11 @@ export default function SocketContext({ children }) {
       // Clean up the event listener when the component unmounts
       socket.off("total-online");
     };
-    
   }, []);
 
-  return <socketContext.Provider value={{ totalOnline }}>{children}</socketContext.Provider>;
+  return (
+    <socketContext.Provider value={{ totalOnline }}>
+      {children}
+    </socketContext.Provider>
+  );
 }

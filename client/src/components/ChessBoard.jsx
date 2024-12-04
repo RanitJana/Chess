@@ -2,101 +2,118 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
-import roateBoard from "../utils/RotateBoard.js";
+import { gameMove, gameSingle } from "../api/game.js";
+import { useParams } from "react-router";
+
+function convertTo2DArray(chessString) {
+  const rows = [];
+  const rowLength = 8; // Each row has 8 characters
+
+  for (let i = 0; i < chessString.length; i += rowLength) {
+    const row = chessString.slice(i, i + rowLength).split("");
+    rows.push(row);
+  }
+
+  return rows;
+}
 
 export default function ChessBoard() {
-  const colors = {
+  const { gameId } = useParams();
+
+  const colors = Object.freeze({
     white: "white",
     black: "black",
-  };
-  //make sure to freeze the color of the user to prevent undesired change
-  Object.freeze(colors);
+  });
 
-  //initially the board
-  let initialBoard = [
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", "p", "p", "p", "p", "p", "p", "p"],
-    [" ", " ", " ", " ", " ", " ", " ", " "],
-    [" ", " ", " ", " ", " ", " ", " ", " "],
-    [" ", " ", " ", " ", " ", " ", " ", " "],
-    [" ", " ", " ", " ", " ", " ", " ", " "],
-    ["P", "P", "P", "P", "P", "P", "P", "P"],
-    ["R", "N", "B", "Q", "K", "B", "N", "R"],
-  ];
-
-  //hook to store current chessboard state
-  const [chessboard, setChessboard] = useState(initialBoard);
-
-  //backend will decide which color user will play
-  //for now,assume user is white
-  const [playerColor, setPlayerColor] = useState(colors.white);
-
-  //set the color once
-  const [colorChangeCount, setColorChangeCount] = useState(1);
-
-  //make false and make unable other move when pawn needs promotion which is pending
+  const [chessboard, setChessboard] = useState(null);
+  const [playerColor, setPlayerColor] = useState(colors.black);
+  const [allMoves, setAllMoves] = useState([]);
+  const [movingPiece, setMovingPiece] = useState(null);
   const [movePossible, setMovePossible] = useState(true);
-
-  useEffect(() => {
-    //if the user is black then rotate the board for the user
-    if (playerColor === colors.black && colorChangeCount) {
-      const rotatedBoard = roateBoard([...chessboard]);
-      setChessboard(rotatedBoard); // Update state to trigger re-render
-      setColorChangeCount(0);
-    } else setColorChangeCount(0);
-  }, []);
-
-  //keep info of which piece is selected currently and its possible moves;
+  const [isUserMove, setUserMove] = useState(false);
   const [currPiece, setCurrPiece] = useState({
     row: null,
     col: null,
     moves: null,
   });
 
-  // To store moving piece animation of the user and also for the opponent which will be got using backend
-  const [movingPiece, setMovingPiece] = useState(null);
-  /*
-  e.g.:
-   setMovingPiece({
-      from: { row: currPiece.row, col: currPiece.col },
-      to: { row, col },
-    });
-  */
-
-  //contain all moves including opponents
-  const [allMoves, setAllmoves] = useState([]);
-
-  //a hook that will invoke a function to store the data of moves
+  // Fetch initial game state
   useEffect(() => {
-    const appendMoveInfo = () => {
-      //for safety, if no moving piece is found then return
-      if (!movingPiece) return;
+    async function fetchGameInfo() {
+      try {
+        const response = await gameSingle(gameId);
 
-      //create an array to hold the data and set the details
-      let newMoveArray = [...allMoves, movingPiece];
-      setAllmoves(() => newMoveArray);
-    };
+        if (response?.data.info) {
+          let { color, game, board } = response.data.info;
+          board = convertTo2DArray(board);
+          let moves = game.moves.map((val) => JSON.parse(val));
+          setPlayerColor(color);
+          setChessboard(board);
+          setAllMoves(moves);
+          if (color == "white" && game.userMove == 0) setUserMove(true);
+          else if (color == "black" && game.userMove == 1) setUserMove(true);
+          else setUserMove(false);
+        }
+      } catch (error) {
+        console.error("Error fetching game info:", error);
+      }
+    }
 
-    appendMoveInfo();
+    fetchGameInfo();
+  }, [gameId]);
+
+  // Handle move updates
+
+  async function updateMoves(clearedBoard) {
+    let boardString = clearedBoard
+      .map((row) => row.join("")) // Use join to avoid commas
+      .join("");
+
+    if (playerColor == "black")
+      boardString = boardString.split("").reverse().join("");
+
+    try {
+      const response = await gameMove({
+        moves: allMoves,
+        gameId,
+        board: boardString,
+      });
+      if (response.data.board) {
+        setChessboard(convertTo2DArray(response.data.board));
+      }
+      if (response) {
+        if (playerColor == "white" && response.data.info.game.userMove == 0)
+          setUserMove(true);
+        else if (
+          playerColor == "black" &&
+          response.data.info.game.userMove == 1
+        )
+          setUserMove(true);
+        else setUserMove(false);
+      }
+    } catch (error) {
+      console.error("Error updating moves:", error);
+    }
+  }
+
+  // Append new move when movingPiece changes
+  useEffect(() => {
+    if (!movingPiece) return;
+
+    setAllMoves((prevMoves) => [...prevMoves, movingPiece]);
   }, [movingPiece]);
 
   return (
-    <div
-      className="relative w-[100dvw] shadow-inner max-w-[35rem]"
-      // style={{ background: "url('/images/200.png') center / cover no-repeat" }}
-    >
-      {chessboard.map((row, rowIdx) => {
-        return (
-          <div
-            className="grid grid-cols-8 w-full"
-            key={rowIdx}
-            // style={{ backgroundImage: "url('/images/wood.jpg')" }}
-          >
+    <div className="relative w-[100dvw] shadow-inner max-w-[35rem]">
+      {chessboard ? (
+        chessboard.map((row, rowIdx) => (
+          <div className="grid grid-cols-8 w-full" key={rowIdx}>
             {row.map((piece, pieceIdx) => {
-              let color =
-                (pieceIdx + rowIdx) & 1
-                  ? "rgb(115,149,82)"
-                  : "rgb(234,237,208)";
+              const color =
+                (pieceIdx + rowIdx) % 2 === 0
+                  ? "rgb(234,237,208)"
+                  : "rgb(115,149,82)";
+
               return (
                 <ChessBoardBox
                   key={pieceIdx}
@@ -114,12 +131,17 @@ export default function ChessBoard() {
                   col={pieceIdx}
                   color={color}
                   piece={piece}
+                  isUserMove={isUserMove}
+                  setUserMove={setUserMove}
+                  updateMoves={updateMoves}
                 />
               );
             })}
           </div>
-        );
-      })}
+        ))
+      ) : (
+        <div>Loading...</div>
+      )}
     </div>
   );
 }

@@ -78,4 +78,11 @@ const logout = AsyncHandler(async (req, res, _) => {
   });
 });
 
-export { login, signup, logout };
+const verify = AsyncHandler(async (req, res, _) => {
+  return res.status(200).json({
+    success: true,
+    message: "Verified",
+  });
+});
+
+export { login, signup, logout, verify };

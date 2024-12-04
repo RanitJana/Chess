@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import auth from "../hooks/auth.js";
+import { signup } from "../api/auth.js";
 import toast from "react-hot-toast";
 import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
@@ -30,15 +30,12 @@ export default function Login() {
     try {
       setSubmit(true);
 
-      const response = await auth(
-        "http://localhost:7096/api/v1/signup",
-        {
-          name: info.name,
-          email: info.email,
-          password: info.password,
-          confirmPassword: info.confirmPassword,
-        }
-      );
+      const response = await signup({
+        name: info.name,
+        email: info.email,
+        password: info.password,
+        confirmPassword: info.confirmPassword,
+      });
       const { success, message } = response?.data;
       if (success) {
         toast.success(message);

@@ -18,7 +18,7 @@ const verifyPlayer = AsyncHandler(async (req, res, next) => {
       _env.ACCESS_TOKEN_SEC
     );
 
-    const _id = decodedAccessToken._id;
+    let _id = decodedAccessToken._id;
 
     if (!_id)
       return res.status(401).json({
@@ -35,6 +35,7 @@ const verifyPlayer = AsyncHandler(async (req, res, next) => {
       });
 
     req.player = player;
+    req._id = _id;
 
     return next();
   } catch (error) {

@@ -28,9 +28,13 @@ app.get("/", (req, res) => {
 import login from "./routes/login.route.js";
 import signup from "./routes/signup.route.js";
 import logout from "./routes/logout.route.js";
+import game from "./routes/Game.route.js";
+import verify from "./routes/verify.route.js";
 
 app.use("/api/v1/login", login);
 app.use("/api/v1/signup", signup);
 app.use("/api/v1/logout", logout);
+app.use("/api/v1/game", game);
+app.use("/api/v1/verify", verify);
 
 export default app;
