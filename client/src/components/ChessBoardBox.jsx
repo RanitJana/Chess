@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
@@ -26,154 +26,87 @@ function ChessBoardBox({
   setUserMove,
   updateMoves,
 }) {
-  //set the image of pieces
   const [imgPath, setImgPath] = useState("");
-
-  //promotion pawn's possible pieces
   const [pawnUpdatePieces, setPawnUpdatePieces] = useState([
     "queen-w",
     "rook-w",
     "bishop-w",
     "knight-w",
   ]);
-
-  //active transition
   const [moveInfo, setMoveInfo] = useState(null);
-
-  //is dragging
   const [isDragging, setDragging] = useState(false);
 
   useEffect(() => {
-    //assign image path and must use default to set the path to empty to remove previous path
     const assignValue = () => {
-      switch (piece) {
-        //black pices
-        case "r":
-          setImgPath("/images/rook-b.png");
-          break;
-        case "p":
-          setImgPath("/images/pawn-b.png");
-          break;
-        case "n":
-          setImgPath("/images/knight-b.png");
-          break;
-        case "b":
-          setImgPath("/images/bishop-b.png");
-          break;
-        case "q":
-          setImgPath("/images/queen-b.png");
-          break;
-        case "k":
-          setImgPath("/images/nrking-b.png");
-          break;
-
-        //white pices
-        case "R":
-          setImgPath("/images/rook-w.png");
-          break;
-        case "P":
-          setImgPath("/images/pawn-w.png");
-          break;
-        case "N":
-          setImgPath("/images/knight-w.png");
-          break;
-        case "B":
-          setImgPath("/images/bishop-w.png");
-          break;
-        case "Q":
-          setImgPath("/images/queen-w.png");
-          break;
-        case "K":
-          setImgPath("/images/nrking-w.png");
-          break;
-
-        //default
-        default:
-          setImgPath("");
-      }
-
-      //Change the image name for black as white color was default
-      if (playerColor == "black") {
+      const pieceMapping = {
+        r: "/images/rook-b.png",
+        p: "/images/pawn-b.png",
+        n: "/images/knight-b.png",
+        b: "/images/bishop-b.png",
+        q: "/images/queen-b.png",
+        k: "/images/nrking-b.png",
+        R: "/images/rook-w.png",
+        P: "/images/pawn-w.png",
+        N: "/images/knight-w.png",
+        B: "/images/bishop-w.png",
+        Q: "/images/queen-w.png",
+        K: "/images/nrking-w.png",
+      };
+      setImgPath(pieceMapping[piece] || "");
+      if (playerColor === "black") {
         setPawnUpdatePieces((prev) =>
           prev.map((val) => val.replace("-w", "-b"))
         );
       }
     };
-
     assignValue();
-  }, [piece, chessboard, currPiece, playerColor]);
+  }, [piece, playerColor]);
 
-  //a hook that will invoke a function to calculate moving position of a piece
   useEffect(() => {
-    function movePiece() {
-      //if any piece is not moving or not the desired cell where the animation will occur, then return
-      if (
-        !movingPiece ||
-        movingPiece.from.row != row ||
-        movingPiece.from.col != col
-      )
-        return;
+    if (
+      !movingPiece ||
+      movingPiece.from.row !== row ||
+      movingPiece.from.col !== col
+    )
+      return;
+    const x = (movingPiece.to.col - movingPiece.from.col) * 100;
+    const y = (movingPiece.to.row - movingPiece.from.row) * 100;
+    setMoveInfo({ x, y });
 
-      //get the delta x and delta y
-      let x = (movingPiece.to.col - movingPiece.from.col) * 100;
-      let y = (movingPiece.to.row - movingPiece.from.row) * 100;
+    setTimeout(() => setMoveInfo(null), 300);
+  }, [movingPiece, row, col]);
 
-      //set the value
-      setMoveInfo({ x, y });
-
-      //reset the value after a dealy to give user a better animation
-      setTimeout(() => {
-        setMoveInfo(null);
-      }, 300);
-    }
-
-    movePiece();
-  }, [movingPiece]);
-
-  //a function to handle the piece movement and update chessboard
-  function handlePlacePiece() {
-    // if (!currPiece.row || !currPiece.col) return;
+  const handlePlacePiece = useCallback(() => {
     setMovingPiece({
       from: { row: currPiece.row, col: currPiece.col },
       to: { row, col },
     });
 
-    //decide sound type
     const color = getColor(chessboard, row, col);
-    let sound = "move";
-    if (color && color != playerColor) sound = "capture";
+    const sound = color && color !== playerColor ? "capture" : "move";
 
-    //clear the showed possible places from the ui
     const clearedBoard = clearPieceMove(chessboard);
-
-    //move the piece
     clearedBoard[currPiece.row][currPiece.col] = " ";
 
-    //delay a little to show animation
     setTimeout(() => {
       clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
-
-      //check if pawn promotion
       if (
-        row == 0 &&
-        (clearedBoard[row][col] == "p" || clearedBoard[row][col] == "P")
+        row === 0 &&
+        (clearedBoard[row][col] === "p" || clearedBoard[row][col] === "P")
       ) {
         setMovePossible(false);
       }
 
-      //set the current choosed piece's info as nothing
       setCurrPiece({ row: null, col: null, moves: null });
-
-      //render the new chessboard
       setChessboard(clearedBoard);
 
-      //play audio
       switch (sound) {
         case "move":
           moveSound();
           break;
         case "capture":
           captureSound();
+          break;
       }
 
       setMovingPiece(null);
@@ -183,94 +116,79 @@ function ChessBoardBox({
         to: { row, col },
       });
     }, 100);
-  }
+  }, [
+    currPiece,
+    chessboard,
+    row,
+    col,
+    playerColor,
+    setMovePossible,
+    setChessboard,
+    setCurrPiece,
+    setMovingPiece,
+    updateMoves,
+  ]);
 
-  //a function to get info about a piece's possible movement paths
-  function handleDisplayPossibleMoves() {
-    //get the color of the clicked place's piece
-    //if the place is empty cell then it'll return null
+  const handleDisplayPossibleMoves = useCallback(() => {
     const color = getColor(chessboard, row, col);
+    if (color && playerColor !== color) return;
 
-    //if it is null then clicked cell is empty
-    //or clicked cell's piece is opponent's color then return
-    if (color && playerColor != color) return;
-
-    //clear the board to remove the previous shoewd possible moves
     const clearedBoard = clearPieceMove(chessboard);
-
-    //get the possible moves
     const moves = pieceMove(clearedBoard, row, col, true);
+    if (moves.length === 0) return;
 
-    //if no move is possible then nothing to desplay in ui
-    if (moves.length == 0) return;
+    setCurrPiece({ row, col, moves });
+  }, [chessboard, row, col, playerColor, piece]);
 
-    //set the current piece with possible moves
-    setCurrPiece(() => ({ row, col, moves }));
-  }
-
-  //handle piece related operation
-  const handlePieceMove = () => {
-    //if pawn needs promotion
-    if (movePossible == false || !isUserMove) return;
-
-    //if the clicked cell is a possible movement of a piece which must present in the currPiece state then user is trying to move the piece to that location
-    //otherwise if the cell is occupied by user's piece then user is trying to get info about possible movements of that piece
-    if (currPiece.moves?.some(([row1, col1]) => row == row1 && col == col1))
+  const handlePieceMove = useCallback(() => {
+    if (movePossible === false || !isUserMove) return;
+    if (currPiece.moves?.some(([r, c]) => r === row && c === col)) {
       return handlePlacePiece();
-    else return handleDisplayPossibleMoves();
-  };
+    } else {
+      return handleDisplayPossibleMoves();
+    }
+  }, [
+    currPiece,
+    row,
+    col,
+    movePossible,
+    isUserMove,
+    handlePlacePiece,
+    handleDisplayPossibleMoves,
+  ]);
 
-  //function to handle pawn promotion
   const handlePawnPromotion = (e, idx) => {
     if (!isUserMove) return;
-    //create a new chess board to change reference which is needed for useState
-    let newChessBoard = chessboard.map((row) => [...row]);
+    const newChessBoard = chessboard.map((row) => [...row]);
 
-    //based on the value change the pawn to its promotion
-    if (idx == 0) {
-      newChessBoard[row][col] = playerColor == "white" ? "Q" : "q";
-    } else if (idx == 1) {
-      newChessBoard[row][col] = playerColor == "white" ? "R" : "r";
-    } else if (idx == 2) {
-      newChessBoard[row][col] = playerColor == "white" ? "B" : "b";
-    } else {
-      newChessBoard[row][col] = playerColor == "white" ? "N" : "n";
-    }
+    const promotionPieces = ["Q", "R", "B", "N"];
+    const piece = promotionPieces[idx];
+    newChessBoard[row][col] =
+      playerColor === "white" ? piece : piece.toLowerCase();
 
-    //set the new chessboard
     setChessboard(newChessBoard);
-
-    //give permission to move other pieces
     setMovePossible(true);
   };
 
   const handleDragStart = (e) => {
     const { width, height } = e.target.getBoundingClientRect();
 
-    // Create a new image element for the drag image
     let newImg = document.createElement("img");
     newImg.src = imgPath;
-
     newImg.style.width = `${width}px`;
     newImg.style.height = `${height}px`;
-    newImg.style.pointerEvents = "none"; // Ensure it doesn’t interfere with drag
-    newImg.style.position = "absolute"; // Avoid layout interference
+    newImg.style.pointerEvents = "none";
+    newImg.style.position = "absolute";
     newImg.style.top = "-100px";
-    newImg.style.opacity = "1"; // Make sure it's fully visible
+    newImg.style.opacity = "1";
 
-    // Append the image to the document body temporarily
     document.body.appendChild(newImg);
-
-    // Set the drag image to the newly created image
     e.dataTransfer.setDragImage(newImg, width / 2, height / 2);
 
-    // Set dragging state
-    setDragging(() => true);
+    setDragging(true);
     handleDisplayPossibleMoves();
 
-    setTimeout(() => {
-      document.body.removeChild(newImg);
-    }, 100);
+    setTimeout(() => document.body.removeChild(newImg), 100);
   };
 
   return (
@@ -278,11 +196,9 @@ function ChessBoardBox({
       style={{ backgroundColor: color }}
       className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
       onClick={handlePieceMove}
-      //below is necessarry to allow drop
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
     >
-      {/* piece images */}
       <img
         src={imgPath}
         alt=""
@@ -292,15 +208,14 @@ function ChessBoardBox({
         style={{
           ...(moveInfo
             ? {
-              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-              transition: "transform 0.1s linear",
-            }
+                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+                transition: "transform 0.1s linear",
+              }
             : {}),
           opacity: isDragging ? "0" : "1",
         }}
       />
 
-      {/* numbering with pawn promotion */}
       <ChessBoardBoxNumbering
         allMoves={allMoves}
         row={row}
@@ -311,25 +226,22 @@ function ChessBoardBox({
         chessboard={chessboard}
       />
 
-      {/* pawn promotion logic */}
-      {row == 0 &&
-        (chessboard[row][col] == "p" || chessboard[row][col] == "P") && (
+      {row === 0 &&
+        (chessboard[row][col] === "p" || chessboard[row][col] === "P") && (
           <ul className="absolute w-full left-0 top-0 z-20 box shadow-lg shadow-black">
-            {pawnUpdatePieces.map((val, idx) => {
-              return (
-                <li
-                  onClick={(e) => handlePawnPromotion(e, idx)}
-                  key={idx}
-                  style={{
-                    backgroundColor:
-                      idx & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)",
-                  }}
-                  className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
-                >
-                  <img src={"/images/" + val + ".png"} alt="" />
-                </li>
-              );
-            })}
+            {pawnUpdatePieces.map((val, idx) => (
+              <li
+                onClick={(e) => handlePawnPromotion(e, idx)}
+                key={idx}
+                style={{
+                  backgroundColor:
+                    idx & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)",
+                }}
+                className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
+              >
+                <img src={`/images/${val}.png`} alt="" />
+              </li>
+            ))}
           </ul>
         )}
     </span>

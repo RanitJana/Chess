@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameMove, gameSingle } from "../api/game.js";
@@ -65,7 +63,6 @@ export default function ChessBoard() {
   }, [gameId]);
 
   // Handle move updates
-
   async function updateMoves(clearedBoard, info) {
     let boardString = clearedBoard
       .map((row) => row.join("")) // Use join to avoid commas
@@ -80,9 +77,11 @@ export default function ChessBoard() {
         gameId,
         board: boardString,
       });
-      if (response.data.board) {
+
+      if (response?.data.board) {
         setChessboard(convertTo2DArray(response.data.board));
       }
+
       if (response) {
         if (playerColor == "white" && response.data.info.game.userMove == 0)
           setUserMove(true);
@@ -93,6 +92,7 @@ export default function ChessBoard() {
           setUserMove(true);
         else setUserMove(false);
       }
+      setAllMoves((prevMoves) => [...prevMoves, info]);
 
       socket.emit("move-done", [boardString, info]);
     } catch (error) {
@@ -102,24 +102,32 @@ export default function ChessBoard() {
 
   useEffect(() => {
     socket.on("opponent-move", (val) => {
-
       let updatedBoard = val[0];
       let move = val[1];
+
       if (playerColor === "black") {
         updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
       }
 
-      setChessboard(convertTo2DArray(updatedBoard));
       setUserMove(true);
 
-      setMovingPiece({ from: { row: 7 - move.from.row, col: 7 - move.from.col }, to: { row: 7 - move.to.row, col: 7 - move.to.col } });
+      const opponentMove = {
+        from: { row: 7 - move.from.row, col: 7 - move.from.col },
+        to: { row: 7 - move.to.row, col: 7 - move.to.col },
+      };
 
-      //delay a little to show animation
+      setChessboard(convertTo2DArray(updatedBoard));
+      // Update the allMoves array directly
+
+      // Update the moving piece for animations
+      setMovingPiece(opponentMove);
+
+      setAllMoves((prevMoves) => [...prevMoves, move]);
+      // Delay to show animation
       setTimeout(() => {
         setCurrPiece({ row: null, col: null, moves: null });
         setMovingPiece(null);
       }, 100);
-
     });
 
     return () => {
@@ -127,13 +135,11 @@ export default function ChessBoard() {
     };
   }, [playerColor]);
 
-
   // Append new move when movingPiece changes
-  useEffect(() => {
-    if (!movingPiece) return;
+  // useEffect(() => {
+  //   if (!movingPiece) return;
 
-    setAllMoves((prevMoves) => [...prevMoves, movingPiece]);
-  }, [movingPiece]);
+  // }, [movingPiece]);
 
   return (
     <div className="relative w-[100dvw] shadow-inner max-w-[35rem]">

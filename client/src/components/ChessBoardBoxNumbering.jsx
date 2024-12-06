@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
 
+import { useCallback } from "react";
+
 function ChessBoardBoxNumbering({
   allMoves = [],
   row,
@@ -9,14 +11,40 @@ function ChessBoardBoxNumbering({
   playerColor,
   chessboard,
 }) {
+  const isValidPositionToColor = useCallback(() => {
+    if (!allMoves.length) return false;
+
+    const lastMove = allMoves.slice(-1)[0]; // Get the most recent move
+    const { from, to } = lastMove;
+
+    let givenRow1 = from.row,
+      givenCol1 = from.col;
+    let givenRow2 = to.row,
+      givenCol2 = to.col;
+
+    // If the move count is odd and the player is white, reverse the coordinates
+    if (
+      (allMoves.length % 2 == 0 && playerColor === "white") ||
+      (allMoves.length % 2 != 0 && playerColor === "black")
+    ) {
+      givenRow1 = 7 - givenRow1;
+      givenCol1 = 7 - givenCol1;
+      givenRow2 = 7 - givenRow2;
+      givenCol2 = 7 - givenCol2;
+    }
+
+    // Check if the current position matches the from or to positions
+    return (
+      (givenRow1 === row && givenCol1 === col) ||
+      (givenRow2 === row && givenCol2 === col)
+    );
+  }, [allMoves, col, playerColor, row]);
+
   return (
     <>
       {/* recent piece move mark */}
       {allMoves.length ? (
-        (allMoves.slice(-1)[0].from.row == row &&
-          allMoves.slice(-1)[0].from.col == col) ||
-        (allMoves.slice(-1)[0].to.row == row &&
-          allMoves.slice(-1)[0].to.col == col) ? (
+        isValidPositionToColor() ? (
           <div className="absolute h-full w-full bg-[#f2ff007e]"></div>
         ) : (
           ""

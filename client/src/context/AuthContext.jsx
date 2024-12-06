@@ -8,9 +8,16 @@ export function useAuthContext() {
   return useContext(authContext);
 }
 
+const getCookie = (name) => {
+  const cookies = document.cookie.split("; ");
+  const cookie = cookies.find((cookie) => cookie.startsWith(`${name}=`));
+  return cookie ? cookie.split("=")[1] : null;
+};
+
 export default function AuthContext({ children }) {
   const [isAuth, setAuth] = useState(
-    JSON.parse(localStorage.getItem("user")) || false
+    (JSON.parse(localStorage.getItem("user")) && getCookie("accessToken")) ||
+      false
   );
 
   return (
