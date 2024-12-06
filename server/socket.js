@@ -20,11 +20,12 @@ const realTimeInit = function (server) {
     socket.on("join-game", (gameId) => {
       roomId = gameId; // Assign the room ID
       socket.join(gameId); // Join the specific game room
-      console.log(`Socket ${socket.id} joined room ${gameId}`);
     });
 
     // Handle moves
     socket.on("move-done", (clearedBoard) => {
+      // [board,movePieceInfo]
+      //console.log(clearedBoard);
       // Send the cleared board to everyone else in the room (opponent)
       socket.to(roomId).emit("opponent-move", clearedBoard);
     });

@@ -66,7 +66,7 @@ export default function ChessBoard() {
 
   // Handle move updates
 
-  async function updateMoves(clearedBoard) {
+  async function updateMoves(clearedBoard, info) {
     let boardString = clearedBoard
       .map((row) => row.join("")) // Use join to avoid commas
       .join("");
@@ -76,7 +76,7 @@ export default function ChessBoard() {
 
     try {
       const response = await gameMove({
-        moves: allMoves,
+        moves: [...allMoves, info],
         gameId,
         board: boardString,
       });
@@ -94,7 +94,7 @@ export default function ChessBoard() {
         else setUserMove(false);
       }
 
-      socket.emit("move-done", boardString);
+      socket.emit("move-done", [boardString, info]);
     } catch (error) {
       console.error("Error updating moves:", error);
     }
@@ -102,16 +102,31 @@ export default function ChessBoard() {
 
   useEffect(() => {
     socket.on("opponent-move", (val) => {
-      if (playerColor == "black") val = val.split("").reverse().join("");
 
-      setChessboard(convertTo2DArray(val));
+      let updatedBoard = val[0];
+      let move = val[1];
+      if (playerColor === "black") {
+        updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
+      }
+
+      setChessboard(convertTo2DArray(updatedBoard));
       setUserMove(true);
+
+      setMovingPiece({ from: { row: 7 - move.from.row, col: 7 - move.from.col }, to: { row: 7 - move.to.row, col: 7 - move.to.col } });
+
+      //delay a little to show animation
+      setTimeout(() => {
+        setCurrPiece({ row: null, col: null, moves: null });
+        setMovingPiece(null);
+      }, 100);
+
     });
 
     return () => {
-      socket.off("opponent-move"); // Clean up on unmount
+      socket.off("opponent-move");
     };
-  }, []);
+  }, [playerColor]);
+
 
   // Append new move when movingPiece changes
   useEffect(() => {

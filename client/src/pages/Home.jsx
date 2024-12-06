@@ -67,7 +67,7 @@ function Home() {
         </div>
       </div>
       <div className="flex flex-col gap-4 w-full max-w-[970px]">
-        {games.map((game) => {
+        {games?.map((game) => {
           let player = game.player1 ? game.player1 : game.player2;
           return (
             <Link

@@ -178,7 +178,10 @@ function ChessBoardBox({
 
       setMovingPiece(null);
       setUserMove(false);
-      updateMoves(clearedBoard);
+      updateMoves(clearedBoard, {
+        from: { row: currPiece.row, col: currPiece.col },
+        to: { row, col },
+      });
     }, 100);
   }
 
@@ -289,9 +292,9 @@ function ChessBoardBox({
         style={{
           ...(moveInfo
             ? {
-                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-                transition: "transform 0.1s linear",
-              }
+              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+              transition: "transform 0.1s linear",
+            }
             : {}),
           opacity: isDragging ? "0" : "1",
         }}
