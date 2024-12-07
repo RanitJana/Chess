@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameMove, gameSingle } from "../api/game.js";
@@ -15,6 +16,8 @@ function convertTo2DArray(chessString) {
 
   return rows;
 }
+
+export { convertTo2DArray };
 
 export default function ChessBoard() {
   const { gameId } = useParams();
@@ -116,17 +119,16 @@ export default function ChessBoard() {
         to: { row: 7 - move.to.row, col: 7 - move.to.col },
       };
 
-      setChessboard(convertTo2DArray(updatedBoard));
-      // Update the allMoves array directly
-
       // Update the moving piece for animations
       setMovingPiece(opponentMove);
 
+      // Update the allMoves array directly
       setAllMoves((prevMoves) => [...prevMoves, move]);
       // Delay to show animation
       setTimeout(() => {
         setCurrPiece({ row: null, col: null, moves: null });
         setMovingPiece(null);
+        setChessboard(convertTo2DArray(updatedBoard));
       }, 100);
     });
 
@@ -134,12 +136,6 @@ export default function ChessBoard() {
       socket.off("opponent-move");
     };
   }, [playerColor]);
-
-  // Append new move when movingPiece changes
-  // useEffect(() => {
-  //   if (!movingPiece) return;
-
-  // }, [movingPiece]);
 
   return (
     <div className="relative w-[100dvw] shadow-inner max-w-[35rem]">

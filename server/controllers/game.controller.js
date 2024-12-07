@@ -10,6 +10,7 @@ const gameInit = AsyncHandler(async (req, res, _) => {
   //create a new game
   if (!games) {
     let newGame = await gameSchema.create({ player1: player._id });
+    newGame.player1 = null;
 
     return res.status(200).json({
       success: true,
@@ -18,10 +19,18 @@ const gameInit = AsyncHandler(async (req, res, _) => {
     });
   }
 
+  if (games.player1._id.toString() == player._id.toString())
+    return res.status(300).json({
+      success: false,
+      message: "Searching for an opponent",
+    });
+
   //found a game
   games.player2 = player._id;
 
   await games.save();
+  games.player2 = null;
+  await games.populate("player1", "name _id");
 
   return res.status(200).json({
     success: true,

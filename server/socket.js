@@ -25,8 +25,6 @@ const realTimeInit = function (server) {
     // Handle moves
     socket.on("move-done", (clearedBoard) => {
       // [board,movePieceInfo]
-      //console.log(clearedBoard);
-      // Send the cleared board to everyone else in the room (opponent)
       socket.to(roomId).emit("opponent-move", clearedBoard);
     });
 

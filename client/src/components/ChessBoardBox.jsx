@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
@@ -27,14 +26,17 @@ function ChessBoardBox({
   updateMoves,
 }) {
   const [imgPath, setImgPath] = useState("");
-  const [pawnUpdatePieces, setPawnUpdatePieces] = useState([
-    "queen-w",
-    "rook-w",
-    "bishop-w",
-    "knight-w",
-  ]);
+  const pawnUpdatePieces = useMemo(() => {
+    if (playerColor === "black") {
+      return ["queen-b", "rook-b", "bishop-b", "knight-b"];
+    }
+    return ["queen-w", "rook-w", "bishop-w", "knight-w"];
+  }, [playerColor]);
+
   const [moveInfo, setMoveInfo] = useState(null);
   const [isDragging, setDragging] = useState(false);
+
+  const [dragImg, setDragImg] = useState(null);
 
   useEffect(() => {
     const assignValue = () => {
@@ -53,14 +55,9 @@ function ChessBoardBox({
         K: "/images/nrking-w.png",
       };
       setImgPath(pieceMapping[piece] || "");
-      if (playerColor === "black") {
-        setPawnUpdatePieces((prev) =>
-          prev.map((val) => val.replace("-w", "-b"))
-        );
-      }
     };
     assignValue();
-  }, [piece, playerColor]);
+  }, [piece]);
 
   useEffect(() => {
     if (
@@ -76,6 +73,15 @@ function ChessBoardBox({
     setTimeout(() => setMoveInfo(null), 300);
   }, [movingPiece, row, col]);
 
+  useEffect(() => {
+    const img = new Image();
+    img.src = imgPath;
+    img.style.pointerEvents = "none";
+    img.style.position = "absolute";
+    img.style.opacity = "1";
+    setDragImg(img);
+  }, [imgPath]);
+
   const handlePlacePiece = useCallback(() => {
     setMovingPiece({
       from: { row: currPiece.row, col: currPiece.col },
@@ -90,12 +96,12 @@ function ChessBoardBox({
 
     setTimeout(() => {
       clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
-      if (
-        row === 0 &&
-        (clearedBoard[row][col] === "p" || clearedBoard[row][col] === "P")
-      ) {
-        setMovePossible(false);
-      }
+      // if (
+      //   row === 0 &&
+      //   (clearedBoard[row][col] === "p" || clearedBoard[row][col] === "P")
+      // ) {
+      //   setMovePossible(false);
+      // }
 
       setCurrPiece({ row: null, col: null, moves: null });
       setChessboard(clearedBoard);
@@ -157,8 +163,9 @@ function ChessBoardBox({
     handleDisplayPossibleMoves,
   ]);
 
-  const handlePawnPromotion = (e, idx) => {
+  const handlePawnPromotion = (_, idx) => {
     if (!isUserMove) return;
+    setCurrPiece({ row, col });
     const newChessBoard = chessboard.map((row) => [...row]);
 
     const promotionPieces = ["Q", "R", "B", "N"];
@@ -166,30 +173,38 @@ function ChessBoardBox({
     newChessBoard[row][col] =
       playerColor === "white" ? piece : piece.toLowerCase();
 
-    setChessboard(newChessBoard);
     setMovePossible(true);
+    setChessboard(newChessBoard);
+    // handlePlacePiece();
   };
 
   const handleDragStart = (e) => {
     const { width, height } = e.target.getBoundingClientRect();
-
-    let newImg = document.createElement("img");
-    newImg.src = imgPath;
-    newImg.style.width = `${width}px`;
-    newImg.style.height = `${height}px`;
-    newImg.style.pointerEvents = "none";
-    newImg.style.position = "absolute";
-    newImg.style.top = "-100px";
-    newImg.style.opacity = "1";
-
-    document.body.appendChild(newImg);
-    e.dataTransfer.setDragImage(newImg, width / 2, height / 2);
-
+    dragImg.style.width = `${width}px`;
+    dragImg.style.height = `${height}px`;
+    e.dataTransfer.setDragImage(dragImg, width / 2, height / 2);
     setDragging(true);
     handleDisplayPossibleMoves();
-
-    setTimeout(() => document.body.removeChild(newImg), 100);
   };
+
+  const MemoizedChessBoardBoxNumbering = React.memo(ChessBoardBoxNumbering);
+
+  const promotionItems = useMemo(
+    () =>
+      pawnUpdatePieces.map((val, idx) => (
+        <li
+          onClick={(e) => handlePawnPromotion(e, idx)}
+          key={idx}
+          style={{
+            backgroundColor: idx & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)",
+          }}
+          className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
+        >
+          <img src={`/images/${val}.png`} alt="" />
+        </li>
+      )),
+    [pawnUpdatePieces]
+  );
 
   return (
     <span
@@ -216,7 +231,7 @@ function ChessBoardBox({
         }}
       />
 
-      <ChessBoardBoxNumbering
+      <MemoizedChessBoardBoxNumbering
         allMoves={allMoves}
         row={row}
         col={col}
@@ -229,19 +244,7 @@ function ChessBoardBox({
       {row === 0 &&
         (chessboard[row][col] === "p" || chessboard[row][col] === "P") && (
           <ul className="absolute w-full left-0 top-0 z-20 box shadow-lg shadow-black">
-            {pawnUpdatePieces.map((val, idx) => (
-              <li
-                onClick={(e) => handlePawnPromotion(e, idx)}
-                key={idx}
-                style={{
-                  backgroundColor:
-                    idx & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)",
-                }}
-                className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
-              >
-                <img src={`/images/${val}.png`} alt="" />
-              </li>
-            ))}
+            {promotionItems}
           </ul>
         )}
     </span>
