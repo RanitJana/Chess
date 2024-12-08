@@ -21,11 +21,33 @@ const realTimeInit = function (server) {
       roomId = gameId; // Assign the room ID
       socket.join(gameId); // Join the specific game room
     });
+    socket.on("new-message", (info) => {
+      socket.to(roomId).emit("receive-new-message", info);
+    });
+
+    socket.on("typing", (value) => {
+      socket.to(roomId).emit("server-typing", value);
+    });
+
+    socket.on("not-typing", (value) => {
+      socket.to(roomId).emit("server-not-typing", value);
+    });
 
     // Handle moves
     socket.on("move-done", (clearedBoard) => {
       // [board,movePieceInfo]
       socket.to(roomId).emit("opponent-move", clearedBoard);
+    });
+
+    let games = [];
+
+    socket.on("game-show", (gameId) => {
+      socket.join(gameId);
+      games.push(gameId);
+    });
+
+    socket.on("game-move", (gameId) => {
+      socket.to(gameId).emit("update-game-preview", gameId);
     });
 
     // Handle disconnection

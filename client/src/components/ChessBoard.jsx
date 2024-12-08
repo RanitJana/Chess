@@ -1,9 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
 import { useEffect, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameMove, gameSingle } from "../api/game.js";
 import { useParams } from "react-router";
 import { socket } from "../socket.js";
+import EmptyBoard from "./EmptyBoard.jsx";
 
 function convertTo2DArray(chessString) {
   const rows = [];
@@ -19,7 +22,7 @@ function convertTo2DArray(chessString) {
 
 export { convertTo2DArray };
 
-export default function ChessBoard() {
+export default function ChessBoard({ setOpponent }) {
   const { gameId } = useParams();
 
   const colors = Object.freeze({
@@ -38,6 +41,10 @@ export default function ChessBoard() {
     col: null,
     moves: null,
   });
+  const [players, setPlayers] = useState({
+    player1: { name: "Loading..", rating: 0 },
+    player2: { name: "Loading..", rating: 0 },
+  });
 
   // Fetch initial game state
   useEffect(() => {
@@ -55,6 +62,13 @@ export default function ChessBoard() {
           if (color == "white" && game.userMove == 0) setUserMove(true);
           else if (color == "black" && game.userMove == 1) setUserMove(true);
           else setUserMove(false);
+          setPlayers({
+            player1: response.data.info.game.player1,
+            player2: response.data.info.game.player2,
+          });
+
+          if (color == "white") setOpponent(response.data.info.game.player2);
+          else setOpponent(response.data.info.game.player1);
         }
         socket.emit("join-game", gameId);
       } catch (error) {
@@ -80,6 +94,7 @@ export default function ChessBoard() {
         gameId,
         board: boardString,
       });
+      socket.emit("game-move", gameId);
 
       if (response?.data.board) {
         setChessboard(convertTo2DArray(response.data.board));
@@ -138,44 +153,92 @@ export default function ChessBoard() {
   }, [playerColor]);
 
   return (
-    <div className="relative w-[100dvw] shadow-inner max-w-[35rem]">
-      {chessboard ? (
-        chessboard.map((row, rowIdx) => (
-          <div className="grid grid-cols-8 w-full" key={rowIdx}>
-            {row.map((piece, pieceIdx) => {
-              const color =
-                (pieceIdx + rowIdx) % 2 === 0
-                  ? "rgb(234,237,208)"
-                  : "rgb(115,149,82)";
+    <div>
+      <div className="flex py-2 gap-4">
+        <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
+          <img src="/images/user-pawn.gif" alt="" />
+        </div>
+        <p>
+          {playerColor == "white" ? (
+            <>
+              <span className="text-white font-semibold mr-1">
+                {players.player2?.name}
+              </span>
+              <span className="text-gray-400">({players.player2?.rating})</span>
+            </>
+          ) : (
+            <>
+              <span className="text-white font-semibold mr-1">
+                {players.player1?.name}
+              </span>
+              <span className="text-gray-400">({players.player1?.rating})</span>
+            </>
+          )}
+        </p>
+      </div>
+      <div className="relative w-[100dvw] max-w-[35rem] max-h-[35rem]">
+        {chessboard ? (
+          chessboard.map((row, rowIdx) => (
+            <div className="grid grid-cols-8 w-full" key={rowIdx}>
+              {row.map((piece, pieceIdx) => {
+                const color =
+                  (pieceIdx + rowIdx) % 2 === 0
+                    ? "rgb(234,237,208)"
+                    : "rgb(115,149,82)";
 
-              return (
-                <ChessBoardBox
-                  key={pieceIdx}
-                  setMovingPiece={setMovingPiece}
-                  movingPiece={movingPiece}
-                  movePossible={movePossible}
-                  setMovePossible={setMovePossible}
-                  allMoves={allMoves}
-                  chessboard={chessboard}
-                  setChessboard={setChessboard}
-                  currPiece={currPiece}
-                  setCurrPiece={setCurrPiece}
-                  playerColor={playerColor}
-                  row={rowIdx}
-                  col={pieceIdx}
-                  color={color}
-                  piece={piece}
-                  isUserMove={isUserMove}
-                  setUserMove={setUserMove}
-                  updateMoves={updateMoves}
-                />
-              );
-            })}
+                return (
+                  <ChessBoardBox
+                    key={pieceIdx}
+                    setMovingPiece={setMovingPiece}
+                    movingPiece={movingPiece}
+                    movePossible={movePossible}
+                    setMovePossible={setMovePossible}
+                    allMoves={allMoves}
+                    chessboard={chessboard}
+                    setChessboard={setChessboard}
+                    currPiece={currPiece}
+                    setCurrPiece={setCurrPiece}
+                    playerColor={playerColor}
+                    row={rowIdx}
+                    col={pieceIdx}
+                    color={color}
+                    piece={piece}
+                    isUserMove={isUserMove}
+                    setUserMove={setUserMove}
+                    updateMoves={updateMoves}
+                  />
+                );
+              })}
+            </div>
+          ))
+        ) : (
+          <div className="relative w-[100dvw] max-w-[35rem] h-[100dvh] max-h-[35rem]">
+            {<EmptyBoard />}
           </div>
-        ))
-      ) : (
-        <div>Loading...</div>
-      )}
+        )}
+      </div>
+      <div className="flex py-2 gap-4">
+        <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
+          <img src="/images/user-pawn.gif" alt="" />
+        </div>
+        <p>
+          {playerColor == "black" ? (
+            <>
+              <span className="text-white font-semibold mr-1">
+                {players.player2?.name}
+              </span>
+              <span className="text-gray-400">({players.player2?.rating})</span>
+            </>
+          ) : (
+            <>
+              <span className="text-white font-semibold mr-1">
+                {players.player1?.name}
+              </span>
+              <span className="text-gray-400">({players.player1?.rating})</span>
+            </>
+          )}
+        </p>
+      </div>
     </div>
   );
 }

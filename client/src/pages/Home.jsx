@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
-import { gameAll, gameInit } from "../api/game.js";
+import { gameAll, gameInit, gameSingle } from "../api/game.js";
 import { toast } from "react-hot-toast";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
+import { socket } from "../socket.js";
 
 function Home() {
   const { totalOnline } = useSocketContext();
@@ -14,8 +15,12 @@ function Home() {
       try {
         const response = await gameAll();
         const { success, info } = response?.data || {};
-        if (success) setGames(info);
-        else toast.error("Failed to fetch games.");
+        if (success) {
+          setGames(info);
+          info.forEach((game) => {
+            socket.emit("game-show", game._id);
+          });
+        } else toast.error("Failed to fetch games.");
       } catch (error) {
         console.error("Error fetching games:", error);
         toast.error("Something went wrong while fetching games.");
@@ -24,13 +29,42 @@ function Home() {
     fetchGames();
   }, []);
 
+  useEffect(() => {
+    const handleUpdateGamePreview = async (gameId) => {
+      try {
+        const response = await gameSingle(gameId);
+        const { success, info } = response?.data || {};
+        if (success) {
+          setGames((prev) =>
+            prev.map((game) =>
+              game._id === gameId
+                ? { ...game, moves: info.game.moves, board: info.game.board }
+                : game
+            )
+          );
+        } else {
+          toast.error("Failed to fetch game updates.");
+        }
+      } catch (error) {
+        console.error("Error updating game preview:", error);
+        toast.error("Something went wrong while updating game preview.");
+      }
+    };
+
+    socket.on("update-game-preview", handleUpdateGamePreview);
+
+    return () => {
+      socket.off("update-game-preview", handleUpdateGamePreview);
+    };
+  }, []);
+
   // Create a new game
   const handleClick = useCallback(async () => {
     try {
       const response = await gameInit();
       const { success, info, message } = response?.data || {};
       if (success) {
-        setGames((prev) => [...prev, info]);
+        setGames((prev) => [info, ...prev]);
         toast.success(message);
       } else {
         toast.error(message || "Failed to create a game.");

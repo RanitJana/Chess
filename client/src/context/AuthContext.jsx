@@ -14,9 +14,13 @@ const getCookie = (name) => {
   return cookie ? cookie.split("=")[1] : null;
 };
 
+export { getCookie };
+
 export default function AuthContext({ children }) {
   const [isAuth, setAuth] = useState(
-    (JSON.parse(localStorage.getItem("user")) && getCookie("accessToken")) ||
+    (JSON.parse(localStorage.getItem("user")) &&
+      getCookie("accessToken") &&
+      getCookie("userId")) ||
       false
   );
 

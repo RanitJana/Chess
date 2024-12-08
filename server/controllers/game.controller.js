@@ -84,6 +84,8 @@ const gameInfo = AsyncHandler(async (req, res, _) => {
     return game;
   });
 
+  games.reverse();
+
   //return the info
   return res.status(200).json({
     success: true,
@@ -100,8 +102,8 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
   //search for the game
   const game = await gameSchema
     .findById(gameId)
-    .populate("player1", "name _id")
-    .populate("player2", "name _id");
+    .populate("player1", "name _id rating")
+    .populate("player2", "name _id rating");
 
   //if game id is invalid or game is not found
   if (!game)

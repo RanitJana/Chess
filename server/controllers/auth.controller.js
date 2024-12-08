@@ -31,10 +31,14 @@ const login = AsyncHandler(async (req, res, _) => {
 
   await player.save({ validateBeforeSave: false });
 
-  return res.cookie("accessToken", accessToken).status(200).json({
-    success: true,
-    message: "Login successful",
-  });
+  return res
+    .cookie("accessToken", accessToken)
+    .cookie("userId", player._id.toString())
+    .status(200)
+    .json({
+      success: true,
+      message: "Login successful",
+    });
 });
 const signup = AsyncHandler(async (req, res, _) => {
   const { email, password, confirmPassword, name } = req.body;
