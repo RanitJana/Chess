@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
@@ -36,7 +42,9 @@ function ChessBoardBox({
   const [moveInfo, setMoveInfo] = useState(null);
   const [isDragging, setDragging] = useState(false);
 
-  const [dragImg, setDragImg] = useState(null);
+  const [offsets, setOffsets] = useState({ offsetX: 0, offsetY: 0 });
+
+  const dragImg = useRef(null);
 
   useEffect(() => {
     const assignValue = () => {
@@ -72,15 +80,6 @@ function ChessBoardBox({
 
     setTimeout(() => setMoveInfo(null), 300);
   }, [movingPiece, row, col]);
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = imgPath;
-    img.style.pointerEvents = "none";
-    img.style.position = "absolute";
-    img.style.opacity = "1";
-    setDragImg(img);
-  }, [imgPath]);
 
   const handlePlacePiece = useCallback(() => {
     setMovingPiece({
@@ -179,12 +178,62 @@ function ChessBoardBox({
   };
 
   const handleDragStart = (e) => {
-    const { width, height } = e.target.getBoundingClientRect();
-    dragImg.style.width = `${width}px`;
-    dragImg.style.height = `${height}px`;
-    e.dataTransfer.setDragImage(dragImg, width / 2, height / 2);
+    if (!dragImg.current) return;
+
+    // e.target.style.opacity = '0';
+
+    dragImg.current.style.pointerEvents = "none";
     setDragging(true);
+
+    dragImg.current.style.transition = "all 0s linear";
+
+    // Calculate offsets relative to the cursor position
+    const offsetX = e.clientX;
+    const offsetY = e.clientY;
+
+    setOffsets({ offsetX, offsetY });
+    
     handleDisplayPossibleMoves();
+
+    // Prevent default drag image rendering
+    const transparentImage = new Image();
+    transparentImage.src =
+      "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+    e.dataTransfer.setDragImage(transparentImage, 0, 0);
+  };
+
+  const handleDragging = (() => {
+    let animationFrameId = null;
+
+    return (e) => {
+      if (!isDragging || !dragImg.current) return;
+
+      // Cancel any ongoing frame requests
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+      animationFrameId = requestAnimationFrame(() => {
+        const left = e.clientX - offsets.offsetX;
+        const top = e.clientY - offsets.offsetY;
+
+        dragImg.current.style.left = `${left}px`;
+        dragImg.current.style.top = `${top}px`;
+        dragImg.current.style.zIndex = "1000"; // Bring dragged piece to the front
+      });
+    };
+  })();
+
+
+  const handleDragEnd = () => {
+    setTimeout(() => {
+      setDragging(false);
+      if (dragImg.current) {
+        dragImg.current.style.transition = "all 1s linear";
+        dragImg.current.style.pointerEvents = "";
+        dragImg.current.style.left = "";
+        dragImg.current.style.top = "";
+        dragImg.current.style.zIndex = "10";
+      }
+    }, 105);
   };
 
   const MemoizedChessBoardBoxNumbering = React.memo(ChessBoardBoxNumbering);
@@ -211,24 +260,31 @@ function ChessBoardBox({
       style={{ backgroundColor: color }}
       className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
       onClick={handlePieceMove}
+      onDragStart={handleDragStart}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
     >
       <img
         src={imgPath}
         alt=""
+        ref={dragImg}
         className="max-w-full absolute z-10"
-        onDragStart={handleDragStart}
-        onDragEnd={() => setDragging(false)}
         style={{
-          ...(moveInfo
+          ...(moveInfo && !isDragging
             ? {
-                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-                transition: "transform 0.1s linear",
-              }
+              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+              transition: "transform 0.1s linear",
+            }
             : {}),
-          opacity: isDragging ? "0" : "1",
+          transition: "transform 0.1s linear",
         }}
+      />
+      <img
+        src={imgPath}
+        alt=""
+        className="max-w-full absolute z-20 opacity-0"
+        onDrag={handleDragging}
+        onDragEnd={handleDragEnd}
       />
 
       <MemoizedChessBoardBoxNumbering

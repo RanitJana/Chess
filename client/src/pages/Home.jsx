@@ -8,15 +8,19 @@ import { socket } from "../socket.js";
 function Home() {
   const { totalOnline } = useSocketContext();
   const [games, setGames] = useState([]);
+  const [playerInfo, setPlayerInfo] = useState(null);
 
   // Fetch daily games
   useEffect(() => {
     const fetchGames = async () => {
       try {
         const response = await gameAll();
-        const { success, info } = response?.data || {};
+        console.log(response);
+
+        const { success, info, player } = response?.data || {};
         if (success) {
           setGames(info);
+          setPlayerInfo(player);
           info.forEach((game) => {
             socket.emit("game-show", game._id);
           });
@@ -77,9 +81,29 @@ function Home() {
 
   return (
     <div className="w-full flex flex-col items-center h-fit sm:p-8 p-4 gap-10">
+      <div className="flex gap-2 items-center max-w-[60rem] w-full">
+        <div className="w-[2rem] overflow-hidden rounded-sm">
+          <img src="/images/user-pawn.gif" alt="" />
+        </div>
+        <p>
+          <span className="text-white font-semibold">
+            {playerInfo?.name || "Loading..."}
+          </span>
+          <span className="text-gray-400 pl-2">
+            ({playerInfo?.rating || "0"})
+          </span>
+        </p>
+      </div>
       {/* Header Section */}
       <div className="flex flex-wrap justify-center items-center gap-10">
-        <img src="/images/standardboard.png" width={450} alt="Chess Board" />
+        <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
+          <img
+            src="/images/standardboard.png"
+            draggable={false}
+            alt="Chess Board"
+            className="w-[min(28rem,100%)] h-full"
+          />
+        </div>
         <div className="max-w-[30rem] flex flex-col items-center text-center">
           <h2 className="text-white font-extrabold md:text-[3.2rem] text-[2rem] leading-[3.5rem]">
             Play Chess Online on the #2 Site!

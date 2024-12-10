@@ -44,7 +44,12 @@ function ChessBoardPreview({ boardString, playerColor }) {
               style={{ backgroundColor: color }}
               className="aspect-square"
             >
-              <img src={pieceMapping[piece]} alt="" />
+              <img
+                src={pieceMapping[piece]}
+                style={{ userSelect: "none" }}
+                draggable={false}
+                alt=""
+              />
             </div>
           );
         });

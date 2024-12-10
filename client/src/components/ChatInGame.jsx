@@ -67,8 +67,12 @@ function ChatInGame({ opponent }) {
   }, []);
 
   useEffect(() => {
+    chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
+  }, [allMessage]);
+
+  useEffect(() => {
     socket.on("server-typing", (value) => {
-      if (userId !== value) setTyping(true);
+      if (userId !== value.userId && gameId == value.gameId) setTyping(true);
     });
 
     socket.on("server-not-typing", () => {
@@ -79,7 +83,7 @@ function ChatInGame({ opponent }) {
       socket.off("server-typing");
       socket.off("server-not-typing");
     };
-  }, [userId]);
+  }, [gameId, userId]);
 
   useEffect(() => {
     (async () => {
@@ -103,12 +107,23 @@ function ChatInGame({ opponent }) {
   }, [gameId]);
 
   return (
-    <div className="relative w-[100dvw] max-w-[20rem] h-[35rem] bg-[rgb(39,37,35)] rounded-sm flex flex-col">
+    <div className="relative h-[38.5rem] w-[100dvw] max-w-[35rem] max-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
       {/* Chat Messages */}
       <div
         className="w-full h-full text-white overflow-y-auto p-2 space-y-2"
         ref={chatSectionRef}
       >
+        <div className=" flex justify-center">
+          <p className="max-w-[80%] w-full bg-black rounded-lg p-2 text-center text-pretty mb-4 text-[0.8rem]">
+            <img
+              src="/images/lock.png"
+              alt=""
+              className="w-3 aspect-square inline mr-1 mt-[-3px]"
+            />
+            Messages are end-to-end encrypted. No one outside of this chat, not
+            even chess2.com, can read them.
+          </p>
+        </div>
         {allMessage?.map((info, idx) => (
           <div
             key={idx}
@@ -141,9 +156,14 @@ function ChatInGame({ opponent }) {
           onChange={(e) => setText(e.target.value)}
           className="w-full bg-transparent border-[1px] p-2 px-4 text-white outline-none rounded-3xl"
           placeholder="Send a message..."
-          onKeyDown={() => {
+          onKeyDown={(e) => {
             if (typingRef.current) clearTimeout(typingRef.current);
-            socket.emit("typing", userId);
+            if (e.key == "Enter") {
+              socket.emit("not-typing", userId);
+              handleSendMessage();
+            } else {
+              socket.emit("typing", { userId, gameId });
+            }
           }}
           onKeyUp={() => {
             typingRef.current = setTimeout(() => {

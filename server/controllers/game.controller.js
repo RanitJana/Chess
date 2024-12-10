@@ -81,9 +81,10 @@ const gameInfo = AsyncHandler(async (req, res, _) => {
     else if (game.player2._id.toString() == req.player._id.toString())
       game.player2 = null;
 
+    game.moves = game.moves.length;
+
     return game;
   });
-
   games.reverse();
 
   //return the info
@@ -91,6 +92,13 @@ const gameInfo = AsyncHandler(async (req, res, _) => {
     success: true,
     message: "Successful",
     info: games,
+    player: {
+      name: req.player.name,
+      _id: req.player._id,
+      email: req.player.email,
+      rating: req.player.rating,
+      avatar: req.player.avatar
+    }
   });
 });
 
