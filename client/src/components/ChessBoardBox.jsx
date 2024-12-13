@@ -30,6 +30,7 @@ function ChessBoardBox({
   isUserMove,
   setUserMove,
   updateMoves,
+  boardDetails,
 }) {
   const [imgPath, setImgPath] = useState("");
   const pawnUpdatePieces = useMemo(() => {
@@ -44,7 +45,14 @@ function ChessBoardBox({
 
   const [offsets, setOffsets] = useState({ offsetX: 0, offsetY: 0 });
 
+  const transparentImage = useRef(new Image());
+  useEffect(() => {
+    transparentImage.current.src =
+      "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+  }, []);
+
   const dragImg = useRef(null);
+  const boxRef = useRef(null);
 
   useEffect(() => {
     const assignValue = () => {
@@ -177,64 +185,79 @@ function ChessBoardBox({
     // handlePlacePiece();
   };
 
-  const handleDragStart = (e) => {
-    if (!dragImg.current) return;
+  const handleDragStart = useCallback(
+    (e) => {
+      if (!dragImg.current) return;
 
-    // e.target.style.opacity = '0';
+      dragImg.current.style.pointerEvents = "none";
+      setDragging(true);
 
-    dragImg.current.style.pointerEvents = "none";
-    setDragging(true);
+      const offsetX = e.clientX;
+      const offsetY = e.clientY;
 
-    dragImg.current.style.transition = "all 0s linear";
+      setOffsets({ offsetX, offsetY });
 
-    // Calculate offsets relative to the cursor position
-    const offsetX = e.clientX;
-    const offsetY = e.clientY;
+      handleDisplayPossibleMoves();
 
-    setOffsets({ offsetX, offsetY });
-    
-    handleDisplayPossibleMoves();
-
-    // Prevent default drag image rendering
-    const transparentImage = new Image();
-    transparentImage.src =
-      "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
-    e.dataTransfer.setDragImage(transparentImage, 0, 0);
-  };
+      e.dataTransfer.setDragImage(transparentImage.current, 0, 0);
+    },
+    [dragImg, setDragging, handleDisplayPossibleMoves]
+  );
 
   const handleDragging = (() => {
     let animationFrameId = null;
+    let currentLeft = 0;
+    let currentTop = 0;
 
     return (e) => {
-      if (!isDragging || !dragImg.current) return;
+      if (!isDragging || !dragImg.current || !boardDetails || !boxRef.current)
+        return;
 
+      const boardX = boardDetails.x;
+      const boardY = boardDetails.y;
+      const boardWidth = boardDetails.width;
+      const boardHeight = boardDetails.height;
+      const cellInfo = boxRef.current?.getBoundingClientRect();
+
+      dragImg.current.style.zIndex = "1000"; // Bring dragged piece to the front
       // Cancel any ongoing frame requests
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-      animationFrameId = requestAnimationFrame(() => {
-        const left = e.clientX - offsets.offsetX;
-        const top = e.clientY - offsets.offsetY;
+      let newLeft = e.clientX - offsets.offsetX;
+      let newTop = e.clientY - offsets.offsetY;
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-        dragImg.current.style.left = `${left}px`;
-        dragImg.current.style.top = `${top}px`;
-        dragImg.current.style.zIndex = "1000"; // Bring dragged piece to the front
+      animationFrameId = requestAnimationFrame(() => {
+        // Clamp values within board boundaries
+        currentLeft = clamp(
+          newLeft,
+          boardX - cellInfo.x,
+          boardX + boardWidth - cellInfo.x - dragImg.current.offsetWidth
+        );
+        currentTop = clamp(
+          newTop,
+          boardY - cellInfo.y,
+          boardY + boardHeight - cellInfo.y - dragImg.current.offsetHeight
+        );
+
+        // Update element position
+        dragImg.current.style.left = `${currentLeft}px`;
+        dragImg.current.style.top = `${currentTop}px`;
       });
     };
   })();
 
-
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setTimeout(() => {
       setDragging(false);
       if (dragImg.current) {
-        dragImg.current.style.transition = "all 1s linear";
         dragImg.current.style.pointerEvents = "";
         dragImg.current.style.left = "";
         dragImg.current.style.top = "";
         dragImg.current.style.zIndex = "10";
       }
     }, 105);
-  };
+  }, []);
 
   const MemoizedChessBoardBoxNumbering = React.memo(ChessBoardBoxNumbering);
 
@@ -263,6 +286,7 @@ function ChessBoardBox({
       onDragStart={handleDragStart}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
+      ref={boxRef}
     >
       <img
         src={imgPath}
@@ -272,9 +296,9 @@ function ChessBoardBox({
         style={{
           ...(moveInfo && !isDragging
             ? {
-              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-              transition: "transform 0.1s linear",
-            }
+                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+                transition: "transform 0.1s linear",
+              }
             : {}),
           transition: "transform 0.1s linear",
         }}

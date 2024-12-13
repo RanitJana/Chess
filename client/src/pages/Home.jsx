@@ -15,7 +15,6 @@ function Home() {
     const fetchGames = async () => {
       try {
         const response = await gameAll();
-        console.log(response);
 
         const { success, info, player } = response?.data || {};
         if (success) {

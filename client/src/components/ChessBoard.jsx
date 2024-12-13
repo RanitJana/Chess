@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameMove, gameSingle } from "../api/game.js";
 import { useParams } from "react-router";
@@ -152,6 +152,8 @@ export default function ChessBoard({ setOpponent }) {
     };
   }, [playerColor]);
 
+  const boardRef = useRef(null);
+
   return (
     <div>
       <div className="flex py-2 gap-4">
@@ -176,7 +178,10 @@ export default function ChessBoard({ setOpponent }) {
           )}
         </p>
       </div>
-      <div className="relative w-[100dvw] max-w-[35rem] max-h-[35rem]">
+      <div
+        ref={boardRef}
+        className="relative w-[100dvw] max-w-[35rem] max-h-[35rem]"
+      >
         {chessboard ? (
           chessboard.map((row, rowIdx) => (
             <div className="grid grid-cols-8 w-full" key={rowIdx}>
@@ -206,6 +211,7 @@ export default function ChessBoard({ setOpponent }) {
                     isUserMove={isUserMove}
                     setUserMove={setUserMove}
                     updateMoves={updateMoves}
+                    boardDetails={boardRef.current?.getBoundingClientRect()}
                   />
                 );
               })}

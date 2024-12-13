@@ -6,8 +6,10 @@ function CurrentGamePreview({ games = [] }) {
   const navigate = useNavigate();
   return (
     <div className="w-full max-w-[970px]">
-      {games?.length && (
-        <p className="text-white font-bold mb-4">Daily Games</p>
+      {games?.length ? (
+        <p className="text-white font-bold mb-4">Ongoing Games</p>
+      ) : (
+        ""
       )}
       <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4">
         {games?.map((game) => {

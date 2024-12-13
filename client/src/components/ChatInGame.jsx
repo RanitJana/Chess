@@ -1,5 +1,4 @@
 /* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCookie } from "../context/AuthContext.jsx";
@@ -8,6 +7,10 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { socket } from "../socket.js";
 import "./Chat.css";
+import {
+  decryptMessage,
+  encryptMessage,
+} from "../utils/encryptDecryptMessage.js";
 
 function ChatInGame({ opponent }) {
   const { gameId } = useParams();
@@ -26,16 +29,20 @@ function ChatInGame({ opponent }) {
   let typingRef = useRef(null);
 
   const handleSendMessage = useCallback(async () => {
-    if (!text || !opponent || !userId) return;
+    if (!text.trim() || !opponent || !userId) return;
 
     try {
-      let info = { senderId: userId, message: text };
-      socket.emit("new-message", { senderId: userId, message: text });
+      let encryptedText = encryptMessage(text.trim());
+
+      let info = { senderId: userId, message: text.trim() };
+
+      socket.emit("new-message", { senderId: userId, message: encryptedText });
+
       setAllMessage((prev) => [...prev, info]);
-      let response = await messagePost({
+      await messagePost({
         receiverId: opponent._id,
         gameId,
-        content: text,
+        content: encryptedText,
       });
     } catch (error) {
       console.log(error);
@@ -48,7 +55,11 @@ function ChatInGame({ opponent }) {
 
   useEffect(() => {
     const handleReceiveMessage = (info) => {
-      setAllMessage((prev) => [...prev, info]);
+      const { senderId, message } = info;
+      setAllMessage((prev) => [
+        ...prev,
+        { senderId, message: decryptMessage(message) },
+      ]);
       setTimeout(() => {
         chatSectionRef.current?.scrollTo(
           0,
@@ -95,7 +106,7 @@ function ChatInGame({ opponent }) {
           setAllMessage(() => {
             return info.map((value) => ({
               senderId: value.senderId,
-              message: value.content,
+              message: decryptMessage(value.content),
             }));
           });
         }
@@ -137,15 +148,19 @@ function ChatInGame({ opponent }) {
             </div>
           </div>
         ))}
-        {isTyping && (
-          <div className="bg-white p-2 w-fit px-[15px] rounded-lg rounded-bl-none">
-            <div className="typing">
-              <div className="dot"></div>
-              <div className="dot"></div>
-              <div className="dot"></div>
-            </div>
+        <div
+          className="bg-white w-fit px-[15px] rounded-lg rounded-bl-none overflow-hidden transition-all"
+          style={{
+            height: `${!isTyping ? "0px" : "30px"}`,
+            padding: `${!isTyping ? "0" : "0.5rem"}`,
+          }}
+        >
+          <div className="typing">
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Input Box */}
