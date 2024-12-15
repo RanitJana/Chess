@@ -2,8 +2,11 @@ import { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { gameAll, gameInit, gameSingle } from "../api/game.js";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import { socket } from "../socket.js";
+import { logout } from "../api/auth.js";
+import Loader from "../components/Loader.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
@@ -78,20 +81,60 @@ function Home() {
     }
   }, []);
 
+  const [isLoggingOut, setLoggingOut] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogOut = async () => {
+    try {
+      setLoggingOut(true);
+      let response = await logout();
+      if (response?.data.success) toast.success(response.data.message);
+    } catch (error) {
+      console.log(error);
+      toast.error("Please try again");
+    } finally {
+      navigate("/login");
+      setLoggingOut(false);
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center h-fit sm:p-8 p-4 gap-10">
-      <div className="flex gap-2 items-center max-w-[60rem] w-full">
-        <div className="w-[2rem] overflow-hidden rounded-sm">
-          <img src="/images/user-pawn.gif" alt="" />
+      {isLoggingOut && <Loader />}
+      <div className="flex items-center max-w-[60rem] w-full justify-between">
+        <div className="flex gap-2 items-center">
+          <div className="w-[2rem] overflow-hidden rounded-sm">
+            <img src="/images/user-pawn.gif" alt="" />
+          </div>
+          <p>
+            <span className="text-white font-semibold">
+              {playerInfo?.name || "Loading..."}
+            </span>
+            <span className="text-gray-400 pl-2">
+              ({playerInfo?.rating || "0"})
+            </span>
+          </p>
         </div>
-        <p>
-          <span className="text-white font-semibold">
-            {playerInfo?.name || "Loading..."}
-          </span>
-          <span className="text-gray-400 pl-2">
-            ({playerInfo?.rating || "0"})
-          </span>
-        </p>
+        <div className="relative group cursor-pointer">
+          <img
+            src="/images/settings.png"
+            alt="Settings"
+            className="aspect-square w-[1.5rem]"
+          />
+          <ul className="group-hover:block hidden  absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden">
+            <li className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all">
+              <img src="/images/user.png" alt="" className="w-[1.5rem]" />
+              <span>Profile</span>
+            </li>
+            <li
+              onClick={handleLogOut}
+              className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+            >
+              <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
+              <span>Log out</span>
+            </li>
+          </ul>
+        </div>
       </div>
       {/* Header Section */}
       <div className="flex flex-wrap justify-center items-center gap-10">
@@ -123,10 +166,10 @@ function Home() {
           >
             <img src="/images/play.svg" alt="Play Icon" className="w-[4rem]" />
             <div className="flex flex-col items-start">
-              <span className="text-3xl">Play Online</span>
-              <span className="text-sm font-normal">
+              <span className="text-3xl">New Game</span>
+              {/* <span className="text-sm font-normal">
                 Play with someone at your level
-              </span>
+              </span> */}
             </div>
           </button>
         </div>

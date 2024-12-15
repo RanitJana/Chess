@@ -76,7 +76,7 @@ const logout = AsyncHandler(async (req, res, _) => {
 
   await player.save({ validateBeforeSave: false });
 
-  return res.clearCookie("accessToken").status(200).json({
+  return res.clearCookie("accessToken").status(200).clearCookie("userId").json({
     success: true,
     message: "Logged out succesfully",
   });

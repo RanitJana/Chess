@@ -11,27 +11,24 @@ import pieceMove, { getColor } from "../utils/PieceMove.js";
 import clearPieceMove from "../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
 import { captureSound, moveSound } from "../utils/Sounds.js";
+import { useGameContext } from "../pages/Game.jsx";
 
-function ChessBoardBox({
-  color,
-  piece,
-  chessboard,
-  setChessboard,
-  currPiece,
-  setCurrPiece,
-  allMoves,
-  row,
-  col,
-  playerColor,
-  movePossible,
-  setMovePossible,
-  movingPiece,
-  setMovingPiece,
-  isUserMove,
-  setUserMove,
-  updateMoves,
-  boardDetails,
-}) {
+function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
+  const {
+    chessboard,
+    setChessboard,
+    currPiece,
+    setCurrPiece,
+    allMoves,
+    playerColor,
+    movePossible,
+    setMovePossible,
+    movingPiece,
+    setMovingPiece,
+    isUserMove,
+    setUserMove,
+  } = useGameContext();
+
   const [imgPath, setImgPath] = useState("");
   const pawnUpdatePieces = useMemo(() => {
     if (playerColor === "black") {
@@ -127,6 +124,9 @@ function ChessBoardBox({
       updateMoves(clearedBoard, {
         from: { row: currPiece.row, col: currPiece.col },
         to: { row, col },
+        color: playerColor,
+        piece: chessboard[currPiece.row][currPiece.col],
+        takes: chessboard[row][col],
       });
     }, 100);
   }, [
@@ -197,7 +197,7 @@ function ChessBoardBox({
 
       setOffsets({ offsetX, offsetY });
 
-      handleDisplayPossibleMoves();
+      if (isUserMove) handleDisplayPossibleMoves();
 
       e.dataTransfer.setDragImage(transparentImage.current, 0, 0);
     },
@@ -251,10 +251,14 @@ function ChessBoardBox({
     setTimeout(() => {
       setDragging(false);
       if (dragImg.current) {
+        dragImg.current.style.transition = "all 0.1s linear";
         dragImg.current.style.pointerEvents = "";
-        dragImg.current.style.left = "";
-        dragImg.current.style.top = "";
+        dragImg.current.style.left = "0px";
+        dragImg.current.style.top = "0px";
         dragImg.current.style.zIndex = "10";
+        setTimeout(() => {
+          dragImg.current.style.transition = "all 0s linear";
+        }, 120);
       }
     }, 105);
   }, []);

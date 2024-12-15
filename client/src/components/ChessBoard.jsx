@@ -1,83 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
-import { gameMove, gameSingle } from "../api/game.js";
-import { useParams } from "react-router";
+import { gameMove } from "../api/game.js";
 import { socket } from "../socket.js";
 import EmptyBoard from "./EmptyBoard.jsx";
+import { useGameContext, convertTo2DArray } from "../pages/Game.jsx";
 
-function convertTo2DArray(chessString) {
-  const rows = [];
-  const rowLength = 8; // Each row has 8 characters
-
-  for (let i = 0; i < chessString.length; i += rowLength) {
-    const row = chessString.slice(i, i + rowLength).split("");
-    rows.push(row);
-  }
-
-  return rows;
-}
-
-export { convertTo2DArray };
-
-export default function ChessBoard({ setOpponent }) {
-  const { gameId } = useParams();
-
-  const colors = Object.freeze({
-    white: "white",
-    black: "black",
-  });
-
-  const [chessboard, setChessboard] = useState(null);
-  const [playerColor, setPlayerColor] = useState(colors.black);
-  const [allMoves, setAllMoves] = useState([]);
-  const [movingPiece, setMovingPiece] = useState(null);
-  const [movePossible, setMovePossible] = useState(true);
-  const [isUserMove, setUserMove] = useState(false);
-  const [currPiece, setCurrPiece] = useState({
-    row: null,
-    col: null,
-    moves: null,
-  });
-  const [players, setPlayers] = useState({
-    player1: { name: "Loading..", rating: 0 },
-    player2: { name: "Loading..", rating: 0 },
-  });
-
-  // Fetch initial game state
-  useEffect(() => {
-    async function fetchGameInfo() {
-      try {
-        const response = await gameSingle(gameId);
-
-        if (response?.data.info) {
-          let { color, game, board } = response.data.info;
-          board = convertTo2DArray(board);
-          let moves = game.moves.map((val) => JSON.parse(val));
-          setPlayerColor(color);
-          setChessboard(board);
-          setAllMoves(moves);
-          if (color == "white" && game.userMove == 0) setUserMove(true);
-          else if (color == "black" && game.userMove == 1) setUserMove(true);
-          else setUserMove(false);
-          setPlayers({
-            player1: response.data.info.game.player1,
-            player2: response.data.info.game.player2,
-          });
-
-          if (color == "white") setOpponent(response.data.info.game.player2);
-          else setOpponent(response.data.info.game.player1);
-        }
-        socket.emit("join-game", gameId);
-      } catch (error) {
-        console.error("Error fetching game info:", error);
-      }
-    }
-
-    fetchGameInfo();
-  }, [gameId]);
+export default function ChessBoard() {
+  const {
+    playerColor,
+    allMoves,
+    gameId,
+    setChessboard,
+    setUserMove,
+    setAllMoves,
+    setMovingPiece,
+    setCurrPiece,
+    chessboard,
+    players,
+  } = useGameContext();
 
   // Handle move updates
   async function updateMoves(clearedBoard, info) {
@@ -194,22 +137,10 @@ export default function ChessBoard({ setOpponent }) {
                 return (
                   <ChessBoardBox
                     key={pieceIdx}
-                    setMovingPiece={setMovingPiece}
-                    movingPiece={movingPiece}
-                    movePossible={movePossible}
-                    setMovePossible={setMovePossible}
-                    allMoves={allMoves}
-                    chessboard={chessboard}
-                    setChessboard={setChessboard}
-                    currPiece={currPiece}
-                    setCurrPiece={setCurrPiece}
-                    playerColor={playerColor}
                     row={rowIdx}
                     col={pieceIdx}
                     color={color}
                     piece={piece}
-                    isUserMove={isUserMove}
-                    setUserMove={setUserMove}
                     updateMoves={updateMoves}
                     boardDetails={boardRef.current?.getBoundingClientRect()}
                   />

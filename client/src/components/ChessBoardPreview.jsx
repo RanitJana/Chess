@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { convertTo2DArray } from "./ChessBoard.jsx";
+import { convertTo2DArray } from "../pages/Game.jsx";
 
 function ChessBoardPreview({ boardString, playerColor }) {
   const [board, setBoard] = useState(null);
