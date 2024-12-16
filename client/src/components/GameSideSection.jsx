@@ -11,7 +11,7 @@ import { socket } from "../socket.js";
 function Tab({ isActive, label, onClick, newMessageCount }) {
   return (
     <li
-      className={`relative px-4 py-2 text-white border-b-4 transition ${
+      className={`relative px-8 py-2 text-white border-b-4 transition ${
         isActive ? "border-white" : "border-transparent"
       } cursor-pointer`}
       onClick={onClick}
@@ -106,7 +106,7 @@ function GameSideSection() {
   };
 
   return (
-    <div className="relative h-[38.5rem] w-[100dvw] max-w-[35rem] max-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
+    <div className="relative h-[45rem] w-[100dvw] lg-976:w-[25rem] max-h-[92%] min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
       <ul className="flex w-full border-b border-[rgba(255,255,255,0.16)]">
         <Tab
           isActive={activeTab === 0}

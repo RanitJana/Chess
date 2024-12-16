@@ -15,6 +15,9 @@ export default {
         buttonLight: "rgb(128,182,77)",
         buttonDark: "rgb(69,116,61)"
       },
+      screens: {
+        'lg-976': '976px'
+      }
 
     },
   },

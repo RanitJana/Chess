@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/prop-types */
-/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useRef } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameMove } from "../api/game.js";

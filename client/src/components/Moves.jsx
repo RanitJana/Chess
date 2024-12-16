@@ -14,7 +14,7 @@ function Moves() {
             ans.push(
               <div
                 key={idx}
-                className={`flex gap-5 ${row & 1 ? "bg-[rgb(38,37,34)]" : "bg-[rgb(43,41,39)]"} w-full text-[rgba(255,255,255,0.69)] px-4 py-1 text-[0.9rem]`}
+                className={`flex gap-5 ${row & 1 ? "bg-[rgb(38,37,34)]" : "bg-[rgb(43,41,39)]"} w-full text-[rgba(255,255,255,0.69)] px-4 py-1`}
               >
                 <span>{row}.</span>
                 <div className={`grid grid-cols-2 gap-4 w-[50%] font-semibold`}>
@@ -28,7 +28,6 @@ function Moves() {
               </div>
             );
           }
-
           return ans;
         })()}
       </div>

@@ -18,7 +18,9 @@ function ChatInGame({
 }) {
   const { opponent } = useGameContext();
 
-  setNewMessageCount(0);
+  useEffect(() => {
+    setNewMessageCount(0);
+  }, []);
 
   const [isTyping, setTyping] = useState(false);
 

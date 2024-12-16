@@ -86,6 +86,8 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
     setTimeout(() => setMoveInfo(null), 300);
   }, [movingPiece, row, col]);
 
+  const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
+
   const handlePlacePiece = useCallback(() => {
     setMovingPiece({
       from: { row: currPiece.row, col: currPiece.col },
@@ -96,39 +98,44 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
     const sound = color && color !== playerColor ? "capture" : "move";
 
     const clearedBoard = clearPieceMove(chessboard);
-    clearedBoard[currPiece.row][currPiece.col] = " ";
 
-    setTimeout(() => {
-      clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
-      // if (
-      //   row === 0 &&
-      //   (clearedBoard[row][col] === "p" || clearedBoard[row][col] === "P")
-      // ) {
-      //   setMovePossible(false);
-      // }
-
-      setCurrPiece({ row: null, col: null, moves: null });
+    if (
+      row === 0 &&
+      (clearedBoard[currPiece.row][currPiece.col] === "p" ||
+        clearedBoard[currPiece.row][currPiece.col] === "P")
+    ) {
+      clearedBoard[currPiece.row][currPiece.col] = " ";
       setChessboard(clearedBoard);
+      setPawnPieceDisplay(true);
+      setMovePossible(false);
+    } else {
+      clearedBoard[currPiece.row][currPiece.col] = " ";
+      setTimeout(() => {
+        clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
 
-      switch (sound) {
-        case "move":
-          moveSound();
-          break;
-        case "capture":
-          captureSound();
-          break;
-      }
+        setCurrPiece({ row: null, col: null, moves: null });
+        setChessboard(clearedBoard);
 
-      setMovingPiece(null);
-      setUserMove(false);
-      updateMoves(clearedBoard, {
-        from: { row: currPiece.row, col: currPiece.col },
-        to: { row, col },
-        color: playerColor,
-        piece: chessboard[currPiece.row][currPiece.col],
-        takes: chessboard[row][col],
-      });
-    }, 100);
+        switch (sound) {
+          case "move":
+            moveSound();
+            break;
+          case "capture":
+            captureSound();
+            break;
+        }
+
+        setMovingPiece(null);
+        setUserMove(false);
+        updateMoves(clearedBoard, {
+          from: { row: currPiece.row, col: currPiece.col },
+          to: { row, col },
+          color: playerColor,
+          piece: chessboard[currPiece.row][currPiece.col],
+          takes: chessboard[row][col],
+        });
+      }, 100);
+    }
   }, [
     currPiece,
     chessboard,
@@ -171,18 +178,47 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   ]);
 
   const handlePawnPromotion = (_, idx) => {
+    console.log(idx);
     if (!isUserMove) return;
-    setCurrPiece({ row, col });
-    const newChessBoard = chessboard.map((row) => [...row]);
+
+
+    const clearedBoard = clearPieceMove(chessboard.map((row) => [...row]));
 
     const promotionPieces = ["Q", "R", "B", "N"];
     const piece = promotionPieces[idx];
-    newChessBoard[row][col] =
+    clearedBoard[row][col] =
       playerColor === "white" ? piece : piece.toLowerCase();
 
+    clearedBoard[currPiece.row][currPiece.col] = " ";
+
     setMovePossible(true);
-    setChessboard(newChessBoard);
-    // handlePlacePiece();
+    setPawnPieceDisplay(false);
+
+    const sound = color && color !== playerColor ? "capture" : "move";
+
+    setTimeout(() => {
+      setCurrPiece({ row: null, col: null, moves: null });
+      setChessboard(clearedBoard);
+
+      switch (sound) {
+        case "move":
+          moveSound();
+          break;
+        case "capture":
+          captureSound();
+          break;
+      }
+
+      setMovingPiece(null);
+      setUserMove(false);
+      updateMoves(clearedBoard, {
+        from: { row: currPiece.row, col: currPiece.col },
+        to: { row, col },
+        color: playerColor,
+        piece: chessboard[currPiece.row][currPiece.col],
+        takes: chessboard[row][col],
+      });
+    }, 100);
   };
 
   const handleDragStart = useCallback(
@@ -279,7 +315,7 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
           <img src={`/images/${val}.png`} alt="" />
         </li>
       )),
-    [pawnUpdatePieces]
+    [pawnUpdatePieces, currPiece]
   );
 
   return (
@@ -300,9 +336,9 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
         style={{
           ...(moveInfo && !isDragging
             ? {
-                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-                transition: "transform 0.1s linear",
-              }
+              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+              transition: "transform 0.1s linear",
+            }
             : {}),
           transition: "transform 0.1s linear",
         }}
@@ -325,12 +361,11 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
         chessboard={chessboard}
       />
 
-      {row === 0 &&
-        (chessboard[row][col] === "p" || chessboard[row][col] === "P") && (
-          <ul className="absolute w-full left-0 top-0 z-20 box shadow-lg shadow-black">
-            {promotionItems}
-          </ul>
-        )}
+      {pawnPieceDisplay && (
+        <ul className="absolute w-full left-0 top-0 z-[100] box shadow-lg shadow-black">
+          {promotionItems}
+        </ul>
+      )}
     </span>
   );
 }
