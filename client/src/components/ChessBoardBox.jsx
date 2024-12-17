@@ -178,10 +178,7 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   ]);
 
   const handlePawnPromotion = (_, idx) => {
-    console.log(idx);
     if (!isUserMove) return;
-
-
     const clearedBoard = clearPieceMove(chessboard.map((row) => [...row]));
 
     const promotionPieces = ["Q", "R", "B", "N"];
@@ -336,9 +333,9 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
         style={{
           ...(moveInfo && !isDragging
             ? {
-              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-              transition: "transform 0.1s linear",
-            }
+                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+                transition: "transform 0.1s linear",
+              }
             : {}),
           transition: "transform 0.1s linear",
         }}

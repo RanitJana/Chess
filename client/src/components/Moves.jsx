@@ -6,6 +6,9 @@ function Moves() {
 
   return (
     <div className="relative w-full h-full">
+      <p className="w-full text-white px-4 py-2 border-b border-b-[rgba(255,255,255,0.19)]">
+        Starting moves
+      </p>
       <div className="flex flex-col w-full">
         {(() => {
           let ans = [];
@@ -16,11 +19,19 @@ function Moves() {
                 key={idx}
                 className={`flex gap-5 ${row & 1 ? "bg-[rgb(38,37,34)]" : "bg-[rgb(43,41,39)]"} w-full text-[rgba(255,255,255,0.69)] px-4 py-1`}
               >
-                <span>{row}.</span>
+                <span className="w-8 mr-4 text-center">{row}.</span>
                 <div className={`grid grid-cols-2 gap-4 w-[50%] font-semibold`}>
-                  <span>{convertToChessNotation(allMoves[idx])}</span>
+                  <span
+                    className={`w-fit px-1 rounded-sm text-center ${idx == allMoves.length - 1 ? "bg-[rgb(72,70,68)] shadow-[0px_2px_0px_0px_white]" : ""}`}
+                  >
+                    {convertToChessNotation(allMoves[idx])}
+                  </span>
                   {idx + 1 < allMoves.length ? (
-                    <span>{convertToChessNotation(allMoves[idx + 1])}</span>
+                    <span
+                      className={`w-fit px-1 rounded-sm text-center ${idx + 1 == allMoves.length - 1 ? "bg-[rgb(72,70,68)] shadow-[0px_2px_0px_0px_white]" : ""}`}
+                    >
+                      {convertToChessNotation(allMoves[idx + 1])}
+                    </span>
                   ) : (
                     ""
                   )}

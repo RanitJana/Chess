@@ -110,7 +110,7 @@ export default function Game() {
         players,
       }}
     >
-      <div className="relative w-full h-[100dvh] min-h-fit overflow-scroll flex items-center justify-center gap-2 flex-wrap">
+      <div className="relative w-full h-[100dvh] min-h-fit overflow-scroll flex items-center justify-center gap-4 flex-wrap">
         <ChessBoard />
         <GameSideSection />
       </div>

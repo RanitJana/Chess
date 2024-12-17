@@ -11,7 +11,7 @@ import { socket } from "../socket.js";
 function Tab({ isActive, label, onClick, newMessageCount }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-4 transition ${
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
         isActive ? "border-white" : "border-transparent"
       } cursor-pointer`}
       onClick={onClick}
@@ -44,7 +44,7 @@ function GameSideSection() {
     (async () => {
       try {
         let response = await messageGet(gameId);
-        console.log(response);
+
         if (response) {
           const { success, info } = response.data;
           if (success) {
@@ -106,7 +106,7 @@ function GameSideSection() {
   };
 
   return (
-    <div className="relative h-[45rem] w-[100dvw] lg-976:w-[25rem] max-h-[92%] min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
+    <div className="relative h-[40rem] w-[100dvw] lg-976:w-[27rem] max-h-[92%] min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
       <ul className="flex w-full border-b border-[rgba(255,255,255,0.16)]">
         <Tab
           isActive={activeTab === 0}
@@ -122,12 +122,22 @@ function GameSideSection() {
         />
       </ul>
       <div className="overflow-y-scroll h-full">{renderContent()}</div>
-      <div className="flex gap-2 min-h-fit p-2">
-        <button className="bg-blackDarkest shadow-sm px-4 text-white py-2 rounded-sm w-[8rem]">
-          Back
+      <div className="flex gap-2 justify-between min-h-fit p-4 bg-[rgb(33,32,29)]">
+        <button className="group relative flex items-center justify-center bg-[rgb(57,54,52)] shadow-sm px-4 text-white py-2 rounded-md w-[4rem] h-[3rem]">
+          <div className="opacity-0 transition-opacity group-hover:opacity-100 absolute top-[-100%] bg-[rgba(0,0,0,0.66)] px-4 py-2 rounded-md z-10">
+            Back
+          </div>
+          <img
+            src="/images/arrow.png"
+            className="w-[1rem] rotate-180"
+            alt="Back"
+          />
         </button>
-        <button className="bg-blackDarkest shadow-sm px-4 text-white py-2 rounded-sm w-[8rem]">
-          Forward
+        <button className="group relative flex items-center justify-center bg-[rgb(57,54,52)] shadow-sm px-4 text-white py-2 rounded-md w-[4rem] h-[3rem]">
+          <div className="opacity-0 transition-opacity group-hover:opacity-100 absolute top-[-100%] bg-[rgba(0,0,0,0.66)] px-4 py-2 rounded-md z-10">
+            Next
+          </div>
+          <img src="/images/arrow.png" className="w-[1rem]" alt="Next" />
         </button>
       </div>
     </div>

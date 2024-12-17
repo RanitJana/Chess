@@ -97,27 +97,37 @@ export default function ChessBoard() {
 
   return (
     <div>
-      <div className="flex py-2 gap-4">
-        <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
-          <img src="/images/user-pawn.gif" alt="" />
+      <div className="flex justify-between items-center">
+        <div className="flex py-2 gap-4">
+          <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
+            <img src="/images/user-pawn.gif" alt="" />
+          </div>
+          <p>
+            {playerColor == "white" ? (
+              <>
+                <span className="text-white font-semibold mr-1">
+                  {players.player2?.name}
+                </span>
+                <span className="text-gray-400">
+                  ({players.player2?.rating})
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-white font-semibold mr-1">
+                  {players.player1?.name}
+                </span>
+                <span className="text-gray-400">
+                  ({players.player1?.rating})
+                </span>
+              </>
+            )}
+          </p>
         </div>
-        <p>
-          {playerColor == "white" ? (
-            <>
-              <span className="text-white font-semibold mr-1">
-                {players.player2?.name}
-              </span>
-              <span className="text-gray-400">({players.player2?.rating})</span>
-            </>
-          ) : (
-            <>
-              <span className="text-white font-semibold mr-1">
-                {players.player1?.name}
-              </span>
-              <span className="text-gray-400">({players.player1?.rating})</span>
-            </>
-          )}
-        </p>
+        <div className="flex items-center justify-evenly gap-1 w-full max-w-[7rem] bg-white p-2 rounded-md">
+          <img src="/images/time.gif" alt="" />
+          <span>3 days</span>
+        </div>
       </div>
       <div
         ref={boardRef}
@@ -152,27 +162,37 @@ export default function ChessBoard() {
           </div>
         )}
       </div>
-      <div className="flex py-2 gap-4">
-        <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
-          <img src="/images/user-pawn.gif" alt="" />
+      <div className="flex justify-between items-center">
+        <div className="flex py-2 gap-4">
+          <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
+            <img src="/images/user-pawn.gif" alt="" />
+          </div>
+          <p>
+            {playerColor == "black" ? (
+              <>
+                <span className="text-white font-semibold mr-1">
+                  {players.player2?.name}
+                </span>
+                <span className="text-gray-400">
+                  ({players.player2?.rating})
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-white font-semibold mr-1">
+                  {players.player1?.name}
+                </span>
+                <span className="text-gray-400">
+                  ({players.player1?.rating})
+                </span>
+              </>
+            )}
+          </p>
         </div>
-        <p>
-          {playerColor == "black" ? (
-            <>
-              <span className="text-white font-semibold mr-1">
-                {players.player2?.name}
-              </span>
-              <span className="text-gray-400">({players.player2?.rating})</span>
-            </>
-          ) : (
-            <>
-              <span className="text-white font-semibold mr-1">
-                {players.player1?.name}
-              </span>
-              <span className="text-gray-400">({players.player1?.rating})</span>
-            </>
-          )}
-        </p>
+        <div className="flex items-center justify-evenly gap-1 w-full max-w-[7rem] bg-white p-2 rounded-md">
+          <img src="/images/time.gif" alt="" />
+          <span>3 days</span>
+        </div>
       </div>
     </div>
   );
