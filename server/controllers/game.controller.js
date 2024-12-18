@@ -148,4 +148,21 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
   });
 });
 
-export { gameInit, gameMove, gameInfo, gameInfoSingle };
+const gameEnd = AsyncHandler(async (req, res, _) => {
+
+  let { winner, gameId } = req.body;
+
+  let game = await gameSchema.findById(gameId);
+
+  game.winner = winner;
+
+  //save the info
+  await game.save({ validateBeforeSave: false });
+
+  return res.status(200).json({
+    success: true,
+    message: "Success"
+  });
+});
+
+export { gameInit, gameMove, gameInfo, gameInfoSingle, gameEnd };

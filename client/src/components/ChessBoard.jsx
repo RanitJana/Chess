@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
-import { gameMove } from "../api/game.js";
+import { gameEnd, gameMove } from "../api/game.js";
 import { socket } from "../socket.js";
 import EmptyBoard from "./EmptyBoard.jsx";
 import { useGameContext, convertTo2DArray } from "../pages/Game.jsx";
+import { kingCheckMate } from "../utils/KingCheck.js";
 
 export default function ChessBoard() {
   const {
@@ -18,6 +19,7 @@ export default function ChessBoard() {
     setCurrPiece,
     chessboard,
     players,
+    setCheckMate,
   } = useGameContext();
 
   // Handle move updates
@@ -36,6 +38,17 @@ export default function ChessBoard() {
         board: boardString,
       });
       socket.emit("game-move", gameId);
+
+      if (
+        kingCheckMate(
+          convertTo2DArray(boardString),
+          playerColor == "white" ? "black" : "white"
+        )
+      ) {
+        const winner = playerColor == "white" ? 1 : 2;
+        setCheckMate(winner);
+        await gameEnd({ winner, gameId });
+      }
 
       if (response?.data.board) {
         setChessboard(convertTo2DArray(response.data.board));
@@ -68,6 +81,11 @@ export default function ChessBoard() {
         updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
       }
 
+      updatedBoard = convertTo2DArray(updatedBoard);
+
+      if (kingCheckMate(updatedBoard, playerColor))
+        setCheckMate(playerColor == "white" ? 2 : 1);
+
       setUserMove(true);
 
       const opponentMove = {
@@ -84,7 +102,7 @@ export default function ChessBoard() {
       setTimeout(() => {
         setCurrPiece({ row: null, col: null, moves: null });
         setMovingPiece(null);
-        setChessboard(convertTo2DArray(updatedBoard));
+        setChessboard(updatedBoard);
       }, 100);
     });
 

@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { gameSingle } from "../api/game.js";
 import { socket } from "../socket.js";
 import GameSideSection from "../components/GameSideSection.jsx";
+import WinnerBoard from "../components/WinnerBoard.jsx";
 
 const GameContext = createContext();
 
@@ -52,11 +53,14 @@ export default function Game() {
     player2: { name: "Loading..", rating: 0 },
   });
 
+  const [isCheckMate, setCheckMate] = useState(0);
+
   // Fetch initial game state
   useEffect(() => {
     async function fetchGameInfo() {
       try {
         const response = await gameSingle(gameId);
+        console.log(response);
 
         if (response?.data.info) {
           let { color, game, board } = response.data.info;
@@ -67,6 +71,8 @@ export default function Game() {
           setPlayerColor(color);
           setChessboard(board);
           setAllMoves(moves);
+          //0 for no one, 1for white, 2 for black, 3 for draw
+          setCheckMate(game.winner);
 
           if (color == "white" && game.userMove == 0) setUserMove(true);
           else if (color == "black" && game.userMove == 1) setUserMove(true);
@@ -92,6 +98,7 @@ export default function Game() {
     <GameContext.Provider
       value={{
         gameId,
+        players,
         opponent,
         setOpponent,
         chessboard,
@@ -107,10 +114,16 @@ export default function Game() {
         setUserMove,
         currPiece,
         setCurrPiece,
-        players,
+        isCheckMate,
+        setCheckMate,
       }}
     >
       <div className="relative w-full h-[100dvh] min-h-fit overflow-scroll flex items-center justify-center gap-4 flex-wrap">
+        <WinnerBoard
+          playerColor={playerColor}
+          isCheckMate={isCheckMate}
+          setCheckMate={setCheckMate}
+        />
         <ChessBoard />
         <GameSideSection />
       </div>

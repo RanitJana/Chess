@@ -65,4 +65,20 @@ const gameMove = async function (body) {
   }
 };
 
-export { gameInit, gameAll, gameSingle, gameMove };
+const gameEnd = async function (body) {
+  try {
+    let response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/end`,
+      body,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+
+export { gameInit, gameAll, gameSingle, gameMove, gameEnd };

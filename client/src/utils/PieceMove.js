@@ -225,7 +225,7 @@ const king = function (chessboard, row, col, kingColor) {
   if (destinationColor != kingColor && c < 8) finalMoves.push([row, col + 1]);
 
   //create a copy of current chessboard which will help us to decide the danger positions
-  let newChessBoard = chessboard.map((row) => [...row]);
+  let newChessBoard = chessboard.map((row) => row.slice());
 
   //filter out safe positions
   finalMoves = finalMoves.filter(([r, c]) => {
@@ -235,9 +235,8 @@ const king = function (chessboard, row, col, kingColor) {
 
     //check if the position is danger free or not
     let checks = kingCheck(newChessBoard, r, c, kingColor);
-
     //make the board same as previous
-    newChessBoard[r][c] = " ";
+    newChessBoard[r][c] = chessboard[r][c];
     newChessBoard[row][col] = chessboard[row][col];
 
     //return true is the position is danger free

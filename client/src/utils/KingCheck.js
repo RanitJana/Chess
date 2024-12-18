@@ -46,6 +46,24 @@ const kingCheck = (chessboard, row, col, kingColor) => {
   return threatPieces;
 };
 
-const kingCheckMate = (chessboard, row, col, kingColor) => {};
+const kingCheckMate = (chessboard, color) => {
+  //get all same color pieces
+  //fetch possible moves for each pieces
+  //if none of them is able to protect the king then this is checkmate
+
+  const allPiecesPositions = [];
+  chessboard.forEach((row, rowIdx) =>
+    row.forEach((_, colIdx) => {
+      if (getColor(chessboard, rowIdx, colIdx) == color)
+        allPiecesPositions.push([rowIdx, colIdx]);
+    })
+  );
+
+  const isCheckMate = allPiecesPositions.reduce((prev, [row, col]) => {
+    return pieceMove(chessboard, row, col, color)?.length === 0 && prev;
+  }, true);
+
+  return isCheckMate;
+};
 
 export { kingCheck, kingCheckMate };
