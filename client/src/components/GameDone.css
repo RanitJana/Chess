@@ -1,0 +1,20 @@
+/* Hide the default checkbox appearance */
+.custom-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  /* border: 2px solid rgb(0, 170, 0); */
+  border-radius: 2px;
+  border: 2px solid greenyellow;
+}
+
+/* Styles for when winner is true */
+.custom-checkbox.true {
+  background-color: white;
+}
+
+/* Styles for when winner is false */
+.custom-checkbox.false {
+  background-color: gray;
+}

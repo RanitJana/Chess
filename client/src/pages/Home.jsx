@@ -1,23 +1,25 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
-import { gameAll, gameInit, gameSingle } from "../api/game.js";
+import { gameOngoing, gameInit, gameSingle, gameDone } from "../api/game.js";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import { socket } from "../socket.js";
 import { logout } from "../api/auth.js";
 import Loader from "../components/Loader.jsx";
+import CompletedGames from "../components/CompletedGames.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
   const [games, setGames] = useState([]);
+  const [doneGames, setDoneGames] = useState([]);
   const [playerInfo, setPlayerInfo] = useState(null);
 
   // Fetch daily games
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchOngoingGames = async () => {
       try {
-        const response = await gameAll();
+        const response = await gameOngoing();
 
         const { success, info, player } = response?.data || {};
         if (success) {
@@ -32,7 +34,21 @@ function Home() {
         toast.error("Something went wrong while fetching games.");
       }
     };
-    fetchGames();
+    const fetchDoneGames = async () => {
+      try {
+        const response = await gameDone();
+
+        const { success, info } = response?.data || {};
+        if (success) {
+          setDoneGames(info);
+        } else toast.error("Failed to fetch games.");
+      } catch (error) {
+        console.error("Error fetching games:", error);
+        toast.error("Something went wrong while fetching games.");
+      }
+    };
+    fetchOngoingGames();
+    fetchDoneGames();
   }, []);
 
   useEffect(() => {
@@ -177,6 +193,7 @@ function Home() {
 
       {/* Games Section */}
       <CurrentGamePreview games={games} />
+      <CompletedGames games={doneGames} />
     </div>
   );
 }

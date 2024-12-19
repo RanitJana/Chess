@@ -4,7 +4,7 @@ const realTimeInit = function (server) {
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:5173",
-      credentials: true
+      credentials: true,
     },
     reconnection: true, // Reconnection is enabled
     reconnectionAttempts: 5, // Retry 5 times before giving up

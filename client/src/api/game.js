@@ -17,11 +17,26 @@ const gameInit = async function (body = {}) {
   }
 };
 
-//get all game info
-const gameAll = async function () {
+//get all ongoing game info
+const gameOngoing = async function () {
   try {
     let response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/info`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/ongoing`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+
+const gameDone = async function () {
+  try {
+    let response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/done`,
       {
         withCredentials: true,
       }
@@ -81,4 +96,4 @@ const gameEnd = async function (body) {
   }
 };
 
-export { gameInit, gameAll, gameSingle, gameMove, gameEnd };
+export { gameInit, gameOngoing, gameDone, gameSingle, gameMove, gameEnd };

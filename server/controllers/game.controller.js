@@ -67,10 +67,15 @@ const gameMove = AsyncHandler(async (req, res, _) => {
 });
 
 //get all games for a user
-const gameInfo = AsyncHandler(async (req, res, _) => {
+const gameOngoing = AsyncHandler(async (req, res, _) => {
   //get all the games based on player
   let games = await gameSchema
-    .find({ $or: [{ player1: req._id }, { player2: req._id }] })
+    .find({
+      $and: [
+        { $or: [{ player1: req._id }, { player2: req._id }] },
+        { winner: 0 },
+      ],
+    })
     .populate("player1", "name _id")
     .populate("player2", "name _id");
 
@@ -97,8 +102,41 @@ const gameInfo = AsyncHandler(async (req, res, _) => {
       _id: req.player._id,
       email: req.player.email,
       rating: req.player.rating,
-      avatar: req.player.avatar
-    }
+      avatar: req.player.avatar,
+    },
+  });
+});
+
+const gameDone = AsyncHandler(async (req, res, _) => {
+  //get all the games based on player
+  let games = await gameSchema
+    .find({
+      $and: [
+        { $or: [{ player1: req._id }, { player2: req._id }] },
+        { $nor: [{ winner: 0 }] },
+      ],
+    })
+    .populate("player1", "name _id rating")
+    .populate("player2", "name _id rating");
+
+  let gameRequiredInfo = games.map((value) => {
+    return {
+      board: value.board,
+      updatedAt: value.updatedAt,
+      totalMoves: value.moves.length,
+      _id: value._id,
+      player1: value.player1,
+      player2: value.player2,
+      winner: value.winner,
+    };
+  });
+  gameRequiredInfo.reverse();
+
+  //return the info
+  return res.status(200).json({
+    success: true,
+    message: "Successful",
+    info: gameRequiredInfo,
   });
 });
 
@@ -149,7 +187,6 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
 });
 
 const gameEnd = AsyncHandler(async (req, res, _) => {
-
   let { winner, gameId } = req.body;
 
   let game = await gameSchema.findById(gameId);
@@ -161,8 +198,8 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
 
   return res.status(200).json({
     success: true,
-    message: "Success"
+    message: "Success",
   });
 });
 
-export { gameInit, gameMove, gameInfo, gameInfoSingle, gameEnd };
+export { gameInit, gameMove, gameOngoing, gameDone, gameInfoSingle, gameEnd };
