@@ -108,35 +108,42 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
 });
 
 const gameDone = AsyncHandler(async (req, res, _) => {
-  //get all the games based on player
+  const { total } = req.params;
+
+  // Query to find games based on player and winner
+  const query = {
+    $and: [
+      { $or: [{ player1: req._id }, { player2: req._id }] },
+      { $nor: [{ winner: 0 }] },
+    ],
+  };
+
+  // Get the total document count
+  const totalDocuments = await gameSchema.countDocuments(query);
+
+  // Fetch games and sort them by createdAt (most recent first)
   let games = await gameSchema
-    .find({
-      $and: [
-        { $or: [{ player1: req._id }, { player2: req._id }] },
-        { $nor: [{ winner: 0 }] },
-      ],
-    })
+    .find(query)
+    .sort({ createdAt: -1 })
+    .limit(total ? parseInt(total) : undefined)
     .populate("player1", "name _id rating")
     .populate("player2", "name _id rating");
 
-  let gameRequiredInfo = games.map((value) => {
-    return {
-      board: value.board,
-      updatedAt: value.updatedAt,
-      totalMoves: value.moves.length,
-      _id: value._id,
-      player1: value.player1,
-      player2: value.player2,
-      winner: value.winner,
-    };
-  });
-  gameRequiredInfo.reverse();
+  const gameRequiredInfo = games.map((value) => ({
+    board: value.board,
+    updatedAt: value.updatedAt,
+    totalMoves: value.moves.length,
+    _id: value._id,
+    player1: value.player1,
+    player2: value.player2,
+    winner: value.winner,
+  }));
 
-  //return the info
   return res.status(200).json({
     success: true,
     message: "Successful",
     info: gameRequiredInfo,
+    totalDocuments,
   });
 });
 

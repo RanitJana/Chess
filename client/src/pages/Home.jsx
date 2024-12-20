@@ -14,6 +14,26 @@ function Home() {
   const [games, setGames] = useState([]);
   const [doneGames, setDoneGames] = useState([]);
   const [playerInfo, setPlayerInfo] = useState(null);
+  const [totalDoneGames, setTotalDoneGames] = useState(0);
+  const [fetchingDoneGamesAll, setFetchingDoneGamesAll] = useState(false);
+
+  const fetchDoneGames = async (total = null) => {
+    try {
+      setFetchingDoneGamesAll(true);
+      const response = await gameDone(total);
+
+      const { success, info, totalDocuments } = response?.data || {};
+      if (success) {
+        setDoneGames(info);
+        setTotalDoneGames(totalDocuments);
+      } else toast.error("Failed to fetch games.");
+    } catch (error) {
+      console.error("Error fetching games:", error);
+      toast.error("Something went wrong while fetching games.");
+    } finally {
+      setFetchingDoneGamesAll(false);
+    }
+  };
 
   // Fetch daily games
   useEffect(() => {
@@ -34,21 +54,8 @@ function Home() {
         toast.error("Something went wrong while fetching games.");
       }
     };
-    const fetchDoneGames = async () => {
-      try {
-        const response = await gameDone();
-
-        const { success, info } = response?.data || {};
-        if (success) {
-          setDoneGames(info);
-        } else toast.error("Failed to fetch games.");
-      } catch (error) {
-        console.error("Error fetching games:", error);
-        toast.error("Something went wrong while fetching games.");
-      }
-    };
     fetchOngoingGames();
-    fetchDoneGames();
+    fetchDoneGames(5);
   }, []);
 
   useEffect(() => {
@@ -193,7 +200,12 @@ function Home() {
 
       {/* Games Section */}
       <CurrentGamePreview games={games} />
-      <CompletedGames games={doneGames} />
+      <CompletedGames
+        games={doneGames}
+        fetchDoneGames={fetchDoneGames}
+        totalDoneGames={totalDoneGames}
+        fetchingDoneGamesAll={fetchingDoneGamesAll}
+      />
     </div>
   );
 }

@@ -67,7 +67,7 @@ function WinnerBoard({ playerColor, isCheckMate, setCheckMate }) {
               <span className="font-bold text-rose-400">Misses</span>
             </li>
           </ul>
-          <button className="bg-buttonLight w-full rounded-lg h-12 p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }">
+          <button className="bg-buttonLight w-full rounded-lg h-12 p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.3rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }">
             Game Review
           </button>
           <div className="grid grid-cols-2 gap-2 mt-4">

@@ -10,7 +10,7 @@ connectDB()
   .then(() => {
     console.log("DB connection succesful\n");
 
-    const port = _env.PORT | 3000;
+    const port = _env.PORT || 3000;
 
     const server = createServer(app);
 

@@ -4,6 +4,7 @@ import "./GameDone.css";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../context/AuthContext.jsx";
 import { useState } from "react";
+import Loader from "./Loader.jsx";
 // import ChessBoardPreview from "./ChessBoardPreview.jsx";
 
 function NamePlate({ name, winner, rating }) {
@@ -21,8 +22,13 @@ function NamePlate({ name, winner, rating }) {
   );
 }
 
-function CompletedGames({ games = [] }) {
-  const [userId, setUserId] = useState(getCookie("userId"));
+function CompletedGames({
+  games = [],
+  fetchDoneGames,
+  totalDoneGames,
+  fetchingDoneGamesAll,
+}) {
+  const userId = getCookie("userId");
 
   function isUserWinner(game) {
     return (
@@ -34,8 +40,17 @@ function CompletedGames({ games = [] }) {
   const navigate = useNavigate();
   return (
     <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
-      <p className="text-white font-bold p-4 border-b-[2px] border-blackLight">
-        Completed Games ({games?.length || 0})
+      <p className="text-white p-4 border-b-[2px] border-blackLight flex items-center justify-between">
+        <span className="font-bold">
+          Completed Games ({totalDoneGames || 0})
+        </span>
+        <span className="mr-6">
+          {games.length < totalDoneGames ? (
+            <button onClick={() => fetchDoneGames()}>See all</button>
+          ) : (
+            ""
+          )}
+        </span>
       </p>
       {games?.length ? (
         <table className="w-full text-gray-300 h-fit bg-gray-700">
@@ -106,6 +121,19 @@ function CompletedGames({ games = [] }) {
                 </tr>
               );
             })}
+            {fetchingDoneGamesAll ? (
+              <tr className=" text-center w-full hover:cursor-pointer hover:bg-[rgb(27,27,27)] bg-blackDarkest transition-colors">
+                <td
+                  colSpan={4}
+                  style={{ borderTop: "1px solid rgb(80,80,80)" }}
+                  className="p-3 "
+                >
+                  <span className="loader"></span>
+                </td>
+              </tr>
+            ) : (
+              ""
+            )}
           </tbody>
         </table>
       ) : (
