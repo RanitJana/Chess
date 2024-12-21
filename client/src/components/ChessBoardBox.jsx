@@ -12,6 +12,8 @@ import clearPieceMove from "../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
 import { captureSound, moveSound } from "../utils/Sounds.js";
 import { useGameContext } from "../pages/Game.jsx";
+import { kingCheck, kingCheckMate } from "../utils/KingCheck.js";
+import getKingPos from "../utils/KingPos.js";
 
 function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   const {
@@ -127,12 +129,23 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
 
         setMovingPiece(null);
         setUserMove(false);
+        const opponentColor = playerColor == "white" ? "black" : "white";
+        const kingPosition = getKingPos(clearedBoard, opponentColor);
+        const isCheck = kingCheck(
+          clearedBoard,
+          kingPosition.row,
+          kingPosition.col,
+          opponentColor
+        );
+        const isCheckMate = kingCheckMate(clearedBoard, opponentColor);
         updateMoves(clearedBoard, {
           from: { row: currPiece.row, col: currPiece.col },
           to: { row, col },
           color: playerColor,
           piece: chessboard[currPiece.row][currPiece.col],
           takes: chessboard[row][col],
+          check: isCheck.length > 0,
+          checkMate: isCheckMate,
         });
       }, 100);
     }

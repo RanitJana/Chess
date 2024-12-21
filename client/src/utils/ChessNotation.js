@@ -12,7 +12,7 @@ export default function convertToChessNotation(move) {
   }
 
   // Extract details from the move object
-  const { from, to, piece, takes, color } = move;
+  const { from, to, piece, takes, color, check, checkMate } = move;
 
   // Get source and destination coordinates
   const fromCoord = toChessCoord(from.row, from.col, color);
@@ -42,11 +42,13 @@ export default function convertToChessNotation(move) {
   };
 
   if (takes && takes.trim() !== "") {
-    notation += isPawn ? fromCoord[0] : ""; // Add file of the pawn if it captures
-    notation = `${isPawn ? "" : pieceSymbols[notation]}x${toCoord}`; // Add capture notation
+    notation = `${fromCoord[0]}x${toCoord}`; // Add capture notation
   } else {
     notation = (isPawn ? "" : pieceSymbols[notation]) + toCoord; // Add destination square
   }
+
+  if (checkMate) notation += "#";
+  else if (check) notation += "+";
 
   return notation;
 }
