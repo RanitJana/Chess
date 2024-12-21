@@ -1,5 +1,6 @@
 import AsyncHandler from "../utils/AsyncHandler.js";
 import playarSchema from "../models/player.model.js";
+import { cookieOptions } from "../constants.js";
 
 const login = AsyncHandler(async (req, res, _) => {
   const { email, password } = req.body;
@@ -32,8 +33,8 @@ const login = AsyncHandler(async (req, res, _) => {
   await player.save({ validateBeforeSave: false });
 
   return res
-    .cookie("accessToken", accessToken)
-    .cookie("userId", player._id.toString())
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("userId", player._id.toString(), cookieOptions)
     .status(200)
     .json({
       success: true,
@@ -76,10 +77,14 @@ const logout = AsyncHandler(async (req, res, _) => {
 
   await player.save({ validateBeforeSave: false });
 
-  return res.clearCookie("accessToken").status(200).clearCookie("userId").json({
-    success: true,
-    message: "Logged out succesfully",
-  });
+  return res
+    .clearCookie("accessToken", cookieOptions)
+    .status(200)
+    .clearCookie("userId", cookieOptions)
+    .json({
+      success: true,
+      message: "Logged out succesfully",
+    });
 });
 
 const verify = AsyncHandler(async (req, res, _) => {
