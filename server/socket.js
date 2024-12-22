@@ -1,9 +1,10 @@
 import { Server } from "socket.io";
+import { _env } from "./constants.js";
 
 const realTimeInit = function (server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: _env.ORIGIN.split(','),
       credentials: true,
     },
     reconnection: true, // Reconnection is enabled
