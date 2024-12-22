@@ -9,9 +9,10 @@ const origins = _env.ORIGIN.split(",");
 
 app.use(
   cors({
+    origin: origins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-    origin: origins,
+    allowedHeaders: ['Content-Type']
   })
 );
 app.use(cookieParser());
