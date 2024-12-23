@@ -48,4 +48,20 @@ const logout = async function () {
   }
 };
 
-export { login, signup, logout };
+const verify = async function () {
+  try {
+    let response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/verify`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+
+export { login, signup, logout, verify };

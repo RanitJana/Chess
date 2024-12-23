@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
+import { verify } from "../api/auth";
 
 const authContext = createContext();
 
@@ -17,9 +18,19 @@ const getCookie = (name) => {
 export { getCookie };
 
 export default function AuthContext({ children }) {
-  const [isAuth, setAuth] = useState(
-    JSON.parse(localStorage.getItem("user")) || false
-  );
+  const [isAuth, setAuth] = useState(false);
+
+  useEffect(() => {
+    const handleVerify = async () => {
+      try {
+        let response = await verify();
+        if (response?.success) setAuth(true);
+      } catch (error) {
+        console.log(error?.message);
+      }
+    }
+    handleVerify();
+  }, [])
 
   return (
     <authContext.Provider value={{ isAuth, setAuth }}>
