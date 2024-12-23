@@ -23,6 +23,8 @@ function Home() {
       const response = await gameDone(total);
 
       const { success, info, totalDocuments } = response?.data || {};
+      console.log(info);
+      
       if (success) {
         setDoneGames(info);
         setTotalDoneGames(totalDocuments);
@@ -104,6 +106,7 @@ function Home() {
     }
   }, []);
 
+  const [toggleSetting, setSetting] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
@@ -111,7 +114,10 @@ function Home() {
     try {
       setLoggingOut(true);
       let response = await logout();
-      if (response?.data.success) toast.success(response.data.message);
+      if (response?.data.success) {
+        localStorage.removeItem("user");
+        toast.success(response.data.message);
+      }
     } catch (error) {
       console.log(error);
       toast.error("Please try again");
@@ -138,25 +144,33 @@ function Home() {
             </span>
           </p>
         </div>
-        <div className="relative group cursor-pointer">
+        <div
+          className="relative cursor-pointer w-fit"
+          onMouseEnter={() => setSetting(true)}
+          onMouseLeave={() => {
+            setTimeout(() => { setSetting(false) }, 200)
+          }}
+        >
           <img
             src="/images/settings.png"
             alt="Settings"
             className="aspect-square w-[1.5rem]"
-          />
-          <ul className="group-hover:block hidden  absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden">
-            <li className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all">
-              <img src="/images/user.png" alt="" className="w-[1.5rem]" />
-              <span>Profile</span>
-            </li>
-            <li
-              onClick={handleLogOut}
-              className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
-            >
-              <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
-              <span>Log out</span>
-            </li>
-          </ul>
+          />{
+            toggleSetting ?
+              <ul className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden">
+                <li className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all">
+                  <img src="/images/user.png" alt="" className="w-[1.5rem]" />
+                  <span>Profile</span>
+                </li>
+                <li
+                  onClick={handleLogOut}
+                  className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                >
+                  <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
+                  <span>Log out</span>
+                </li>
+              </ul> : ""
+          }
         </div>
       </div>
       {/* Header Section */}

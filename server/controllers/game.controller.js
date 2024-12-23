@@ -136,7 +136,7 @@ const gameDone = AsyncHandler(async (req, res, _) => {
     _id: value._id,
     player1: value.player1,
     player2: value.player2,
-    winner: value.winner,
+    winner: value.winner == 1 ? req.player._id.toString() == value.player1._id.toString() : req.player._id.toString() == value.player2._id.toString(),
   }));
 
   return res.status(200).json({
