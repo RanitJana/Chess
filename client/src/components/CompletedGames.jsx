@@ -2,10 +2,6 @@
 /* eslint-disable react/prop-types */
 import "./GameDone.css";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../context/AuthContext.jsx";
-import { useState } from "react";
-import Loader from "./Loader.jsx";
-// import ChessBoardPreview from "./ChessBoardPreview.jsx";
 
 function NamePlate({ name, winner, rating }) {
   return (
@@ -28,13 +24,9 @@ function CompletedGames({
   totalDoneGames,
   fetchingDoneGamesAll,
 }) {
-  const userId = getCookie("userId");
 
   function isUserWinner(game) {
-    return (
-      (userId == game.player1._id.toString() && game.winner == 1) ||
-      (userId == game.player2._id.toString() && game.winner == 2)
-    );
+    return game.winner;
   }
 
   const navigate = useNavigate();
@@ -80,12 +72,12 @@ function CompletedGames({
                       <NamePlate
                         name={game.player1.name}
                         rating={game.player1.rating}
-                        winner={game.winner == 1}
+                        winner={game.winner}
                       />
                       <NamePlate
                         name={game.player2.name}
                         rating={game.player2.rating}
-                        winner={game.winner == 2}
+                        winner={game.winner}
                       />
                     </div>
                   </td>

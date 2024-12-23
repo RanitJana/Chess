@@ -134,9 +134,8 @@ const gameDone = AsyncHandler(async (req, res, _) => {
     updatedAt: value.updatedAt,
     totalMoves: value.moves.length,
     _id: value._id,
-    player1: value.player1,
-    player2: value.player2,
-    winner: value.winner == 1 ? req.player._id.toString() == value.player1._id.toString() : req.player._id.toString() == value.player2._id.toString(),
+    player1: { ...value.player1, won: value.winner == 1, draw: value.winner == 3 },
+    player2: { ...value.player2, won: value.winner == 2, draw: value.winner == 3 },
   }));
 
   return res.status(200).json({

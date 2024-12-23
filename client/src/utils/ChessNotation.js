@@ -42,7 +42,7 @@ export default function convertToChessNotation(move) {
   };
 
   if (takes && takes.trim() !== "") {
-    notation = `${fromCoord[0]}x${toCoord}`; // Add capture notation
+    notation = `${(isPawn ? "" : pieceSymbols[notation]) + fromCoord[0]}x${toCoord}`; // Add capture notation
   } else {
     notation = (isPawn ? "" : pieceSymbols[notation]) + toCoord; // Add destination square
   }
