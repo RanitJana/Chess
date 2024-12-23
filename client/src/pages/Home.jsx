@@ -115,6 +115,7 @@ function Home() {
       setLoggingOut(true);
       let response = await logout();
       if (response?.data.success) {
+        document.cookie = `${"authToken"}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
         localStorage.removeItem("user");
         toast.success(response.data.message);
       }

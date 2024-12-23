@@ -11,7 +11,7 @@ export default function App() {
   const { isAuth } = useAuthContext();
 
   return (
-    <div className="bg-[hsl(40,7%,18%)] h-[100dvh] min-h-fit">
+    <>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
@@ -27,6 +27,6 @@ export default function App() {
         <Route path="*" element={<Navigate to={"/login"} />} />
       </Routes>
       <Toaster />
-    </div>
+    </>
   );
 }
