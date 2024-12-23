@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { messagePost } from "../api/message.js";
 import { toast } from "react-hot-toast";
 import { socket } from "../socket.js";
@@ -8,6 +7,23 @@ import "./Chat.css";
 import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
+
+const EmojiPickerComponent = ({ onEmojiClick }) => (
+  <EmojiPicker
+    theme="dark"
+    autoFocusSearch={false}
+    style={{
+      position: "absolute",
+      bottom: "3.5rem",
+      left: "0.5rem",
+      height: "25rem",
+    }}
+    lazyLoadEmojis={true}
+    onEmojiClick={onEmojiClick}
+  />
+);
+
+const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 
 function ChatInGame({
   allMessage,
@@ -24,12 +40,9 @@ function ChatInGame({
   }, []);
 
   const [isTyping, setTyping] = useState(false);
-
   const [text, setText] = useState("");
-
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
-
-  let typingRef = useRef(null);
+  const typingRef = useRef(null);
 
   const handleSendMessage = useCallback(async () => {
     if (!text.trim() || !opponent || !userId) return;
@@ -51,7 +64,7 @@ function ChatInGame({
         content: encryptedText,
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Unable to send the message");
     } finally {
       chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
@@ -64,7 +77,7 @@ function ChatInGame({
 
   useEffect(() => {
     socket.on("server-typing", (value) => {
-      if (userId !== value.userId && gameId == value.gameId) setTyping(true);
+      if (userId !== value.userId && gameId === value.gameId) setTyping(true);
     });
 
     socket.on("server-not-typing", () => {
@@ -77,6 +90,13 @@ function ChatInGame({
     };
   }, [gameId, userId]);
 
+  const handleEmojiClick = useCallback(
+    (emojiObject) => {
+      setText((prev) => prev + emojiObject.emoji);
+    },
+    [setText]
+  );
+
   return (
     <div className="relative h-full w-full flex flex-col">
       {/* Chat Messages */}
@@ -86,7 +106,7 @@ function ChatInGame({
             className="w-full h-full text-white overflow-y-auto px-3 space-y-1"
             ref={chatSectionRef}
           >
-            <div className=" flex justify-center mt-2">
+            <div className="flex justify-center mt-2">
               <p className="max-w-[80%] w-full bg-black rounded-lg p-2 text-center text-pretty mb-4 text-[0.8rem]">
                 <img
                   src="/images/lock.png"
@@ -97,14 +117,19 @@ function ChatInGame({
                 (except chess2.com), can read them.
               </p>
             </div>
-            {allMessage?.map((info, idx) => (
+            {allMessage.map((info, idx) => (
               <div
                 key={idx}
-                className={`flex ${info.senderId === userId ? "justify-end" : "justify-start"}`}
-                style={info.senderId == userId ? {} : {}}
+                className={`flex ${
+                  info.senderId === userId ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
-                  className={`p-1 px-2 rounded-lg ${info.senderId == userId ? "bg-blue-500 rounded-br-none" : "bg-white text-black rounded-bl-none"} max-w-[90%]`}
+                  className={`p-1 px-2 rounded-lg ${
+                    info.senderId === userId
+                      ? "bg-blue-500 rounded-br-none"
+                      : "bg-white text-black rounded-bl-none"
+                  } max-w-[90%]`}
                 >
                   {info.message}
                 </div>
@@ -127,9 +152,7 @@ function ChatInGame({
 
           {/* Input Box */}
           <div className="w-full relative flex gap-2 items-center p-2">
-            <div
-              className="w-10 hover:cursor-pointer h-8"
-            >
+            <div className="w-10 hover:cursor-pointer h-8">
               <img
                 src="/images/smile.png"
                 alt="E"
@@ -137,18 +160,7 @@ function ChatInGame({
               />
             </div>
             {isEmojiPickerTrue && (
-              <EmojiPicker
-                theme="dark"
-                autoFocusSearch={false}
-                style={{
-                  position: "absolute",
-                  bottom: "3.5rem",
-                  left: "0.5rem",
-                  height: "25rem"
-                }}
-                lazyLoadEmojis={true}
-                onEmojiClick={(e) => setText((prev) => prev + e.emoji)}
-              />
+              <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
             )}
             <input
               type="text"
@@ -158,7 +170,7 @@ function ChatInGame({
               placeholder="Send a message..."
               onKeyDown={(e) => {
                 if (typingRef.current) clearTimeout(typingRef.current);
-                if (e.key == "Enter") {
+                if (e.key === "Enter") {
                   socket.emit("not-typing", userId);
                   handleSendMessage();
                 } else {
@@ -171,11 +183,6 @@ function ChatInGame({
                 }, 2000);
               }}
               onFocus={() => setIsEmojiPickerTrue(false)}
-              onBlur={() => {
-                typingRef.current = setTimeout(() => {
-                  socket.emit("not-typing", userId);
-                }, 2000);
-              }}
             />
             <button
               className="h-full flex justify-center items-center text-white border rounded-[50%] aspect-square bg-slate-100"

@@ -55,7 +55,9 @@ export default function Game() {
 
   const [isCheckMate, setCheckMate] = useState(0);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [])
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Fetch initial game state
   useEffect(() => {
