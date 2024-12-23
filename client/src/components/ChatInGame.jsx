@@ -139,6 +139,7 @@ function ChatInGame({
             {isEmojiPickerTrue && (
               <EmojiPicker
                 theme="dark"
+                autoFocusSearch={false}
                 style={{
                   position: "absolute",
                   bottom: "3.5rem",
