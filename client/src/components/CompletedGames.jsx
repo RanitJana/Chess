@@ -84,8 +84,8 @@ function CompletedGames({
                   <td>
                     <div className="flex justify-center items-center gap-4">
                       <div className="flex flex-col">
-                        <span>{game.winner == 1 ? "1" : "0"}</span>
-                        <span>{game.winner == 2 ? "1" : "0"}</span>
+                        <span>{game.player1.won ? "1" : "0"}</span>
+                        <span>{game.player2.won ? "1" : "0"}</span>
                       </div>
                       <div
                         style={{
