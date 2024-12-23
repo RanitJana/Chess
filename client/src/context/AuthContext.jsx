@@ -30,7 +30,6 @@ export default function AuthContext({ children }) {
 
   useEffect(() => {
     const handleVerify = async () => {
-
       const cookie = getCookie("authToken"); // Replace with your cookie name
       if (cookie) {
         // If cookie is present, assume the user is authenticated
@@ -59,16 +58,15 @@ export default function AuthContext({ children }) {
   return (
     <authContext.Provider value={{ isAuth, setAuth }}>
       <div className="bg-[hsl(40,7%,18%)] h-full min-h-[25rem]">
-        {
-          isLoading ?
-            <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
-              <span className="loader"></span>
-            </div>
-            :
-            isAuth ?
-              children
-              : <Login />
-        }
+        {isLoading ? (
+          <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
+            <span className="loader"></span>
+          </div>
+        ) : isAuth ? (
+          children
+        ) : (
+          <Login />
+        )}
       </div>
     </authContext.Provider>
   );

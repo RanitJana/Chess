@@ -123,22 +123,18 @@ function GameSideSection({ userId }) {
         />
       </ul>
       <div className="overflow-y-scroll h-full">{renderContent()}</div>
-      <div className="flex gap-2 justify-between min-h-fit p-4 bg-[rgb(33,32,29)]">
-        <button className="group relative flex items-center justify-center bg-[rgb(57,54,52)] shadow-sm px-4 text-white py-2 rounded-md w-[4rem] h-[3rem]">
-          <div className="opacity-0 transition-opacity group-hover:opacity-100 absolute top-[-100%] bg-[rgba(0,0,0,0.66)] px-4 py-2 rounded-md z-10">
-            Back
-          </div>
+      <div className="flex gap-2 justify-between min-h-fit p-2 bg-[rgb(33,32,29)]">
+        <button className="group relative flex items-center justify-center gap-1 bg-[rgb(57,54,52)] shadow-sm px-4 text-white rounded-md text-[0.8rem] w-[5rem] h-[2.1rem]">
           <img
             src="/images/arrow.png"
-            className="w-[1rem] rotate-180"
+            className="w-[0.8rem] rotate-180"
             alt="Back"
           />
+          <span>Previous</span>
         </button>
-        <button className="group relative flex items-center justify-center bg-[rgb(57,54,52)] shadow-sm px-4 text-white py-2 rounded-md w-[4rem] h-[3rem]">
-          <div className="opacity-0 transition-opacity group-hover:opacity-100 absolute top-[-100%] bg-[rgba(0,0,0,0.66)] px-4 py-2 rounded-md z-10">
-            Next
-          </div>
-          <img src="/images/arrow.png" className="w-[1rem]" alt="Next" />
+        <button className="group relative flex items-center justify-center gap-1 bg-[rgb(57,54,52)] shadow-sm px-4 text-white rounded-md text-[0.8rem] w-[5rem] h-[2.1rem]">
+          <span>Next</span>
+          <img src="/images/arrow.png" className="w-[0.8rem]" alt="Back" />
         </button>
       </div>
     </div>

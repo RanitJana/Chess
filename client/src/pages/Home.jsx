@@ -50,7 +50,11 @@ function Home() {
           info.forEach((game) => {
             socket.emit("game-show", game._id);
           });
-        } else toast.error("Failed to fetch games.");
+        } else {
+          navigate("/login");
+          toast.error("Failed to fetch games.");
+          toast.error("Please try to login again");
+        }
       } catch (error) {
         console.error("Error fetching games:", error);
         toast.error("Something went wrong while fetching games.");
@@ -89,9 +93,11 @@ function Home() {
     };
   }, []);
 
+  const [isCreatingGame, setIsCreatingGame] = useState(false);
   // Create a new game
   const handleClick = useCallback(async () => {
     try {
+      setIsCreatingGame(true);
       const response = await gameInit();
       const { success, info, message } = response?.data || {};
       if (success) {
@@ -103,6 +109,8 @@ function Home() {
     } catch (error) {
       console.error("Error creating a game:", error);
       toast.error("Something went wrong while creating a game.");
+    } finally {
+      setIsCreatingGame(false);
     }
   }, []);
 
@@ -203,7 +211,8 @@ function Home() {
             </div>
           </div>
           <button
-            className="bg-buttonLight w-full max-w-[25rem] rounded-lg h-12 p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }"
+            disabled={isCreatingGame}
+            className={`bg-buttonLight ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-12 p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }`}
             onClick={handleClick}
           >
             <img src="/images/play.svg" alt="Play Icon" className="w-[4rem]" />

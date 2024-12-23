@@ -7,6 +7,7 @@ import { socket } from "../socket.js";
 import "./Chat.css";
 import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
+import EmojiPicker from "emoji-picker-react";
 
 function ChatInGame({
   allMessage,
@@ -26,16 +27,21 @@ function ChatInGame({
 
   const [text, setText] = useState("");
 
+  const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
+
   let typingRef = useRef(null);
 
   const handleSendMessage = useCallback(async () => {
     if (!text.trim() || !opponent || !userId) return;
+
+    setIsEmojiPickerTrue(false);
 
     try {
       let encryptedText = encryptMessage(text.trim());
 
       let info = { senderId: userId, message: text.trim() };
 
+      setText("");
       socket.emit("new-message", { senderId: userId, message: encryptedText });
 
       setAllMessage((prev) => [...prev, info]);
@@ -48,7 +54,6 @@ function ChatInGame({
       console.log(error);
       toast.error("Unable to send the message");
     } finally {
-      setText("");
       chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
     }
   }, [gameId, opponent, text, userId]);
@@ -88,8 +93,8 @@ function ChatInGame({
                   alt=""
                   className="w-3 aspect-square inline mr-1 mt-[-3px]"
                 />
-                Messages are end-to-end encrypted. No one outside of this chat,
-                not even chess2.com, can read them.
+                Messages are partially encrypted. No one outside of this chat,
+                (except chess2.com), can read them.
               </p>
             </div>
             {allMessage?.map((info, idx) => (
@@ -121,7 +126,29 @@ function ChatInGame({
           </div>
 
           {/* Input Box */}
-          <div className="w-full relative flex gap-2 p-2">
+          <div className="w-full relative flex gap-2 items-center p-2">
+            <div
+              className="w-10 hover:cursor-pointer h-8"
+            >
+              <img
+                src="/images/smile.png"
+                alt="E"
+                onClick={() => setIsEmojiPickerTrue((prev) => !prev)}
+              />
+            </div>
+            {isEmojiPickerTrue && (
+              <EmojiPicker
+                theme="dark"
+                style={{
+                  position: "absolute",
+                  bottom: "3.5rem",
+                  left: "0.5rem",
+                  height: "25rem"
+                }}
+                lazyLoadEmojis={true}
+                onEmojiClick={(e) => setText((prev) => prev + e.emoji)}
+              />
+            )}
             <input
               type="text"
               value={text}
@@ -142,6 +169,7 @@ function ChatInGame({
                   socket.emit("not-typing", userId);
                 }, 2000);
               }}
+              onFocus={() => setIsEmojiPickerTrue(false)}
               onBlur={() => {
                 typingRef.current = setTimeout(() => {
                   socket.emit("not-typing", userId);
