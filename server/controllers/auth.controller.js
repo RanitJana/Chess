@@ -91,6 +91,7 @@ const verify = AsyncHandler(async (req, res, _) => {
   return res.status(200).json({
     success: true,
     message: "Verified",
+    userId:req.player._id
   });
 });
 
