@@ -28,7 +28,7 @@ function Tab({ isActive, label, onClick, newMessageCount }) {
   );
 }
 
-function GameSideSection({userId}) {
+function GameSideSection({ userId }) {
   const [activeTab, setActiveTab] = useState(0);
 
   const { gameId } = useParams();

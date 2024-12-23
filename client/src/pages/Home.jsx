@@ -24,7 +24,7 @@ function Home() {
 
       const { success, info, totalDocuments } = response?.data || {};
       console.log(info);
-      
+
       if (success) {
         setDoneGames(info);
         setTotalDoneGames(totalDocuments);
@@ -148,29 +148,33 @@ function Home() {
           className="relative cursor-pointer w-fit"
           onMouseEnter={() => setSetting(true)}
           onMouseLeave={() => {
-            setTimeout(() => { setSetting(false) }, 200)
+            setTimeout(() => {
+              setSetting(false);
+            }, 200);
           }}
         >
           <img
             src="/images/settings.png"
             alt="Settings"
             className="aspect-square w-[1.5rem]"
-          />{
-            toggleSetting ?
-              <ul className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden">
-                <li className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all">
-                  <img src="/images/user.png" alt="" className="w-[1.5rem]" />
-                  <span>Profile</span>
-                </li>
-                <li
-                  onClick={handleLogOut}
-                  className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
-                >
-                  <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
-                  <span>Log out</span>
-                </li>
-              </ul> : ""
-          }
+          />
+          {toggleSetting ? (
+            <ul className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden">
+              <li className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all">
+                <img src="/images/user.png" alt="" className="w-[1.5rem]" />
+                <span>Profile</span>
+              </li>
+              <li
+                onClick={handleLogOut}
+                className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+              >
+                <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
+                <span>Log out</span>
+              </li>
+            </ul>
+          ) : (
+            ""
+          )}
         </div>
       </div>
       {/* Header Section */}

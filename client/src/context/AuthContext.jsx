@@ -18,10 +18,8 @@ export { getCookie };
 
 export default function AuthContext({ children }) {
   const [isAuth, setAuth] = useState(
-    (JSON.parse(localStorage.getItem("user")) ) ||
-    false
+    JSON.parse(localStorage.getItem("user")) || false
   );
-
 
   return (
     <authContext.Provider value={{ isAuth, setAuth }}>

@@ -124,7 +124,13 @@ export default function Game() {
           setCheckMate={setCheckMate}
         />
         <ChessBoard />
-        <GameSideSection userId={players?.player1._id == opponent?._id ? players.player2._id : players.player1._id} />
+        <GameSideSection
+          userId={
+            players?.player1._id == opponent?._id
+              ? players.player2._id
+              : players.player1._id
+          }
+        />
       </div>
     </GameContext.Provider>
   );
