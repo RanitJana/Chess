@@ -34,7 +34,7 @@ const login = AsyncHandler(async (req, res, _) => {
 
   return res
     .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("userId", player._id.toString(), cookieOptions)
+    .cookie("userId", player._id.toString())
     .status(200)
     .json({
       success: true,
@@ -91,7 +91,7 @@ const verify = AsyncHandler(async (req, res, _) => {
   return res.status(200).json({
     success: true,
     message: "Verified",
-    userId:req.player._id
+    userId: req.player._id
   });
 });
 
