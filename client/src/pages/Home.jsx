@@ -23,7 +23,8 @@ function Home() {
       const response = await gameDone(total);
 
       const { success, info, totalDocuments } = response?.data || {};
-
+      console.log(info);
+      
       if (success) {
         setDoneGames(info);
         setTotalDoneGames(totalDocuments);

@@ -26,7 +26,7 @@ function CompletedGames({
 }) {
 
   function isUserWinner(game) {
-    return game.winner;
+    return game.youWon;
   }
 
   const navigate = useNavigate();
