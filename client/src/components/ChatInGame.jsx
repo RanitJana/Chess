@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useRef, useState } from "react";
-// import { getCookie } from "../context/AuthContext.jsx";
+import { getCookie } from "../context/AuthContext.jsx";
 import { messagePost } from "../api/message.js";
 import { toast } from "react-hot-toast";
 import { socket } from "../socket.js";
@@ -26,7 +26,7 @@ function ChatInGame({
 
   const [text, setText] = useState("");
 
-  const userId = localStorage.getItem("userId");
+  const userId = getCookie("userId");
 
   let typingRef = useRef(null);
 
