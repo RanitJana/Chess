@@ -34,7 +34,6 @@ const login = AsyncHandler(async (req, res, _) => {
 
   return res
     .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("userId", player._id.toString(), cookieOptions)
     .status(200)
     .json({
       success: true,
@@ -80,7 +79,6 @@ const logout = AsyncHandler(async (req, res, _) => {
   return res
     .clearCookie("accessToken", cookieOptions)
     .status(200)
-    .clearCookie("userId", cookieOptions)
     .json({
       success: true,
       message: "Logged out succesfully",

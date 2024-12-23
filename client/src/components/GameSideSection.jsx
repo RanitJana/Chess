@@ -28,7 +28,7 @@ function Tab({ isActive, label, onClick, newMessageCount }) {
   );
 }
 
-function GameSideSection() {
+function GameSideSection({userId}) {
   const [activeTab, setActiveTab] = useState(0);
 
   const { gameId } = useParams();
@@ -98,6 +98,7 @@ function GameSideSection() {
             gameId={gameId}
             chatSectionRef={chatSectionRef}
             setNewMessageCount={setNewMessageCount}
+            userId={userId}
           />
         );
       default:

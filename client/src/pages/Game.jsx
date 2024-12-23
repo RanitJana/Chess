@@ -60,7 +60,6 @@ export default function Game() {
     async function fetchGameInfo() {
       try {
         const response = await gameSingle(gameId);
-        console.log(response);
 
         if (response?.data.info) {
           let { color, game, board } = response.data.info;
@@ -125,7 +124,7 @@ export default function Game() {
           setCheckMate={setCheckMate}
         />
         <ChessBoard />
-        <GameSideSection />
+        <GameSideSection userId={players?.player1._id == opponent?._id ? players.player2._id : players.player1._id} />
       </div>
     </GameContext.Provider>
   );
