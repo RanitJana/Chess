@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { messagePost } from "../api/message.js";

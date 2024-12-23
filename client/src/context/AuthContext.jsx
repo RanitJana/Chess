@@ -1,8 +1,10 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
 import { useContext, createContext, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // Import useLocation
 import { verify } from "../api/auth";
 import Login from "../pages/Login";
+import SignUp from "../pages/SignUp";
 
 const authContext = createContext();
 
@@ -27,6 +29,7 @@ export { getCookie };
 export default function AuthContext({ children }) {
   const [isLoading, setLoading] = useState(true); // Default to true
   const [isAuth, setAuth] = useState(false);
+  const location = useLocation(); // Hook to access the current route
 
   useEffect(() => {
     const handleVerify = async () => {
@@ -55,6 +58,7 @@ export default function AuthContext({ children }) {
 
     handleVerify();
   }, []);
+
   return (
     <authContext.Provider value={{ isAuth, setAuth }}>
       <div className="bg-[hsl(40,7%,18%)] h-full min-h-[25rem]">
@@ -64,8 +68,12 @@ export default function AuthContext({ children }) {
           </div>
         ) : isAuth ? (
           children
-        ) : (
+        ) : location.pathname === "/login" ? ( // Check the current route
           <Login />
+        ) : location.pathname === "/signup" ? (
+          <SignUp />
+        ) : (
+          <Login /> // Default to Login if the path doesn't match
         )}
       </div>
     </authContext.Provider>
