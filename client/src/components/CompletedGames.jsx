@@ -72,12 +72,12 @@ function CompletedGames({
                       <NamePlate
                         name={game.player1.name}
                         rating={game.player1.rating}
-                        winner={game.winner}
+                        winner={game.player1.won}
                       />
                       <NamePlate
                         name={game.player2.name}
                         rating={game.player2.rating}
-                        winner={game.winner}
+                        winner={game.player2.won}
                       />
                     </div>
                   </td>
