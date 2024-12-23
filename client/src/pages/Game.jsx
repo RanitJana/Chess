@@ -57,6 +57,7 @@ export default function Game() {
 
   // Fetch initial game state
   useEffect(() => {
+    window.scrollTo(0,0);
     async function fetchGameInfo() {
       try {
         const response = await gameSingle(gameId);
