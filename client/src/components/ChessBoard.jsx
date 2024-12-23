@@ -114,7 +114,7 @@ export default function ChessBoard() {
   const boardRef = useRef(null);
 
   return (
-    <div>
+    <div className="flex flex-col h-fit">
       <div className="flex justify-between items-center">
         <div className="flex py-2 gap-4">
           <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
@@ -149,7 +149,7 @@ export default function ChessBoard() {
       </div>
       <div
         ref={boardRef}
-        className="relative w-[100dvw] max-w-[35rem] max-h-[35rem]"
+        className="relative w-[100dvw] max-w-[35rem] aspect-square h-fit"
       >
         {chessboard ? (
           chessboard.map((row, rowIdx) => (
