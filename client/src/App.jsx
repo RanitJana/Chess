@@ -5,6 +5,7 @@ import Home from "./pages/Home.jsx";
 import Game from "./pages/Game.jsx";
 import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
+import Profile from "./pages/Profile.jsx";
 import { useAuthContext } from "./context/AuthContext.jsx";
 
 export default function App() {
@@ -19,6 +20,10 @@ export default function App() {
         <Route
           path="/"
           element={isAuth ? <Home /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/member/:userId"
+          element={isAuth ? <Profile /> : <Navigate to={"/login"} />}
         />
         <Route
           path="/game/:gameId"

@@ -61,7 +61,7 @@ export default function AuthContext({ children }) {
 
   return (
     <authContext.Provider value={{ isAuth, setAuth }}>
-      <div className="bg-[hsl(40,7%,18%)] h-full min-h-[25rem]">
+      <div className="bg-[hsl(40,7%,18%)] h-full min-h-[max(25rem,100dvh)]">
         {isLoading ? (
           <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
             <span className="loader"></span>

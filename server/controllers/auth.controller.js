@@ -38,7 +38,7 @@ const login = AsyncHandler(async (req, res, _) => {
     .json({
       success: true,
       message: "Login successful",
-      userId:player._id
+      userId: player._id
     });
 });
 const signup = AsyncHandler(async (req, res, _) => {
@@ -90,6 +90,13 @@ const verify = AsyncHandler(async (req, res, _) => {
   return res.status(200).json({
     success: true,
     message: "Verified",
+    player: {
+      _id: req.player._id,
+      name: req.player.name,
+      email: req.player.email,
+      rating: req.player.rating,
+      avatar: req.player.avatar
+    }
   });
 });
 
