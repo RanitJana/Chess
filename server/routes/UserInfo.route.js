@@ -4,6 +4,6 @@ import verifyPlayer from "../middlewares/verify.player.js";
 
 const router = express.Router();
 
-router.get("/", verifyPlayer, handlePlayerDetails);
+router.get("/:userId", verifyPlayer, handlePlayerDetails);
 
 export default router;

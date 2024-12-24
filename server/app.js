@@ -40,6 +40,6 @@ app.use("/api/v1/logout", logout);
 app.use("/api/v1/game", game);
 app.use("/api/v1/message", message);
 app.use("/api/v1/verify", verify);
-app.use("/api/v1/user/info/:userId", userInfo);
+app.use("/api/v1/user/info", userInfo);
 
 export default app;

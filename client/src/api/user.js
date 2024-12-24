@@ -5,9 +5,6 @@ const getUserInfo = async function (userId) {
     let response = await axios.get(
       `${import.meta.env.VITE_BACKEND_URI}/api/v1/user/info/${userId}`,
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
         withCredentials: true,
       }
     );
