@@ -95,7 +95,12 @@ const verify = AsyncHandler(async (req, res, _) => {
       name: req.player.name,
       email: req.player.email,
       rating: req.player.rating,
-      avatar: req.player.avatar
+      avatar: req.player.avatar,
+      about: req.player.about,
+      createdAt: req.player.createdAt,
+      updatedAt: req.player.updatedAt,
+      friends: req.player.friends,
+      views: req.player.views
     }
   });
 });

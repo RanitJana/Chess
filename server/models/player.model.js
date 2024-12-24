@@ -28,6 +28,22 @@ const playerSchema = new Schema(
       type: Number,
       default: 200,
     },
+    friends: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Player"
+        }
+      ]
+    },
+    views: {
+      type: Number,
+      default: 0,
+    },
+    about: {
+      type: String,
+      default: "Chess is the gymnasium of the mind."
+    },
     refreshToken: {
       type: String,
       trim: true,

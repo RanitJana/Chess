@@ -115,7 +115,7 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full flex flex-col items-center h-fit sm:p-8 p-4 gap-10">
+    <div className="w-full flex flex-col items-center h-fit sm:p-8 p-2 gap-10">
       {<NavBar />}
       {/* Header Section */}
       <div className="flex flex-wrap justify-center items-center gap-10">
