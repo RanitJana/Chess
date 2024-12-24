@@ -38,7 +38,6 @@ export default function Login() {
 
       if (success) {
         toast.success(message);
-        localStorage.setItem("user", JSON.stringify(response));
         setAuth(response);
         navigate("/");
       } else toast.error(message);

@@ -96,14 +96,7 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
   return res.status(200).json({
     success: true,
     message: "Successful",
-    info: games,
-    player: {
-      name: req.player.name,
-      _id: req.player._id,
-      email: req.player.email,
-      rating: req.player.rating,
-      avatar: req.player.avatar,
-    },
+    info: games
   });
 });
 

@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import { socket } from "../socket.js";
-import Loader from "../components/Loader.jsx";
+
 import CompletedGames from "../components/CompletedGames.jsx";
 import NavBar from "../components/NavBar.jsx";
 
@@ -14,7 +14,6 @@ function Home() {
   const { totalOnline } = useSocketContext();
   const [games, setGames] = useState([]);
   const [doneGames, setDoneGames] = useState([]);
-  const [playerInfo, setPlayerInfo] = useState(null);
   const [totalDoneGames, setTotalDoneGames] = useState(0);
   const [fetchingDoneGamesAll, setFetchingDoneGamesAll] = useState(false);
 
@@ -43,10 +42,9 @@ function Home() {
       try {
         const response = await gameOngoing();
 
-        const { success, info, player } = response?.data || {};
+        const { success, info } = response?.data || {};
         if (success) {
           setGames(info);
-          setPlayerInfo(player);
           info.forEach((game) => {
             socket.emit("game-show", game._id);
           });
@@ -113,13 +111,12 @@ function Home() {
       setIsCreatingGame(false);
     }
   }, []);
-  const [isLoggingOut, setLoggingOut] = useState(false);
+
   const navigate = useNavigate();
 
   return (
     <div className="w-full flex flex-col items-center h-fit sm:p-8 p-4 gap-10">
-      {isLoggingOut && <Loader />}
-      {<NavBar playerInfo={playerInfo} setLoggingOut={setLoggingOut} />}
+      {<NavBar />}
       {/* Header Section */}
       <div className="flex flex-wrap justify-center items-center gap-10">
         <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
