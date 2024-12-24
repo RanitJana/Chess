@@ -30,6 +30,7 @@ function Profile() {
         }
       } else {
         setUser(playerInfo);
+        setLoading(false);
       }
     };
     handleUser();
