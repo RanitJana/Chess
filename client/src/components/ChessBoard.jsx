@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameEnd, gameMove } from "../api/game.js";
 import { socket } from "../socket.js";
@@ -21,6 +22,9 @@ export default function ChessBoard() {
     players,
     setCheckMate,
   } = useGameContext();
+
+  const navigate = useNavigate();
+  console.log(players);
 
   // Handle move updates
   async function updateMoves(clearedBoard, info) {
@@ -123,7 +127,10 @@ export default function ChessBoard() {
           <p>
             {playerColor == "white" ? (
               <>
-                <span className="text-white font-semibold mr-1">
+                <span
+                  onClick={() => navigate(`/member/${players.player2._id}`)}
+                  className="text-white font-semibold mr-1 hover:cursor-pointer"
+                >
                   {players.player2?.name}
                 </span>
                 <span className="text-gray-400">
@@ -132,7 +139,10 @@ export default function ChessBoard() {
               </>
             ) : (
               <>
-                <span className="text-white font-semibold mr-1">
+                <span
+                  onClick={() => navigate(`/member/${players.player1._id}`)}
+                  className="text-white font-semibold mr-1 hover:cursor-pointer"
+                >
                   {players.player1?.name}
                 </span>
                 <span className="text-gray-400">
@@ -188,7 +198,10 @@ export default function ChessBoard() {
           <p>
             {playerColor == "black" ? (
               <>
-                <span className="text-white font-semibold mr-1">
+                <span
+                  onClick={() => navigate(`/member/${players.player2._id}`)}
+                  className="text-white font-semibold mr-1 hover:cursor-pointer"
+                >
                   {players.player2?.name}
                 </span>
                 <span className="text-gray-400">
@@ -197,7 +210,10 @@ export default function ChessBoard() {
               </>
             ) : (
               <>
-                <span className="text-white font-semibold mr-1">
+                <span
+                  onClick={() => navigate(`/member/${players.player1._id}`)}
+                  className="text-white font-semibold mr-1 hover:cursor-pointer"
+                >
                   {players.player1?.name}
                 </span>
                 <span className="text-gray-400">

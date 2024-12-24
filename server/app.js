@@ -12,7 +12,7 @@ app.use(
     origin: origins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ["Content-Type"],
   })
 );
 app.use(cookieParser());
@@ -32,6 +32,7 @@ import logout from "./routes/logout.route.js";
 import game from "./routes/Game.route.js";
 import verify from "./routes/verify.route.js";
 import message from "./routes/message.route.js";
+import userInfo from "./routes/UserInfo.route.js";
 
 app.use("/api/v1/login", login);
 app.use("/api/v1/signup", signup);
@@ -39,5 +40,6 @@ app.use("/api/v1/logout", logout);
 app.use("/api/v1/game", game);
 app.use("/api/v1/message", message);
 app.use("/api/v1/verify", verify);
+app.use("/api/v1/user/info/:userId", userInfo);
 
 export default app;

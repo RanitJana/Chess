@@ -38,7 +38,7 @@ const login = AsyncHandler(async (req, res, _) => {
     .json({
       success: true,
       message: "Login successful",
-      userId: player._id
+      userId: player._id,
     });
 });
 const signup = AsyncHandler(async (req, res, _) => {
@@ -77,13 +77,10 @@ const logout = AsyncHandler(async (req, res, _) => {
 
   await player.save({ validateBeforeSave: false });
 
-  return res
-    .clearCookie("accessToken", cookieOptions)
-    .status(200)
-    .json({
-      success: true,
-      message: "Logged out succesfully",
-    });
+  return res.clearCookie("accessToken", cookieOptions).status(200).json({
+    success: true,
+    message: "Logged out succesfully",
+  });
 });
 
 const verify = AsyncHandler(async (req, res, _) => {
@@ -100,8 +97,8 @@ const verify = AsyncHandler(async (req, res, _) => {
       createdAt: req.player.createdAt,
       updatedAt: req.player.updatedAt,
       friends: req.player.friends,
-      views: req.player.views
-    }
+      views: req.player.views,
+    },
   });
 });
 

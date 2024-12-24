@@ -32,9 +32,9 @@ const playerSchema = new Schema(
       type: [
         {
           type: Schema.Types.ObjectId,
-          ref: "Player"
-        }
-      ]
+          ref: "Player",
+        },
+      ],
     },
     views: {
       type: Number,
@@ -42,7 +42,7 @@ const playerSchema = new Schema(
     },
     about: {
       type: String,
-      default: "Chess is the gymnasium of the mind."
+      default: "Chess is the gymnasium of the mind.",
     },
     refreshToken: {
       type: String,

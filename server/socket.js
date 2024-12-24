@@ -4,7 +4,7 @@ import { _env } from "./constants.js";
 const realTimeInit = function (server) {
   const io = new Server(server, {
     cors: {
-      origin: _env.ORIGIN.split(','),
+      origin: _env.ORIGIN.split(","),
       credentials: true,
     },
     reconnection: true, // Reconnection is enabled
