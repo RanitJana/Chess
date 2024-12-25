@@ -6,10 +6,17 @@ import { gameOngoing, gameSingle } from "../api/game.js";
 import toast from "react-hot-toast";
 import { socket } from "../socket.js";
 
-function CurrentGamePreview({ userId }) {
+function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   const [games, setGames] = useState([]);
 
   const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (addNewGame != null) {
+      setGames((prev) => [addNewGame, ...prev]);
+      setAddNewGame(null);
+    }
+  }, [addNewGame, setAddNewGame]);
 
   useEffect(() => {
     const fetchOngoingGames = async () => {
@@ -59,7 +66,7 @@ function CurrentGamePreview({ userId }) {
     return () => {
       socket.off("update-game-preview", handleUpdateGamePreview);
     };
-  }, []);
+  }, [userId]);
 
   const navigate = useNavigate();
   return (

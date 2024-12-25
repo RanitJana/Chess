@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { gameInit, gameDone } from "../api/game.js";
@@ -41,6 +40,7 @@ function Home() {
   }, [playerInfo]);
 
   const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const [addNewGame, setAddNewGame] = useState(null);
   // Create a new game
   const handleClick = useCallback(async () => {
     try {
@@ -48,7 +48,8 @@ function Home() {
       const response = await gameInit();
       const { success, info, message } = response?.data || {};
       if (success) {
-        setGames((prev) => [info, ...prev]);
+        setAddNewGame(info);
+        // setGames((prev) => [info, ...prev]);
         toast.success(message);
       } else {
         toast.error(message || "Failed to create a game.");
@@ -102,7 +103,11 @@ function Home() {
       </div>
 
       {/* Games Section */}
-      <CurrentGamePreview userId={playerInfo?._id} />
+      <CurrentGamePreview
+        userId={playerInfo?._id}
+        addNewGame={addNewGame}
+        setAddNewGame={setAddNewGame}
+      />
       <CompletedGames
         games={doneGames}
         fetchDoneGames={fetchDoneGames}
