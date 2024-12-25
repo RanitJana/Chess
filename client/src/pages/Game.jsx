@@ -49,8 +49,8 @@ export default function Game() {
     moves: null,
   });
   const [players, setPlayers] = useState({
-    player1: { name: "Loading..", rating: 0 },
-    player2: { name: "Loading..", rating: 0 },
+    player1: { name: "Loading..", rating: 200 },
+    player2: { name: "Loading..", rating: 200 },
   });
 
   const [isCheckMate, setCheckMate] = useState(0);

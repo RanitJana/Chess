@@ -18,10 +18,10 @@ const gameInit = async function (body = {}) {
 };
 
 //get all ongoing game info
-const gameOngoing = async function () {
+const gameOngoing = async function (userId) {
   try {
     let response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/ongoing`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/ongoing/${userId}`,
       {
         withCredentials: true,
       }

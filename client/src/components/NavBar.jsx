@@ -30,7 +30,7 @@ function NavBar() {
     }
   };
   return (
-    <div className="flex items-center max-w-[60rem] w-full justify-between">
+    <div className="flex items-center max-w-[970px] w-full justify-between">
       {isLoggingOut && <Loader />}
       <div className="flex gap-2 items-center">
         <div className="w-[2rem] overflow-hidden rounded-sm">
@@ -52,37 +52,45 @@ function NavBar() {
           </span>
         </p>
       </div>
-      <div
-        className="relative cursor-pointer w-fit"
-        onMouseEnter={() => setSetting(true)}
-        onMouseLeave={() => {
-          setTimeout(() => {
-            setSetting(false);
-          }, 200);
-        }}
-      >
-        <img
-          src="/images/settings.png"
-          alt="Settings"
-          className="aspect-square w-[1.5rem]"
-        />
-        {toggleSetting ? (
-          <ul className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden">
-            <li className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all">
-              <img src="/images/user.png" alt="" className="w-[1.5rem]" />
-              <span>Profile</span>
-            </li>
-            <li
-              onClick={handleLogOut}
-              className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
-            >
-              <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
-              <span>Log out</span>
-            </li>
-          </ul>
-        ) : (
-          ""
-        )}
+      <div className=" flex gap-3">
+        <div className=" hover:cursor-pointer" onClick={() => navigate('/')}>
+          <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
+        </div>
+        <div
+          className="relative cursor-pointer w-fit"
+          onMouseEnter={() => setSetting(true)}
+          onMouseLeave={() => {
+            setTimeout(() => {
+              setSetting(false);
+            }, 200);
+          }}
+        >
+          <img
+            src="/images/settings.png"
+            alt="Settings"
+            className="aspect-square w-[1.5rem]"
+          />
+          {toggleSetting ? (
+            <ul className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden shadow-xl">
+              <li
+                onClick={() => navigate('/member/' + playerInfo._id)}
+                className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+              >
+                <img src="/images/user.png" alt="" className="w-[1.5rem]" />
+                <span>Profile</span>
+              </li>
+              <li
+                onClick={handleLogOut}
+                className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+              >
+                <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
+                <span>Log out</span>
+              </li>
+            </ul>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     </div>
   );

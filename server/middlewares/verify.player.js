@@ -35,7 +35,6 @@ const verifyPlayer = AsyncHandler(async (req, res, next) => {
       });
 
     req.player = player;
-    req._id = _id;
 
     return next();
   } catch (error) {

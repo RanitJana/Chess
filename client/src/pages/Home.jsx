@@ -9,6 +9,7 @@ import { socket } from "../socket.js";
 
 import CompletedGames from "../components/CompletedGames.jsx";
 import NavBar from "../components/NavBar.jsx";
+import { useAuthContext } from "../context/AuthContext.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
@@ -36,11 +37,13 @@ function Home() {
     }
   };
 
+  const { playerInfo } = useAuthContext();
+
   // Fetch daily games
   useEffect(() => {
     const fetchOngoingGames = async () => {
       try {
-        const response = await gameOngoing();
+        const response = await gameOngoing(playerInfo?._id);
 
         const { success, info } = response?.data || {};
         if (success) {
@@ -60,7 +63,7 @@ function Home() {
     };
     fetchOngoingGames();
     fetchDoneGames(5);
-  }, []);
+  }, [playerInfo]);
 
   useEffect(() => {
     const handleUpdateGamePreview = async (gameId) => {

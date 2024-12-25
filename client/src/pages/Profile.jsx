@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
-import Loader from "../components/Loader.jsx";
+import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 
 function Profile() {
   const { userId } = useParams();
@@ -38,13 +38,12 @@ function Profile() {
 
   return (
     <div className="flex flex-col items-center sm:p-8 p-2">
-      {isLoading ? <Loader /> : ""}
       <div className="max-w-[970px] w-full flex flex-col gap-10">
         {<NavBar />}
-        <div className="bg-blackDarkest p-6 rounded-md flex flex-wrap  sm:flex-nowrap gap-5">
-          <div className="max-h-[12rem] rounded-sm overflow-hidden aspect-square">
+        <div className="bg-blackDarkest p-6 rounded-md flex flex-wrap sm:flex-nowrap gap-5">
+          <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
             <img
-              className="h-full w-full"
+              className=""
               src={user?.avatar || "/images/user-pawn.gif"}
               alt=""
             />
@@ -81,6 +80,7 @@ function Profile() {
             </ul>
           </div>
         </div>
+        {<CurrentGamePreview/>}
       </div>
     </div>
   );

@@ -24,7 +24,6 @@ export default function ChessBoard() {
   } = useGameContext();
 
   const navigate = useNavigate();
-  console.log(players);
 
   // Handle move updates
   async function updateMoves(clearedBoard, info) {
