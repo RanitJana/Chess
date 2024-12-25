@@ -4,13 +4,16 @@ import { useParams } from "react-router";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
+import { gameOngoing } from "../api/game.js";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
+import toast from "react-hot-toast";
 
 function Profile() {
   const { userId } = useParams();
   const { playerInfo } = useAuthContext();
   const [isLoading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [games, setGames] = useState([]);
   const [isDifferentUser, setIsDifferentUser] = useState(false);
 
   useEffect(() => {
@@ -33,7 +36,28 @@ function Profile() {
         setLoading(false);
       }
     };
+    const fetchOngoingGames = async () => {
+      try {
+        const response = await gameOngoing(userId);
+
+        const { success, info } = response?.data || {};
+        if (success) {
+          setGames(info);
+
+        } else {
+          toast.error("Failed to fetch games.");
+          toast.error("Please try to login again");
+        }
+      } catch (error) {
+        console.error("Error fetching games:", error);
+        toast.error("Something went wrong while fetching games.");
+      }
+    };
+
+
+    fetchOngoingGames();
     handleUser();
+
   }, [userId, playerInfo]);
 
   return (
@@ -80,7 +104,7 @@ function Profile() {
             </ul>
           </div>
         </div>
-        {<CurrentGamePreview />}
+        <CurrentGamePreview games={games} />
       </div>
     </div>
   );

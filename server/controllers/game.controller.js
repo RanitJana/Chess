@@ -89,9 +89,9 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
 
   //nullify the player which mathces with requested user
   games = games.map((game) => {
-    if (game.player1._id.toString() == req.player._id.toString())
+    if (game.player1._id.toString() == userId.toString())
       game.player1 = null;
-    else if (game.player2._id.toString() == req.player._id.toString())
+    else if (game.player2._id.toString() == userId.toString())
       game.player2 = null;
 
     game.moves = game.moves.length;
