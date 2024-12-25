@@ -71,9 +71,12 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   const navigate = useNavigate();
   return (
     <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
-      <p className="text-white font-bold p-4 border-b-[2px] border-blackLight">
-        Ongoing Games ({games?.length || 0})
-      </p>
+      <div className="flex gap-2 p-4 border-b-[2px] border-blackLight">
+        <img src="/images/sun.png" alt="" className="invert w-6 aspect-square" />
+        <p className="text-white font-bold">
+          Ongoing Games ({games?.length || 0})
+        </p>
+      </div>
       {isLoading ? (
         <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
           {Array.from({ length: 4 }).map((_, idx) => (

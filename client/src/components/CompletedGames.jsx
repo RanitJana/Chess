@@ -97,18 +97,27 @@ function CompletedGames({ userId }) {
                     onClick={(_) => navigate(`/game/${game._id}`)}
                     className="text-center hover:cursor-pointer hover:bg-[rgb(27,27,27)] bg-blackDarkest transition-colors"
                   >
-                    <td className="flex justify-center px-2 py-3">
-                      <div className="flex flex-col justify-start text-start">
-                        <NamePlate
-                          name={game.player1.name}
-                          rating={game.player1.rating}
-                          winner={game.player1.won}
+                    <td className="flex justify-center py-3">
+                      <div className="flex  items-center gap-4">
+                        <img
+                          src="/images/sun.png" alt=""
+                          className="w-6"
+                          style={{
+                            filter: "invert(50%) sepia(100%) saturate(400%) brightness(200%)"
+                          }}
                         />
-                        <NamePlate
-                          name={game.player2.name}
-                          rating={game.player2.rating}
-                          winner={game.player2.won}
-                        />
+                        <div className="flex flex-col justify-start text-start">
+                          <NamePlate
+                            name={game.player1.name}
+                            rating={game.player1.rating}
+                            winner={game.player1.won}
+                          />
+                          <NamePlate
+                            name={game.player2.name}
+                            rating={game.player2.rating}
+                            winner={game.player2.won}
+                          />
+                        </div>
                       </div>
                     </td>
                     <td>
