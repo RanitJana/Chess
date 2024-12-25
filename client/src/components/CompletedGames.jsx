@@ -32,12 +32,17 @@ function CompletedGames({
   return (
     <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
       <p className="text-white p-4 border-b-[2px] border-blackLight flex items-center justify-between">
-        <span className="font-bold">
+        <span className="font-bold py-1">
           Completed Games ({totalDoneGames || 0})
         </span>
-        <span className="mr-6">
+        <span>
           {games.length < totalDoneGames ? (
-            <button onClick={() => fetchDoneGames()}>See all</button>
+            <button
+              className=" bg-blackLight px-3 py-1 rounded-sm active:bg-blackDark"
+              onClick={() => fetchDoneGames()}
+            >
+              See all
+            </button>
           ) : (
             ""
           )}

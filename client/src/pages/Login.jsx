@@ -50,7 +50,6 @@ export default function Login() {
 
   return (
     <div className="relative h-full min-h-[100dvh] w-full grid items-center justify-center">
-      <img src="/images/tile.png" alt="" className="absolute bottom-0 w-full" />
       <form
         onSubmit={handleFormSumbit}
         className="bg-blackDark h-fit max-w-[400px] w-[100dvw] min-w-fit rounded-xl flex flex-col gap-4 z-[2]"

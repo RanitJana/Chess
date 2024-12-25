@@ -1,19 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
-import { gameOngoing, gameInit, gameSingle, gameDone } from "../api/game.js";
+import { gameInit, gameDone } from "../api/game.js";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
-import { socket } from "../socket.js";
-
 import CompletedGames from "../components/CompletedGames.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
-  const [games, setGames] = useState([]);
   const [doneGames, setDoneGames] = useState([]);
   const [totalDoneGames, setTotalDoneGames] = useState(0);
   const [fetchingDoneGamesAll, setFetchingDoneGamesAll] = useState(false);
@@ -41,58 +37,8 @@ function Home() {
 
   // Fetch daily games
   useEffect(() => {
-    const fetchOngoingGames = async () => {
-      try {
-        const response = await gameOngoing(playerInfo?._id);
-
-        const { success, info } = response?.data || {};
-        if (success) {
-          setGames(info);
-          info.forEach((game) => {
-            socket.emit("game-show", game._id);
-          });
-        } else {
-          navigate("/login");
-          toast.error("Failed to fetch games.");
-          toast.error("Please try to login again");
-        }
-      } catch (error) {
-        console.error("Error fetching games:", error);
-        toast.error("Something went wrong while fetching games.");
-      }
-    };
-    fetchOngoingGames();
     fetchDoneGames(5);
   }, [playerInfo]);
-
-  useEffect(() => {
-    const handleUpdateGamePreview = async (gameId) => {
-      try {
-        const response = await gameSingle(gameId);
-        const { success, info } = response?.data || {};
-        if (success) {
-          setGames((prev) =>
-            prev.map((game) =>
-              game._id === gameId
-                ? { ...game, moves: info.game.moves, board: info.game.board }
-                : game
-            )
-          );
-        } else {
-          toast.error("Failed to fetch game updates.");
-        }
-      } catch (error) {
-        console.error("Error updating game preview:", error);
-        toast.error("Something went wrong while updating game preview.");
-      }
-    };
-
-    socket.on("update-game-preview", handleUpdateGamePreview);
-
-    return () => {
-      socket.off("update-game-preview", handleUpdateGamePreview);
-    };
-  }, []);
 
   const [isCreatingGame, setIsCreatingGame] = useState(false);
   // Create a new game
@@ -114,8 +60,6 @@ function Home() {
       setIsCreatingGame(false);
     }
   }, []);
-
-  const navigate = useNavigate();
 
   return (
     <div className="w-full flex flex-col items-center h-fit sm:p-8 p-2 gap-10">
@@ -152,16 +96,13 @@ function Home() {
             <img src="/images/play.svg" alt="Play Icon" className="w-[4rem]" />
             <div className="flex flex-col items-start">
               <span className="text-3xl">New Game</span>
-              {/* <span className="text-sm font-normal">
-                Play with someone at your level
-              </span> */}
             </div>
           </button>
         </div>
       </div>
 
       {/* Games Section */}
-      <CurrentGamePreview games={games} />
+      <CurrentGamePreview userId={playerInfo?._id} />
       <CompletedGames
         games={doneGames}
         fetchDoneGames={fetchDoneGames}

@@ -1,15 +1,82 @@
 /* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
 import ChessBoardPreview from "./ChessBoardPreview.jsx";
+import { useEffect, useState } from "react";
+import { gameOngoing, gameSingle } from "../api/game.js";
+import toast from "react-hot-toast";
+import { socket } from "../socket.js";
 
-function CurrentGamePreview({ games = [] }) {
+function CurrentGamePreview({ userId }) {
+  const [games, setGames] = useState([]);
+
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOngoingGames = async () => {
+      try {
+        setLoading(true);
+        const response = await gameOngoing(userId);
+
+        const { success, info } = response?.data || {};
+        if (success) {
+          setGames(info);
+        } else {
+          toast.error("Failed to fetch games.");
+          toast.error("Please try to login again");
+        }
+      } catch (error) {
+        console.error("Error fetching games:", error);
+        toast.error("Something went wrong while fetching games.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleUpdateGamePreview = async (gameId) => {
+      try {
+        const response = await gameSingle(gameId);
+        const { success, info } = response?.data || {};
+        if (success) {
+          setGames((prev) =>
+            prev.map((game) =>
+              game._id === gameId
+                ? { ...game, moves: info.game.moves, board: info.game.board }
+                : game
+            )
+          );
+        } else {
+          toast.error("Failed to fetch game updates.");
+        }
+      } catch (error) {
+        console.error("Error updating game preview:", error);
+        toast.error("Something went wrong while updating game preview.");
+      }
+    };
+
+    fetchOngoingGames();
+    socket.on("update-game-preview", handleUpdateGamePreview);
+
+    return () => {
+      socket.off("update-game-preview", handleUpdateGamePreview);
+    };
+  }, []);
+
   const navigate = useNavigate();
   return (
     <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
       <p className="text-white font-bold p-4 border-b-[2px] border-blackLight">
         Ongoing Games ({games?.length || 0})
       </p>
-      {games?.length ? (
+      {isLoading ? (
+        <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx}>
+              <div className="aspect-square bg-[rgba(0,0,0,0.22)] rounded-md"></div>
+              <div className="h-[60px] rounded-md shadow-[0_5px_0px_0px_rgb(29,28,26)] bg-blackDark"></div>
+            </div>
+          ))}
+        </div>
+      ) : games?.length ? (
         <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
           {games?.map((game) => {
             const player = game.player1 || game.player2;

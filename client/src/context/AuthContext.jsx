@@ -54,20 +54,23 @@ export default function AuthContext({ children }) {
 
   return (
     <authContext.Provider value={{ isAuth, setAuth, playerInfo }}>
-      <div className="bg-[hsl(40,7%,18%)] h-full min-h-[max(25rem,100dvh)]">
-        {isLoading ? (
-          <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
-            <span className="loader"></span>
-          </div>
-        ) : isAuth ? (
-          children
-        ) : location.pathname === "/login" ? ( // Check the current route
-          <Login />
-        ) : location.pathname === "/signup" ? (
-          <SignUp />
-        ) : (
-          <Login /> // Default to Login if the path doesn't match
-        )}
+      {/* <img src="/images/tile.png" alt="" className="fixed bottom-0 w-full" /> */}
+      <div className="bg-[hsl(40,7%,18%)] bg-[url('/images/tile.png')] bg-cover bg-center bg-no-repeat overflow-y-scroll h-[100dvh]">
+        <div className="min-h-fit">
+          {isLoading ? (
+            <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
+              <span className="loader"></span>
+            </div>
+          ) : isAuth ? (
+            children
+          ) : location.pathname === "/login" ? ( // Check the current route
+            <Login />
+          ) : location.pathname === "/signup" ? (
+            <SignUp />
+          ) : (
+            <Login /> // Default to Login if the path doesn't match
+          )}
+        </div>
       </div>
     </authContext.Provider>
   );

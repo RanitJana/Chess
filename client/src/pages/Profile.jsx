@@ -36,28 +36,7 @@ function Profile() {
         setLoading(false);
       }
     };
-    const fetchOngoingGames = async () => {
-      try {
-        const response = await gameOngoing(userId);
-
-        const { success, info } = response?.data || {};
-        if (success) {
-          setGames(info);
-
-        } else {
-          toast.error("Failed to fetch games.");
-          toast.error("Please try to login again");
-        }
-      } catch (error) {
-        console.error("Error fetching games:", error);
-        toast.error("Something went wrong while fetching games.");
-      }
-    };
-
-
-    fetchOngoingGames();
     handleUser();
-
   }, [userId, playerInfo]);
 
   return (
@@ -104,7 +83,7 @@ function Profile() {
             </ul>
           </div>
         </div>
-        <CurrentGamePreview games={games} />
+        <CurrentGamePreview userId={userId} />
       </div>
     </div>
   );
