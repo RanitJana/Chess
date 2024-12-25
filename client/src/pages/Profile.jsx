@@ -80,7 +80,7 @@ function Profile() {
             </ul>
           </div>
         </div>
-        {<CurrentGamePreview/>}
+        {<CurrentGamePreview />}
       </div>
     </div>
   );

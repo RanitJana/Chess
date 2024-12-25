@@ -53,7 +53,7 @@ function NavBar() {
         </p>
       </div>
       <div className=" flex gap-3">
-        <div className=" hover:cursor-pointer" onClick={() => navigate('/')}>
+        <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
           <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
         </div>
         <div
@@ -73,7 +73,7 @@ function NavBar() {
           {toggleSetting ? (
             <ul className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden shadow-xl">
               <li
-                onClick={() => navigate('/member/' + playerInfo._id)}
+                onClick={() => navigate("/member/" + playerInfo._id)}
                 className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
                 <img src="/images/user.png" alt="" className="w-[1.5rem]" />

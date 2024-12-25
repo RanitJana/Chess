@@ -68,14 +68,14 @@ const gameMove = AsyncHandler(async (req, res, _) => {
 
 //get all games for a user
 const gameOngoing = AsyncHandler(async (req, res, _) => {
-
   const { userId } = req.params;
 
-  if (!userId) return res.status(400).json({
-    success: true,
-    message: "Successful",
-    info: [],
-  })
+  if (!userId)
+    return res.status(400).json({
+      success: true,
+      message: "Successful",
+      info: [],
+    });
 
   let games = await gameSchema
     .find({
@@ -114,7 +114,7 @@ const gameDone = AsyncHandler(async (req, res, _) => {
   // Query to find games based on player and winner
   const query = {
     $and: [
-      { $or: [{ player1: req.player._id }, { player2: req.player_id }] },
+      { $or: [{ player1: req.player._id }, { player2: req.player._id }] },
       { $nor: [{ winner: 0 }] },
     ],
   };
