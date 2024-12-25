@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
-import { gameInit, gameDone } from "../api/game.js";
+import { gameInit } from "../api/game.js";
 import { toast } from "react-hot-toast";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import CompletedGames from "../components/CompletedGames.jsx";
@@ -9,35 +9,8 @@ import { useAuthContext } from "../context/AuthContext.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
-  const [doneGames, setDoneGames] = useState([]);
-  const [totalDoneGames, setTotalDoneGames] = useState(0);
-  const [fetchingDoneGamesAll, setFetchingDoneGamesAll] = useState(false);
-
-  const fetchDoneGames = async (total = null) => {
-    try {
-      setFetchingDoneGamesAll(true);
-      const response = await gameDone(total);
-
-      const { success, info, totalDocuments } = response?.data || {};
-
-      if (success) {
-        setDoneGames(info);
-        setTotalDoneGames(totalDocuments);
-      } else toast.error("Failed to fetch games.");
-    } catch (error) {
-      console.error("Error fetching games:", error);
-      toast.error("Something went wrong while fetching games.");
-    } finally {
-      setFetchingDoneGamesAll(false);
-    }
-  };
 
   const { playerInfo } = useAuthContext();
-
-  // Fetch daily games
-  useEffect(() => {
-    fetchDoneGames(5);
-  }, [playerInfo]);
 
   const [isCreatingGame, setIsCreatingGame] = useState(false);
   const [addNewGame, setAddNewGame] = useState(null);
@@ -108,12 +81,7 @@ function Home() {
         addNewGame={addNewGame}
         setAddNewGame={setAddNewGame}
       />
-      <CompletedGames
-        games={doneGames}
-        fetchDoneGames={fetchDoneGames}
-        totalDoneGames={totalDoneGames}
-        fetchingDoneGamesAll={fetchingDoneGamesAll}
-      />
+      <CompletedGames userId={playerInfo?._id} />
     </div>
   );
 }

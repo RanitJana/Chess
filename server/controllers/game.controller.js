@@ -109,12 +109,12 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
 });
 
 const gameDone = AsyncHandler(async (req, res, _) => {
-  const { total } = req.params;
+  const { total, userId } = req.params;
 
   // Query to find games based on player and winner
   const query = {
     $and: [
-      { $or: [{ player1: req.player._id }, { player2: req.player._id }] },
+      { $or: [{ player1: userId }, { player2: userId }] },
       { $nor: [{ winner: 0 }] },
     ],
   };

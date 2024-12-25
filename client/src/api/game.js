@@ -33,10 +33,10 @@ const gameOngoing = async function (userId) {
   }
 };
 
-const gameDone = async function (total) {
+const gameDone = async function (total, userId) {
   try {
     let response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/done/${total}`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/done/${userId}/${total}`,
       {
         withCredentials: true,
       }

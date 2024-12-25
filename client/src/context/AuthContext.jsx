@@ -12,20 +12,6 @@ export function useAuthContext() {
   return useContext(authContext);
 }
 
-const getCookie = (name) => {
-  const cookies = document.cookie.split("; ");
-  const cookie = cookies.find((cookie) => cookie.startsWith(`${name}=`));
-  return cookie ? cookie.split("=")[1] : null;
-};
-
-// const setCookie = (name, value, days = 7) => {
-//   const expires = new Date();
-//   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-//   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-// };
-
-export { getCookie };
-
 export default function AuthContext({ children }) {
   const [isLoading, setLoading] = useState(true); // Default to true
   const [isAuth, setAuth] = useState(false);

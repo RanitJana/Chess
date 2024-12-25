@@ -2,6 +2,9 @@
 /* eslint-disable react/prop-types */
 import "./GameDone.css";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { gameDone } from "../api/game.js";
+import toast from "react-hot-toast";
 
 function NamePlate({ name, winner, rating }) {
   return (
@@ -17,18 +20,42 @@ function NamePlate({ name, winner, rating }) {
     </div>
   );
 }
+function isUserWinner(game) {
+  return game.youWon;
+}
 
-function CompletedGames({
-  games = [],
-  fetchDoneGames,
-  totalDoneGames,
-  fetchingDoneGamesAll,
-}) {
-  function isUserWinner(game) {
-    return game.youWon;
-  }
+
+function CompletedGames({ userId }) {
 
   const navigate = useNavigate();
+
+  const [games, setGames] = useState([]);
+  const [totalDoneGames, setTotalDoneGames] = useState(0);
+  const [fetchingDoneGamesAll, setFetchingDoneGamesAll] = useState(false);
+
+  const fetchDoneGames = async (total = null) => {
+    try {
+      setFetchingDoneGamesAll(true);
+      const response = await gameDone(total,userId);
+
+      const { success, info, totalDocuments } = response?.data || {};
+
+      if (success) {
+        setGames(info);
+        setTotalDoneGames(totalDocuments);
+      } else toast.error("Failed to fetch games.");
+    } catch (error) {
+      console.error("Error fetching games:", error);
+      toast.error("Something went wrong while fetching games.");
+    } finally {
+      setFetchingDoneGamesAll(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDoneGames(5);
+  }, [userId]);
+
   return (
     <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
       <p className="text-white p-4 border-b-[2px] border-blackLight flex items-center justify-between">

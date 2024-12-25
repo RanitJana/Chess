@@ -4,16 +4,13 @@ import { useParams } from "react-router";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
-import { gameOngoing } from "../api/game.js";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
-import toast from "react-hot-toast";
 
 function Profile() {
   const { userId } = useParams();
   const { playerInfo } = useAuthContext();
   const [isLoading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [games, setGames] = useState([]);
   const [isDifferentUser, setIsDifferentUser] = useState(false);
 
   useEffect(() => {
