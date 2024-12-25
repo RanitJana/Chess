@@ -53,7 +53,7 @@ export default function AuthContext({ children }) {
   }, []);
 
   return (
-    <authContext.Provider value={{ isAuth, setAuth, playerInfo }}>
+    <authContext.Provider value={{ isAuth, setAuth, playerInfo, setPlayerInfo }}>
       {/* <img src="/images/tile.png" alt="" className="fixed bottom-0 w-full" /> */}
       <div className="bg-[hsl(40,7%,18%)] bg-[url('/images/tile.png')] bg-bottom bg-contain bg-no-repeat overflow-y-scroll h-[100dvh]">
         <div className="min-h-fit">

@@ -13,7 +13,7 @@ export default function Login() {
     password: "",
   });
 
-  const { setAuth } = useAuthContext();
+  const { setAuth, setPlayerInfo } = useAuthContext();
 
   const [isSubmit, setSubmit] = useState(false);
 
@@ -34,11 +34,12 @@ export default function Login() {
         email: info.email,
         password: info.password,
       });
-      const { success, message } = response?.data;
+      const { success, message, player } = response?.data;
 
       if (success) {
         toast.success(message);
-        setAuth(response);
+        setAuth(true);
+        setPlayerInfo(player);
         navigate("/");
       } else toast.error(message);
     } catch (error) {
