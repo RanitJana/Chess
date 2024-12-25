@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import "./GameDone.css";
@@ -20,13 +21,8 @@ function NamePlate({ name, winner, rating }) {
     </div>
   );
 }
-function isUserWinner(game) {
-  return game.youWon;
-}
-
 
 function CompletedGames({ userId }) {
-
   const navigate = useNavigate();
 
   const [games, setGames] = useState([]);
@@ -36,7 +32,7 @@ function CompletedGames({ userId }) {
   const fetchDoneGames = async (total = null) => {
     try {
       setFetchingDoneGamesAll(true);
-      const response = await gameDone(total,userId);
+      const response = await gameDone(total, userId);
 
       const { success, info, totalDocuments } = response?.data || {};
 
@@ -88,7 +84,9 @@ function CompletedGames({ userId }) {
             </thead>
             <tbody className="border-separate">
               {games.map((game, idx) => {
-                let isUserCurrentGameWinner = isUserWinner(game);
+                let isUserCurrentGameWinner =
+                  (userId == game.player1._id && game.player1.won) ||
+                  (userId == game.player2._id && game.player2.won);
                 return (
                   <tr
                     key={game._id}

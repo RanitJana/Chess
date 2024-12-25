@@ -5,6 +5,7 @@ import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
+import CompletedGames from "../components/CompletedGames.jsx";
 
 function Profile() {
   const { userId } = useParams();
@@ -81,6 +82,7 @@ function Profile() {
           </div>
         </div>
         <CurrentGamePreview userId={userId} />
+        <CompletedGames userId={userId} />
       </div>
     </div>
   );
