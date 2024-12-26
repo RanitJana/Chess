@@ -15,7 +15,7 @@ import { useGameContext } from "../pages/Game.jsx";
 import { kingCheck, kingCheckMate } from "../utils/KingCheck.js";
 import getKingPos from "../utils/KingPos.js";
 
-function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
+function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails, isViewer }) {
   const {
     chessboard,
     setChessboard,
@@ -91,6 +91,7 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
 
   const handlePlacePiece = useCallback(() => {
+    if (isViewer()) return;
     setMovingPiece({
       from: { row: currPiece.row, col: currPiece.col },
       to: { row, col },
@@ -163,6 +164,7 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   ]);
 
   const handleDisplayPossibleMoves = useCallback(() => {
+    if (isViewer()) return;
     const color = getColor(chessboard, row, col);
     if (color && playerColor !== color) return;
 
@@ -174,7 +176,7 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   }, [chessboard, row, col, playerColor, piece]);
 
   const handlePieceMove = useCallback(() => {
-    if (movePossible === false || !isUserMove) return;
+    if (movePossible === false || !isUserMove || isViewer()) return;
     if (currPiece.moves?.some(([r, c]) => r === row && c === col)) {
       return handlePlacePiece();
     } else {
@@ -191,7 +193,7 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
   ]);
 
   const handlePawnPromotion = (_, idx) => {
-    if (!isUserMove) return;
+    if (!isUserMove || isViewer()) return;
     const clearedBoard = clearPieceMove(chessboard.map((row) => [...row]));
 
     const promotionPieces = ["Q", "R", "B", "N"];
@@ -346,9 +348,9 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails }) {
         style={{
           ...(moveInfo && !isDragging
             ? {
-                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-                transition: "transform 0.1s linear",
-              }
+              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+              transition: "transform 0.1s linear",
+            }
             : {}),
           transition: "transform 0.1s linear",
         }}

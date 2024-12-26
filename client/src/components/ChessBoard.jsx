@@ -7,6 +7,7 @@ import { socket } from "../socket.js";
 import EmptyBoard from "./EmptyBoard.jsx";
 import { useGameContext, convertTo2DArray } from "../pages/Game.jsx";
 import { kingCheckMate } from "../utils/KingCheck.js";
+import { useAuthContext } from "../context/AuthContext.jsx";
 
 export default function ChessBoard() {
   const {
@@ -23,10 +24,18 @@ export default function ChessBoard() {
     setCheckMate,
   } = useGameContext();
 
+  const { playerInfo } = useAuthContext();
+
+  const isViewer = () => {
+    if (!playerInfo || players.player1._id) return true;
+    if (playerInfo._id != players.player1._id || playerInfo._id != players.player2._id) return true;
+  }
+
   const navigate = useNavigate();
 
   // Handle move updates
   async function updateMoves(clearedBoard, info) {
+    if (isViewer()) return;
     let boardString = clearedBoard
       .map((row) => row.join("")) // Use join to avoid commas
       .join("");
@@ -77,6 +86,7 @@ export default function ChessBoard() {
 
   useEffect(() => {
     socket.on("opponent-move", (val) => {
+      if (isViewer()) return;
       let updatedBoard = val[0];
       let move = val[1];
 
@@ -171,6 +181,7 @@ export default function ChessBoard() {
 
                 return (
                   <ChessBoardBox
+                    isViewer={isViewer}
                     key={pieceIdx}
                     row={rowIdx}
                     col={pieceIdx}
