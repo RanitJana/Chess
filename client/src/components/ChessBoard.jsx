@@ -27,8 +27,7 @@ export default function ChessBoard() {
   const { playerInfo } = useAuthContext();
 
   const isViewer = () => {
-    if (!playerInfo || players.player1._id) return true;
-    if (playerInfo._id != players.player1._id || playerInfo._id != players.player2._id) return true;
+    if (playerInfo._id != players.player1._id && playerInfo._id != players.player2._id) return true;
   }
 
   const navigate = useNavigate();
