@@ -36,10 +36,10 @@ function Home() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center h-fit sm:p-8 p-2 gap-10">
+    <div className="w-full flex flex-col items-center h-fit sm:p-8 p-2 gap-5">
       {<NavBar />}
       {/* Header Section */}
-      <div className="flex flex-wrap justify-center items-center gap-10">
+      <div className="flex w-full lg-930:flex-row flex-col justify-center items-center gap-10">
         <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
           <img
             src="/images/standardboard.png"
@@ -64,7 +64,7 @@ function Home() {
           </div>
           <button
             disabled={isCreatingGame}
-            className={`bg-buttonLight ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-12 p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }`}
+            className={`bg-buttonLight ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[5.5rem] p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }`}
             onClick={handleClick}
           >
             <img src="/images/play.svg" alt="Play Icon" className="w-[4rem]" />

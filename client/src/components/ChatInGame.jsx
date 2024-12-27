@@ -8,6 +8,7 @@ import "./Chat.css";
 import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
+import { useAuthContext } from "../context/AuthContext.jsx";
 
 const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
@@ -23,27 +24,34 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
     onEmojiClick={onEmojiClick}
   />
 );
-
+let draftMessageTimeout = null;
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 
 function ChatInGame({
   allMessage,
   setAllMessage,
   gameId,
-  userId,
   chatSectionRef,
   setNewMessageCount,
 }) {
   const { opponent } = useGameContext();
+  const { playerInfo } = useAuthContext();
 
-  useEffect(() => {
-    setNewMessageCount(0);
-  }, []);
+  const userId = playerInfo._id;
+
 
   const [isTyping, setTyping] = useState(false);
   const [text, setText] = useState("");
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
   const typingRef = useRef(null);
+
+  useEffect(() => {
+    setNewMessageCount(0);
+    let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
+    if (allDrafts[gameId]) {
+      setText(allDrafts[gameId])
+    }
+  }, []);
 
   const handleSendMessage = useCallback(async () => {
     if (!text.trim() || !opponent || !userId) return;
@@ -64,6 +72,15 @@ function ChatInGame({
         gameId,
         content: encryptedText,
       });
+      let allDrafts = JSON.parse(localStorage.getItem("draft-messages"));
+      if (allDrafts) {
+        try {
+          delete allDrafts[gameId];
+          localStorage.setItem("draft-messages", JSON.stringify(allDrafts));
+        } catch (error) {
+          console.log(error);
+        }
+      }
     } catch (error) {
       console.error(error);
       toast.error("Unable to send the message");
@@ -98,6 +115,24 @@ function ChatInGame({
     [setText]
   );
 
+  const handleDraftMessages = function (value) {
+    if (draftMessageTimeout) {
+      clearTimeout(draftMessageTimeout);
+    }
+
+    draftMessageTimeout = setTimeout(() => {
+      let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
+      allDrafts[gameId] = value;
+      localStorage.setItem("draft-messages", JSON.stringify(allDrafts));
+    }, 1000);
+
+    return () => {
+      if (draftMessageTimeout) {
+        clearTimeout(draftMessageTimeout);
+      }
+    };
+  }
+
   return (
     <div className="relative h-full w-full flex flex-col">
       {/* Chat Messages */}
@@ -121,16 +156,14 @@ function ChatInGame({
             {allMessage.map((info, idx) => (
               <div
                 key={idx}
-                className={`flex ${
-                  info.senderId === userId ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${info.senderId === userId ? "justify-end" : "justify-start"
+                  }`}
               >
                 <div
-                  className={`p-1 px-2 rounded-lg ${
-                    info.senderId === userId
-                      ? "bg-blue-500 rounded-br-none"
-                      : "bg-white text-black rounded-bl-none"
-                  } max-w-[90%]`}
+                  className={`p-1 px-2 rounded-lg ${info.senderId === userId
+                    ? "bg-blue-500 rounded-br-none"
+                    : "bg-white text-black rounded-bl-none"
+                    } max-w-[90%]`}
                 >
                   {info.message}
                 </div>
@@ -166,7 +199,10 @@ function ChatInGame({
             <input
               type="text"
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value)
+                handleDraftMessages(e.target.value);
+              }}
               className="w-full bg-transparent border-[1px] p-2 px-4 text-white outline-none rounded-3xl"
               placeholder="Send a message..."
               onKeyDown={(e) => {

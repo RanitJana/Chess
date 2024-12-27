@@ -39,7 +39,7 @@ function Profile() {
 
   return (
     <div className="flex flex-col items-center sm:p-8 p-2">
-      <div className="max-w-[970px] w-full flex flex-col gap-10">
+      <div className="max-w-[970px] w-full flex flex-col gap-5">
         {<NavBar />}
         <div className="bg-blackDarkest p-6 rounded-md flex flex-wrap sm:flex-nowrap gap-5">
           <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">

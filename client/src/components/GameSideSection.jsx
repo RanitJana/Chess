@@ -11,9 +11,8 @@ import { socket } from "../socket.js";
 function Tab({ isActive, label, onClick, newMessageCount }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
-        isActive ? "border-white" : "border-transparent"
-      } cursor-pointer`}
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${isActive ? "border-white" : "border-transparent"
+        } cursor-pointer`}
       onClick={onClick}
     >
       {label == "Chat" && newMessageCount > 0 ? (
@@ -28,7 +27,7 @@ function Tab({ isActive, label, onClick, newMessageCount }) {
   );
 }
 
-function GameSideSection({ userId }) {
+function GameSideSection() {
   const [activeTab, setActiveTab] = useState(0);
 
   const { gameId } = useParams();
@@ -98,7 +97,6 @@ function GameSideSection({ userId }) {
             gameId={gameId}
             chatSectionRef={chatSectionRef}
             setNewMessageCount={setNewMessageCount}
-            userId={userId}
           />
         );
       default:
