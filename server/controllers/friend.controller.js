@@ -47,7 +47,11 @@ const rejectFriendRequest = AsyncHandler(async (req, res, _) => {
 
 const getFriends = AsyncHandler(async (req, res, _) => {
     const { _id } = req.player;
-    const friends = await friendSchema.find({ $or: [{ sender: _id }, { receiver: _id }] });
+    const friends = await friendSchema
+        .find({
+            $or: [{ sender: _id }, { receiver: _id }]
+        })
+        .populate("sender", "name _id rating");
     return res.status(200).json({
         success: true,
         message: "Succesful",
@@ -58,6 +62,11 @@ const getFriends = AsyncHandler(async (req, res, _) => {
 const sendFriendRequest = AsyncHandler(async (req, res) => {
     const { sender, receiver } = req.body;
 
+    if (!sender || !receiver) return res.status(400).json({
+        success: false,
+        message: "Invalid request"
+    })
+
     let existingRequest = await friendSchema.findOne({
         $or: [
             { sender, receiver },
@@ -67,7 +76,7 @@ const sendFriendRequest = AsyncHandler(async (req, res) => {
 
     if (existingRequest) return res.status(200).json({
         success: false,
-        message: existingRequest.accept ? "Already friends" : "Already frined request send",
+        message: existingRequest.accept ? "Already friends" : "Already friend request is sent",
         info: existingRequest
     })
 

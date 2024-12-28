@@ -1,20 +1,47 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react'
-import NavBar from '../components/NavBar'
+import React, { useEffect, useState } from 'react'
+import NavBar from '../components/NavBar.jsx'
 import { useNavigate, useParams } from 'react-router';
+import { getFriends } from '../api/friend.js';
+import toast from 'react-hot-toast';
 
 function Friends() {
 
     const { userId } = useParams();
     const navigate = useNavigate();
-    const [friends, setFriends] =
-        useState([
-            { name: "Neha", "_id": '6769c43cddfe8c4bfa72f160', "rating": 200 },
-            { name: "Shouvik", "_id": '676850be6f3872e641d267db', "rating": 200 }
-        ]);
-    const [pendingFriends, setPendingFriends] = useState([
-        { name: "Sampa", "_id": '6769c43cddfe8c4bfa72f160', "rating": 200 },
-    ])
+    const [isLoading, setLoading] = useState(false);
+    const [friends, setFriends] = useState({
+        already: [],
+        pending: []
+    });
+
+    useEffect(() => {
+        const handleGetAllFriends = async () => {
+            try {
+                setLoading(true);
+                let response = await getFriends();
+                if (response) {
+                    let tempFrndReq = [], tempFrnds = [];
+                    response.data.friends.map(value => {
+                        if (value.accept) tempFrnds.push({ ...(value.sender), modelId: value._id });
+                        else tempFrndReq.push({ ...(value.sender), modelId: value._id });
+                    })
+                    setFriends(() => ({ already: tempFrnds, pending: tempFrndReq }));
+                }
+                else {
+                    toast.error("Please try to refresh the page again.")
+                }
+
+            } catch (error) {
+                console.log(error);
+                toast.error("Please try to refresh the page again.")
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+        handleGetAllFriends();
+    }, [userId]);
 
     return (
         <div className="flex flex-col items-center sm:p-8 p-2">
@@ -40,32 +67,34 @@ function Friends() {
                     <div>
                         <div>
                             <span className='text-white mr-2 font-semibold'>Friend requests</span>
-                            <span className='bg-blackLight text-white px-2 py-1 rounded-md'>{pendingFriends.length}</span>
+                            <span className='bg-blackLight text-white px-2 py-1 rounded-md'>{friends.pending.length}</span>
                         </div>
                     </div>
                     {
-                        pendingFriends?.length ?
+                        friends.pending?.length ?
                             <ul className='flex flex-col gap-7'>
                                 {
-                                    pendingFriends.map(user => {
+                                    friends.pending.map(user => {
                                         return (
                                             <li key={user._id} className='flex relative'>
-                                                <div className='flex items-center gap-5 min-w-fit'>
-                                                    <div className='w-20'>
-                                                        <img src={user.avatar || '/images/user-pawn.gif'} alt="Dp" className='w-20' />
+                                                <div className='flex items-center gap-4 w-full'>
+                                                    <div className='w-[6rem] min-w-[5rem]'>
+                                                        <img src={user.avatar || '/images/user-pawn.gif'} alt="Dp" className='w-full h-full' />
                                                     </div>
-                                                    <div>
-                                                        <span className='text-white font-semibold hover:cursor-pointer' onClick={() => navigate(`/member/${user._id}`)}>{user.name} </span>
-                                                        <span className='text-gray-400 hover:cursor-pointer' onClick={() => navigate(`/member/${user._id}`)}>({user.rating})</span>
+                                                    <div className='grid grid-rows-2 w-full'>
+                                                        <div>
+                                                            <span className='text-white font-semibold hover:cursor-pointer' onClick={() => navigate(`/member/${user._id}`)}>{user.name} </span>
+                                                            <span className='text-gray-400 hover:cursor-pointer' onClick={() => navigate(`/member/${user._id}`)}>({user.rating})</span>
+                                                        </div>
+                                                        <div className='grid grid-cols-2 gap-2 w-full max-w-[20rem]'>
+                                                            <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'>
+                                                                <img src="/images/cross.png" alt="" className='w-6' />
+                                                            </button>
+                                                            <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'>
+                                                                <img src="/images/tick.png" alt="" className='w-5' />
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className='flex items-center gap-3 absolute top-1/2 right-0 translate-y-[-50%] bg-blackDarkest'>
-                                                    <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-[3rem] active:bg-blackLight transition-colors'>
-                                                        <img src="/images/cross.png" alt="" className='w-6' />
-                                                    </button>
-                                                    <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-[3rem] active:bg-blackLight transition-colors'>
-                                                        <img src="/images/tick.png" alt="" className='w-5' />
-                                                    </button>
                                                 </div>
                                             </li>
                                         )
@@ -73,17 +102,42 @@ function Friends() {
                                 }
                             </ul> : ""
                     }
+                    {
+                        isLoading && (
+                            <div className='flex relative'>
+                                <div className='flex items-center gap-4 w-full'>
+                                    <div className='w-[6rem] min-w-[5rem]'>
+                                        <img src={'/images/user-pawn.gif'} alt="Dp" className='w-full h-full' />
+                                    </div>
+                                    <div className='grid grid-rows-2 w-full'>
+                                        <div>
+                                            <span className='text-white font-semibold hover:cursor-pointer'>Loading... </span>
+                                            <span className='text-gray-400 hover:cursor-pointer'>(200)</span>
+                                        </div>
+                                        <div className='grid grid-cols-2 gap-2 w-full max-w-[20rem]'>
+                                            <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'>
+                                                <img src="/images/cross.png" alt="" className='w-6' />
+                                            </button>
+                                            <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'>
+                                                <img src="/images/tick.png" alt="" className='w-5' />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
                     <div>
                         <div>
                             <span className='text-white mr-2 font-semibold'>Friends</span>
-                            <span className='bg-blackLight text-white px-2 py-1 rounded-md'>{friends.length}</span>
+                            <span className='bg-blackLight text-white px-2 py-1 rounded-md'>{friends.already.length}</span>
                         </div>
                     </div>
                     {
-                        friends?.length ?
+                        friends.already?.length ?
                             <ul className='flex flex-col gap-7'>
                                 {
-                                    friends.map(user => {
+                                    friends.already.map(user => {
                                         return (
                                             <li key={user._id} className='flex justify-between'>
                                                 <div className='flex items-center gap-5'>

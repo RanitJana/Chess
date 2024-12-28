@@ -41,9 +41,11 @@ function Profile() {
   const handleSendFriendRequest = async () => {
     try {
       setIsSendFriendRequest(true);
-      let response = await sendFriendRequest();
-      console.log(response);
-
+      let response = await sendFriendRequest({ sender: playerInfo._id, receiver: userId });
+      if (response) {
+        if (response.data.success) toast.success(response.data.message);
+        else toast.error(response.data.message);
+      }
     } catch (error) {
       console.log(error);
       toast.error("Please try again..")
