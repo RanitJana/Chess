@@ -66,6 +66,86 @@ function AcceptedFriendsSkeleton({ isLoading }) {
   );
 }
 
+function ListFriend({ user, navigate, setFriends }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
+
+  const handleRejectFriendRequest = async function (modelId) {
+    if (isSubmit) return;
+
+    try {
+      setIsSubmit(true);
+      let response = await rejectFriendRequest({ modelId });
+
+      if (response) {
+        if (response.data.success) {
+          toast.success("Friend Removed");
+          setFriends((prev) => {
+            return {
+              already: prev.already.filter((prev) => prev.modelId != modelId),
+              pending: prev.pending,
+            };
+          });
+        } else toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Please try again");
+    } finally {
+      setIsSubmit(false);
+    }
+  };
+
+  return (
+    <li key={user._id} className="flex justify-between">
+      <div className="flex items-center gap-5">
+        <div className="w-20">
+          <img
+            src={user.avatar || "/images/user-pawn.gif"}
+            alt="Dp"
+            className="w-20"
+          />
+        </div>
+        <div>
+          <span
+            className="text-white font-semibold hover:cursor-pointer"
+            onClick={() => navigate(`/member/${user._id}`)}
+          >
+            {user.name}{" "}
+          </span>
+          <span
+            className="text-gray-400 hover:cursor-pointer"
+            onClick={() => navigate(`/member/${user._id}`)}
+          >
+            ({user.rating})
+          </span>
+        </div>
+      </div>
+      <div className="relative">
+        <button
+          className="text-white bg-blackLight active:bg-blackDark text-center rounded-full w-[2rem] aspect-square flex items-center justify-center"
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          <img src="/images/more.png" alt="" className="w-4 invert rotate-90" />
+        </button>
+        {isOpen ? (
+          <ul className="absolute top-[2rem] pt-1 right-0 rounded-md w-[min(15rem,90dvw)] text-white overflow-hidden shadow-[3px_3px_6px_1px_rgba(0,0,0,0.5)]">
+            <li
+              className="flex justify-start rounded-md items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+              onClick={() => handleRejectFriendRequest(user.modelId)}
+            >
+              <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
+              <span>Remove Friend</span>
+            </li>
+          </ul>
+        ) : (
+          ""
+        )}
+      </div>
+    </li>
+  );
+}
+
 function Friends() {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -274,32 +354,12 @@ function Friends() {
             <ul className="flex flex-col gap-7">
               {friends.already.map((user) => {
                 return (
-                  <li key={user._id} className="flex justify-between">
-                    <div className="flex items-center gap-5">
-                      <div className="w-20">
-                        <img
-                          src={user.avatar || "/images/user-pawn.gif"}
-                          alt="Dp"
-                          className="w-20"
-                        />
-                      </div>
-                      <div>
-                        <span
-                          className="text-white font-semibold hover:cursor-pointer"
-                          onClick={() => navigate(`/member/${user._id}`)}
-                        >
-                          {user.name}{" "}
-                        </span>
-                        <span
-                          className="text-gray-400 hover:cursor-pointer"
-                          onClick={() => navigate(`/member/${user._id}`)}
-                        >
-                          ({user.rating})
-                        </span>
-                      </div>
-                    </div>
-                    <div></div>
-                  </li>
+                  <ListFriend
+                    key={user._id}
+                    user={user}
+                    navigate={navigate}
+                    setFriends={setFriends}
+                  />
                 );
               })}
             </ul>
