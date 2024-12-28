@@ -56,7 +56,10 @@ function NavBar() {
         <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
           <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
         </div>
-        <div className=" hover:cursor-pointer" onClick={() => navigate("/friends/" + playerInfo?._id)}>
+        <div
+          className=" hover:cursor-pointer"
+          onClick={() => navigate("/friends/" + playerInfo?._id)}
+        >
           <img src="/images/friends.png" className="w-[1.6rem]" alt="" />
         </div>
         <div

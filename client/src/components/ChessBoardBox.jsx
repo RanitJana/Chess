@@ -15,7 +15,15 @@ import { useGameContext } from "../pages/Game.jsx";
 import { kingCheck, kingCheckMate } from "../utils/KingCheck.js";
 import getKingPos from "../utils/KingPos.js";
 
-function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails, isViewer }) {
+function ChessBoardBox({
+  row,
+  col,
+  color,
+  piece,
+  updateMoves,
+  boardDetails,
+  isViewer,
+}) {
   const {
     chessboard,
     setChessboard,
@@ -348,9 +356,9 @@ function ChessBoardBox({ row, col, color, piece, updateMoves, boardDetails, isVi
         style={{
           ...(moveInfo && !isDragging
             ? {
-              transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-              transition: "transform 0.1s linear",
-            }
+                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
+                transition: "transform 0.1s linear",
+              }
             : {}),
           transition: "transform 0.1s linear",
         }}

@@ -72,7 +72,11 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   return (
     <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
       <div className="flex gap-2 p-4 border-b-[2px] border-blackLight">
-        <img src="/images/sun.png" alt="" className="invert w-6 aspect-square" />
+        <img
+          src="/images/sun.png"
+          alt=""
+          className="invert w-6 aspect-square"
+        />
         <p className="text-white font-bold">
           Ongoing Games ({games?.length || 0})
         </p>

@@ -100,10 +100,12 @@ function CompletedGames({ userId }) {
                     <td className="flex justify-center py-3">
                       <div className="flex  items-center gap-4">
                         <img
-                          src="/images/sun.png" alt=""
+                          src="/images/sun.png"
+                          alt=""
                           className="w-6"
                           style={{
-                            filter: "invert(50%) sepia(100%) saturate(400%) brightness(200%)"
+                            filter:
+                              "invert(50%) sepia(100%) saturate(400%) brightness(200%)",
                           }}
                         />
                         <div className="flex flex-col justify-start text-start">

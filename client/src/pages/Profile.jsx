@@ -39,21 +39,24 @@ function Profile() {
   }, [userId, playerInfo]);
 
   const handleSendFriendRequest = async () => {
+    if (isSendFriendRequest) return;
     try {
       setIsSendFriendRequest(true);
-      let response = await sendFriendRequest({ sender: playerInfo._id, receiver: userId });
+      let response = await sendFriendRequest({
+        sender: playerInfo._id,
+        receiver: userId,
+      });
       if (response) {
         if (response.data.success) toast.success(response.data.message);
         else toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again..")
-    }
-    finally {
+      toast.error("Please try again..");
+    } finally {
       setIsSendFriendRequest(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center sm:p-8 p-2">
@@ -100,27 +103,26 @@ function Profile() {
               </ul>
             </div>
           </div>
-          {
-            playerInfo?._id !== userId ?
-              <div className="mt-6">
-                <button
-                  className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
-                  onClick={handleSendFriendRequest}
-                  disabled={isSendFriendRequest}
-                >
-                  {
-                    isSendFriendRequest ?
-                      <span className="loader" style={{ width: '1.5rem', height: "1.5rem" }}></span>
-                      :
-                      <>
-                        <div className="w-5"><img src="/images/add-user.png" alt="" className="invert" /></div>
-                        <span className="font-semibold text-white">Add Friend</span>
-                      </>
-                  }
-                </button>
-              </div>
-              : ""
-          }
+          {playerInfo?._id !== userId ? (
+            <div className="mt-6">
+              <button
+                className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
+                style={{
+                  opacity: isSendFriendRequest ? "0.5" : "1",
+                  cursor: isSendFriendRequest ? "not-allowed" : "pointer",
+                }}
+                onClick={handleSendFriendRequest}
+                disabled={isSendFriendRequest}
+              >
+                <div className="w-5">
+                  <img src="/images/add-user.png" alt="" className="invert" />
+                </div>
+                <span className="font-semibold text-white">Add Friend</span>
+              </button>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         <CurrentGamePreview userId={userId} />
         <CompletedGames userId={userId} />

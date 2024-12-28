@@ -39,7 +39,6 @@ function ChatInGame({
 
   const userId = playerInfo._id;
 
-
   const [isTyping, setTyping] = useState(false);
   const [text, setText] = useState("");
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
@@ -49,7 +48,7 @@ function ChatInGame({
     setNewMessageCount(0);
     let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
     if (allDrafts[gameId]) {
-      setText(allDrafts[gameId])
+      setText(allDrafts[gameId]);
     }
   }, []);
 
@@ -131,7 +130,7 @@ function ChatInGame({
         clearTimeout(draftMessageTimeout);
       }
     };
-  }
+  };
 
   return (
     <div className="relative h-full w-full flex flex-col">
@@ -156,14 +155,16 @@ function ChatInGame({
             {allMessage.map((info, idx) => (
               <div
                 key={idx}
-                className={`flex ${info.senderId === userId ? "justify-end" : "justify-start"
-                  }`}
+                className={`flex ${
+                  info.senderId === userId ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
-                  className={`p-1 px-2 rounded-lg ${info.senderId === userId
-                    ? "bg-blue-500 rounded-br-none"
-                    : "bg-white text-black rounded-bl-none"
-                    } max-w-[90%]`}
+                  className={`p-1 px-2 rounded-lg ${
+                    info.senderId === userId
+                      ? "bg-blue-500 rounded-br-none"
+                      : "bg-white text-black rounded-bl-none"
+                  } max-w-[90%]`}
                 >
                   {info.message}
                 </div>
@@ -200,7 +201,7 @@ function ChatInGame({
               type="text"
               value={text}
               onChange={(e) => {
-                setText(e.target.value)
+                setText(e.target.value);
                 handleDraftMessages(e.target.value);
               }}
               className="w-full bg-transparent border-[1px] p-2 px-4 text-white outline-none rounded-3xl"
