@@ -121,7 +121,7 @@ export default function ChessBoard() {
     return () => {
       socket.off("opponent-move");
     };
-  }, [playerColor]);
+  }, []);
 
   const boardRef = useRef(null);
 

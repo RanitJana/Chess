@@ -2,22 +2,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import NavBar from "../components/NavBar.jsx";
+import toast from "react-hot-toast";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import CompletedGames from "../components/CompletedGames.jsx";
+import { sendFriendRequest } from "../api/friend.js";
 
 function Profile() {
   const { userId } = useParams();
   const { playerInfo } = useAuthContext();
   const [isLoading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [isDifferentUser, setIsDifferentUser] = useState(false);
 
   useEffect(() => {
     const handleUser = async () => {
       if (userId != playerInfo?._id) {
-        setIsDifferentUser(true);
         try {
           setLoading(true);
           let response = await getUserInfo(userId);
@@ -37,49 +37,76 @@ function Profile() {
     handleUser();
   }, [userId, playerInfo]);
 
+  const handleSendFriendRequest = async () => {
+    try {
+      let response = await sendFriendRequest();
+      console.log(response);
+      
+    } catch (error) {
+      console.log(error);
+      toast.error("Please try again..")
+
+    }
+  }
+
   return (
     <div className="flex flex-col items-center sm:p-8 p-2">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
         {<NavBar />}
-        <div className="bg-blackDarkest p-6 rounded-md flex flex-wrap sm:flex-nowrap gap-5">
-          <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
-            <img
-              className=""
-              src={user?.avatar || "/images/user-pawn.gif"}
-              alt=""
-            />
-          </div>
-          <div className="flex flex-col justify-between w-full text-[rgb(146,147,145)] gap-5">
-            <div>
-              <p className="text-white font-bold text-2xl">
-                {user?.name || "Loading.."}
-              </p>
-              <p>{user?.about || "Loading.."}</p>
+        <div className="bg-blackDarkest p-6 rounded-md">
+          <div className=" flex flex-wrap sm:flex-nowrap gap-5">
+            <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
+              <img
+                className=""
+                src={user?.avatar || "/images/user-pawn.gif"}
+                alt=""
+              />
             </div>
-            <ul className="flex w-full justify-between max-w-[20rem]">
-              <li className="flex flex-col justify-center items-center">
-                <img className="w-8" src="/images/joined.png" alt="" />
-                <span>
-                  {new Date(user?.createdAt || Date.now()).toLocaleDateString(
-                    "en-US",
-                    {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    }
-                  )}
-                </span>
-              </li>
-              <li className="flex flex-col justify-center items-center">
-                <img className="w-8" src="/images/followers.png" alt="" />
-                <span>{user?.friends.length || 0}</span>
-              </li>
-              <li className="flex flex-col justify-center items-center">
-                <img className="w-8" src="/images/icons8-eye-24.png" alt="" />
-                <span>{user?.views || 0}</span>
-              </li>
-            </ul>
+            <div className="flex flex-col justify-between w-full text-[rgb(146,147,145)] gap-5">
+              <div>
+                <p className="text-white font-bold text-2xl">
+                  {user?.name || "Loading.."}
+                </p>
+                <p>{user?.about || "Loading.."}</p>
+              </div>
+              <ul className="flex w-full justify-between max-w-[20rem]">
+                <li className="flex flex-col justify-center items-center">
+                  <img className="w-8" src="/images/joined.png" alt="" />
+                  <span>
+                    {new Date(user?.createdAt || Date.now()).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      }
+                    )}
+                  </span>
+                </li>
+                <li className="flex flex-col justify-center items-center">
+                  <img className="w-8" src="/images/followers.png" alt="" />
+                  <span>{user?.friends.length || 0}</span>
+                </li>
+                <li className="flex flex-col justify-center items-center">
+                  <img className="w-8" src="/images/icons8-eye-24.png" alt="" />
+                  <span>{user?.views || 0}</span>
+                </li>
+              </ul>
+            </div>
           </div>
+          {
+            playerInfo?._id !== userId ?
+              <div className="mt-6">
+                <button
+                  className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
+                  onClick={handleSendFriendRequest}
+                >
+                  <div className="w-5"><img src="/images/add-user.png" alt="" className="invert" /></div>
+                  <span className="font-semibold text-white">Add Friend</span>
+                </button>
+              </div>
+              : ""
+          }
         </div>
         <CurrentGamePreview userId={userId} />
         <CompletedGames userId={userId} />

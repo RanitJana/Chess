@@ -52,7 +52,7 @@ function NavBar() {
           </span>
         </p>
       </div>
-      <div className=" flex gap-5">
+      <div className=" flex gap-3">
         <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
           <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
         </div>

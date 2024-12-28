@@ -58,6 +58,19 @@ const getFriends = AsyncHandler(async (req, res, _) => {
 const sendFriendRequest = AsyncHandler(async (req, res) => {
     const { sender, receiver } = req.body;
 
+    let existingRequest = await friendSchema.findOne({
+        $or: [
+            { sender, receiver },
+            { sender: receiver, receiver: sender }
+        ]
+    })
+
+    if (existingRequest) res.status(200).json({
+        success: false,
+        message: existingRequest.accept ? "Already friends" : "Already frined request send",
+        info: existingRequest
+    })
+
     let newFriendReq = await friendSchema.create({ sender, receiver });
 
     return res.status(200).json({
