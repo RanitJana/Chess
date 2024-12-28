@@ -10,7 +10,7 @@ const _env = {
 };
 
 const cookieOptions = {
-  httpOnly: false, // Ensures the cookie is sent only via HTTP(S) and not accessible to JavaScript (e.g., `document.cookie`).
+  httpOnly: process.env.COOKIE_HTTPONLY == 1 ? true : false, // Ensures the cookie is sent only via HTTP(S) and not accessible to JavaScript (e.g., `document.cookie`).
   secure: true, // Ensures the cookie is sent only over HTTPS.
   maxAge: 24 * 60 * 60 * 1000, //set for 1 day.
   sameSite: "none",
