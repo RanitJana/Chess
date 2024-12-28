@@ -51,7 +51,9 @@ const getFriends = AsyncHandler(async (req, res, _) => {
     .find({
       $or: [{ sender: _id }, { receiver: _id }],
     })
-    .populate("sender", "name _id rating");
+    .populate("sender", "name _id rating")
+    .populate("receiver", "name _id rating");
+
   return res.status(200).json({
     success: true,
     message: "Succesful",
