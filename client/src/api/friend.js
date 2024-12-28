@@ -6,9 +6,6 @@ const sendFriendRequest = async function (body = {}) {
             `${import.meta.env.VITE_BACKEND_URI}/api/v1/friend/send`,
             body,
             {
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 withCredentials: true,
             }
         );
@@ -24,9 +21,6 @@ const getFriends = async function () {
         let response = await axios.get(
             `${import.meta.env.VITE_BACKEND_URI}/api/v1/friend/all`,
             {
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 withCredentials: true,
             }
         );
@@ -43,9 +37,6 @@ const acceptFriendRequest = async function (body = {}) {
             `${import.meta.env.VITE_BACKEND_URI}/api/v1/friend/accept`,
             body,
             {
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 withCredentials: true,
             }
         );
@@ -62,9 +53,6 @@ const rejectFriendRequest = async function (body = {}) {
             `${import.meta.env.VITE_BACKEND_URI}/api/v1/friend/reject`,
             body,
             {
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 withCredentials: true,
             }
         );

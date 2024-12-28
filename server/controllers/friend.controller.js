@@ -65,7 +65,7 @@ const sendFriendRequest = AsyncHandler(async (req, res) => {
         ]
     })
 
-    if (existingRequest) res.status(200).json({
+    if (existingRequest) return res.status(200).json({
         success: false,
         message: existingRequest.accept ? "Already friends" : "Already frined request send",
         info: existingRequest

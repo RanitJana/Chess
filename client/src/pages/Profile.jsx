@@ -13,6 +13,7 @@ function Profile() {
   const { userId } = useParams();
   const { playerInfo } = useAuthContext();
   const [isLoading, setLoading] = useState(true);
+  const [isSendFriendRequest, setIsSendFriendRequest] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -39,13 +40,16 @@ function Profile() {
 
   const handleSendFriendRequest = async () => {
     try {
+      setIsSendFriendRequest(true);
       let response = await sendFriendRequest();
       console.log(response);
-      
+
     } catch (error) {
       console.log(error);
       toast.error("Please try again..")
-
+    }
+    finally {
+      setIsSendFriendRequest(false);
     }
   }
 
@@ -100,9 +104,17 @@ function Profile() {
                 <button
                   className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
                   onClick={handleSendFriendRequest}
+                  disabled={isSendFriendRequest}
                 >
-                  <div className="w-5"><img src="/images/add-user.png" alt="" className="invert" /></div>
-                  <span className="font-semibold text-white">Add Friend</span>
+                  {
+                    isSendFriendRequest ?
+                      <span className="loader" style={{ width: '1.5rem', height: "1.5rem" }}></span>
+                      :
+                      <>
+                        <div className="w-5"><img src="/images/add-user.png" alt="" className="invert" /></div>
+                        <span className="font-semibold text-white">Add Friend</span>
+                      </>
+                  }
                 </button>
               </div>
               : ""
