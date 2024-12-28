@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import NavBar from '../components/NavBar.jsx'
 import { useNavigate, useParams } from 'react-router';
-import { getFriends } from '../api/friend.js';
+import { getFriends, rejectFriendRequest } from '../api/friend.js';
 import toast from 'react-hot-toast';
 
 function Friends() {
@@ -24,7 +24,7 @@ function Friends() {
                     let tempFrndReq = [], tempFrnds = [];
                     response.data.friends.map(value => {
                         if (value.accept) tempFrnds.push({ ...(value.sender), modelId: value._id });
-                        else tempFrndReq.push({ ...(value.sender), modelId: value._id });
+                        else if (value.sender._id.toString() !== userId.toString()) tempFrndReq.push({ ...(value.sender), modelId: value._id });
                     })
                     setFriends(() => ({ already: tempFrnds, pending: tempFrndReq }));
                 }
@@ -42,6 +42,25 @@ function Friends() {
         }
         handleGetAllFriends();
     }, [userId]);
+
+    const handleRejectFriendRequest = async function (modelId) {
+        try {
+            let response = await rejectFriendRequest({ modelId });
+            if (response) {
+                if (response.data.success) {
+                    toast.success(response.data.message);
+                    setFriends(prev => {
+                        return { already: prev.already, pending: prev.pending.pending.filter(val => val.modelId != modelId) };
+                    })
+                }
+                else toast.error(response.data.message);
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Please try again")
+        }
+    }
 
     return (
         <div className="flex flex-col items-center sm:p-8 p-2">
@@ -75,6 +94,8 @@ function Friends() {
                             <ul className='flex flex-col gap-7'>
                                 {
                                     friends.pending.map(user => {
+                                        console.log(user);
+
                                         return (
                                             <li key={user._id} className='flex relative'>
                                                 <div className='flex items-center gap-4 w-full'>
@@ -87,7 +108,10 @@ function Friends() {
                                                             <span className='text-gray-400 hover:cursor-pointer' onClick={() => navigate(`/member/${user._id}`)}>({user.rating})</span>
                                                         </div>
                                                         <div className='grid grid-cols-2 gap-2 w-full max-w-[20rem]'>
-                                                            <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'>
+                                                            <button
+                                                                className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'
+                                                                onClick={() => handleRejectFriendRequest(user.modelId)}
+                                                            >
                                                                 <img src="/images/cross.png" alt="" className='w-6' />
                                                             </button>
                                                             <button className=' bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors'>

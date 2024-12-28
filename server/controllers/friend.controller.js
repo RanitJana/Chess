@@ -39,7 +39,7 @@ const rejectFriendRequest = AsyncHandler(async (req, res, _) => {
     await friendSchema.findByIdAndDelete(modelId);
 
     return res.status(200).json({
-        success: false,
+        success: true,
         message: "Rejected!"
     })
 
