@@ -45,9 +45,7 @@ function Profile() {
       if (userId != playerInfo?._id) {
         try {
           setLoading(true);
-          let response = await getUserInfo(userId);
-          console.log(response);
-          
+          let response = await getUserInfo(userId);        
           if (response?.data.success) {
             setUser(response.data.player);
           }
@@ -182,7 +180,7 @@ function Profile() {
                     src="/images/followers.png"
                     alt=""
                   />
-                  <span>{user?.friends?.length || 0}</span>
+                  <span>{user?.friendsCount || 0}</span>
                 </li>
                 <li className="flex flex-col justify-center items-center">
                   <img
