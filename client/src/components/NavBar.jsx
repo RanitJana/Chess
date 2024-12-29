@@ -32,30 +32,13 @@ function NavBar() {
   return (
     <div className="flex items-center max-w-[970px] w-full justify-between">
       {isLoggingOut && <Loader />}
-      <div className="flex gap-2 items-center">
-        <div className="w-[2rem] overflow-hidden rounded-sm">
-          <img src="/images/user-pawn.gif" alt="" />
-        </div>
-        <p
-          className="hover:cursor-pointer"
-          onClick={() => {
-            if (playerInfo) {
-              navigate(`/member/${playerInfo._id}`);
-            }
-          }}
-        >
-          <span className="text-white font-bold text-[1.3rem]">
-            {playerInfo?.name || "Loading..."}
-          </span>
-          <span className="text-gray-400 pl-2">
-            ({playerInfo?.rating || "0"})
-          </span>
-        </p>
+      <div className="flex gap-2 items-center hover:cursor-pointer" onClick={() => navigate("/")}>
+        <img src="/images/chess.com.png" alt="" decoding="sync" className="w-[8rem]" />
       </div>
       <div className=" flex gap-3">
-        <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
+        {/* <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
           <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
-        </div>
+        </div> */}
         <div
           className=" hover:cursor-pointer"
           onClick={() => navigate("/friends/" + playerInfo?._id)}

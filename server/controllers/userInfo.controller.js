@@ -1,5 +1,6 @@
 import playerSchema from "../models/player.model.js";
 import AsyncHandler from "../utils/AsyncHandler.js";
+import friendSchema from "../models/friend.model.js";
 
 const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
   const { userId } = req.params;
@@ -10,6 +11,13 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       success: false,
       message: "Please login first",
     });
+
+  const friend = await friendSchema.find({
+    $or: [
+      { sender: req.player._id, receiver: userId },
+      { receiver: req.player._id, sender: userId }
+    ]
+  })
   return res.status(200).json({
     success: true,
     message: "Success",
@@ -21,7 +29,7 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       about: player.about,
       createdAt: player.createdAt,
       updatedAt: player.updatedAt,
-      friends: player.friends,
+      friend,
       views: player.views,
     },
   });
