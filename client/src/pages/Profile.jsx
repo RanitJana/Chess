@@ -7,7 +7,7 @@ import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import CompletedGames from "../components/CompletedGames.jsx";
-import { sendFriendRequest } from "../api/friend.js";
+import { sendFriendRequest, rejectFriendRequest } from "../api/friend.js";
 
 function Profile() {
   const { userId } = useParams();
@@ -22,9 +22,7 @@ function Profile() {
         try {
           setLoading(true);
           let response = await getUserInfo(userId);
-          
           if (response?.data.success) {
-            console.log(response.data.player);
             setUser(response.data.player);
           }
         } catch (error) {
@@ -49,8 +47,10 @@ function Profile() {
         receiver: userId,
       });
       if (response) {
-        if (response.data.success) toast.success(response.data.message);
-        else toast.error(response.data.message);
+        if (response.data.success) {
+          toast.success(response.data.message);
+          setUser((prev) => ({ ...prev, friend: { accept: false } }));
+        } else toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
@@ -60,11 +60,30 @@ function Profile() {
     }
   };
 
+  const handleRejectFriendRequest = async function (modelId) {
+    if (isSendFriendRequest) return;
+    try {
+      setIsSendFriendRequest(true);
+      let response = await rejectFriendRequest({ modelId });
+      if (response) {
+        if (response.data.success) {
+          toast.success("Unfriend successful");
+          setUser((prev) => ({ ...prev, friend: null }));
+        } else toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Please try again");
+    } finally {
+      setIsSendFriendRequest(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center sm:p-8 p-2">
+    <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
         {<NavBar />}
-        <div className="bg-blackDarkest p-6 rounded-md">
+        <div className="bg-blackDarkest p-4 rounded-md">
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
             <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
               <img
@@ -105,7 +124,7 @@ function Profile() {
               </ul>
             </div>
           </div>
-          {playerInfo?._id !== userId ? (
+          {!isLoading && !user?.friend && userId !== playerInfo?._id && (
             <div className="mt-6">
               <button
                 className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
@@ -122,8 +141,37 @@ function Profile() {
                 <span className="font-semibold text-white">Add Friend</span>
               </button>
             </div>
-          ) : (
-            ""
+          )}
+          {user?.friend?.accept == false && userId !== playerInfo?._id && (
+            <div className="mt-6">
+              <button
+                className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
+                disabled={true}
+              >
+                <div className="w-5">
+                  <img src="/images/add-user.png" alt="" className="invert" />
+                </div>
+                <span className="font-semibold text-white">Request sent</span>
+              </button>
+            </div>
+          )}
+          {user?.friend?.accept == true && userId !== playerInfo?._id && (
+            <div className="mt-6">
+              <button
+                className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
+                style={{
+                  opacity: isSendFriendRequest ? "0.5" : "1",
+                  cursor: isSendFriendRequest ? "not-allowed" : "pointer",
+                }}
+                onClick={() => handleRejectFriendRequest(user?.friend?._id)}
+                disabled={isSendFriendRequest}
+              >
+                <div className="w-5">
+                  <img src="/images/unfriend.png" alt="" className="invert" />
+                </div>
+                <span className="font-semibold text-white">Unfriend</span>
+              </button>
+            </div>
           )}
         </div>
         <CurrentGamePreview userId={userId} />

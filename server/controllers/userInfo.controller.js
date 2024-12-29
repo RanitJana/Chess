@@ -15,9 +15,9 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
   const friend = await friendSchema.findOne({
     $or: [
       { sender: req.player._id, receiver: userId },
-      { receiver: req.player._id, sender: userId }
-    ]
-  })
+      { receiver: req.player._id, sender: userId },
+    ],
+  });
   return res.status(200).json({
     success: true,
     message: "Success",

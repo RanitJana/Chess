@@ -36,10 +36,10 @@ function Home() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center h-fit sm:p-8 p-2 gap-5">
+    <div className="w-full flex flex-col items-center h-fit sm:p-8 p-0 gap-5">
       {<NavBar />}
       {/* Header Section */}
-      <div className="flex w-full lg-930:flex-row flex-col justify-center items-center gap-10">
+      <div className="flex w-full lg-930:flex-row flex-col justify-center items-center gap-10 sm:p-0 p-2">
         <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
           <img
             src="/images/standardboard.png"

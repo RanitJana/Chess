@@ -30,10 +30,18 @@ function NavBar() {
     }
   };
   return (
-    <div className="flex items-center max-w-[970px] w-full justify-between">
+    <div className="flex items-center max-w-[970px] w-full justify-between sm:p-0 p-4">
       {isLoggingOut && <Loader />}
-      <div className="flex gap-2 items-center hover:cursor-pointer" onClick={() => navigate("/")}>
-        <img src="/images/chess.com.png" alt="" decoding="sync" className="w-[8rem]" />
+      <div
+        className="flex gap-2 items-center hover:cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        <img
+          src="/images/chess.com.png"
+          alt=""
+          decoding="sync"
+          className="w-[8rem]"
+        />
       </div>
       <div className=" flex gap-3">
         {/* <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
