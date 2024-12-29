@@ -22,7 +22,9 @@ function Profile() {
         try {
           setLoading(true);
           let response = await getUserInfo(userId);
+          
           if (response?.data.success) {
+            console.log(response.data.player);
             setUser(response.data.player);
           }
         } catch (error) {
@@ -94,7 +96,7 @@ function Profile() {
                 </li>
                 <li className="flex flex-col justify-center items-center">
                   <img className="w-8" src="/images/followers.png" alt="" />
-                  <span>{user?.friends.length || 0}</span>
+                  <span>{user?.friends?.length || 0}</span>
                 </li>
                 <li className="flex flex-col justify-center items-center">
                   <img className="w-8" src="/images/icons8-eye-24.png" alt="" />

@@ -12,7 +12,7 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       message: "Please login first",
     });
 
-  const friend = await friendSchema.find({
+  const friend = await friendSchema.findOne({
     $or: [
       { sender: req.player._id, receiver: userId },
       { receiver: req.player._id, sender: userId }
