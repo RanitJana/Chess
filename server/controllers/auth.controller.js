@@ -1,5 +1,6 @@
 import AsyncHandler from "../utils/AsyncHandler.js";
 import playarSchema from "../models/player.model.js";
+import friendSchema from "../models/friend.model.js";
 import { cookieOptions } from "../constants.js";
 
 const login = AsyncHandler(async (req, res, _) => {
