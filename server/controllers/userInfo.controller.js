@@ -18,6 +18,12 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       { receiver: req.player._id, sender: userId },
     ],
   });
+  const friendsCount = await friendSchema.countDocuments({
+    $or: [
+      { sender: userId, accept: true },
+      { receiver: userId, accept: true },
+    ]
+  })
   return res.status(200).json({
     success: true,
     message: "Success",
@@ -30,6 +36,7 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       createdAt: player.createdAt,
       updatedAt: player.updatedAt,
       friend,
+      friendsCount,
       views: player.views,
       lastSeen: player.lastSeen,
     },

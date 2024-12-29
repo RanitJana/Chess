@@ -95,6 +95,12 @@ const logout = AsyncHandler(async (req, res, _) => {
 });
 
 const verify = AsyncHandler(async (req, res, _) => {
+  const friendsCount = await friendSchema.countDocuments({
+    $or: [
+      { sender: userId, accept: true },
+      { receiver: userId, accept: true },
+    ]
+  })
   return res.status(200).json({
     success: true,
     message: "Verified",
@@ -107,7 +113,7 @@ const verify = AsyncHandler(async (req, res, _) => {
       about: req.player.about,
       createdAt: req.player.createdAt,
       updatedAt: req.player.updatedAt,
-      friends: req.player.friends,
+      friendsCount,
       views: req.player.views,
       lastSeen: req.player.lastSeen,
     },
