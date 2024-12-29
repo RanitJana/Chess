@@ -90,6 +90,7 @@ export default function ChessBoard() {
   useEffect(() => {
     socket.on("opponent-move", (val) => {
       if (isViewer()) return;
+      console.log("Your Turn");
       let updatedBoard = val[0];
       let move = val[1];
 

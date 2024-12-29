@@ -1,8 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useState } from "react";
 import { socket } from "../socket.js";
+import { useAuthContext } from "./AuthContext.jsx";
 
 const socketContext = createContext();
 
@@ -12,13 +12,21 @@ export function useSocketContext() {
 
 //this context will hold the all games information that'll be shown in UI
 export default function SocketContext({ children }) {
-  //all games info array
-  const [games, setGames] = useState([]);
+  const { playerInfo } = useAuthContext();
   const [totalOnline, setTotalOnline] = useState(0);
+  const [onlineUsers, setOnlineUsers] = useState({});
+
+  useEffect(() => {
+    if (playerInfo) socket.emit("add-online-user", playerInfo._id);
+  }, [playerInfo]);
 
   useEffect(() => {
     socket.on("total-online", (data) => {
       setTotalOnline(data);
+    });
+
+    socket.on("online-user", (users) => {
+      setOnlineUsers(users);
     });
 
     return () => {
@@ -28,7 +36,7 @@ export default function SocketContext({ children }) {
   }, []);
 
   return (
-    <socketContext.Provider value={{ totalOnline }}>
+    <socketContext.Provider value={{ totalOnline, onlineUsers }}>
       {children}
     </socketContext.Provider>
   );

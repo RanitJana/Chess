@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import { _env } from "./constants.js";
+import jwt from "jsonwebtoken";
+import playerSchema from "./models/player.model.js";
 
 const realTimeInit = function (server) {
   const io = new Server(server, {
@@ -13,9 +15,19 @@ const realTimeInit = function (server) {
     timeout: 20000, // Wait up to 20 seconds for a connection before timing out
   });
 
+  const onlineUsers = {};
   let totalOnline = 0;
 
   io.on("connection", (socket) => {
+    let userIdsave = null; // Assume user ID is sent when connecting
+    socket.on("add-online-user", (userId) => {
+      onlineUsers[userId] = true;
+      userIdsave = userId;
+      io.emit("online-user", onlineUsers);
+    });
+
+    // Mark user as online
+
     let roomId; // To track which room this socket belongs to
 
     // Increment total online when a user connects
@@ -57,9 +69,24 @@ const realTimeInit = function (server) {
     });
 
     // Handle disconnection
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       totalOnline--;
+      if (userIdsave) delete onlineUsers[userIdsave];
+
+      io.emit("online-user", onlineUsers);
       io.emit("total-online", totalOnline); // Broadcast the updated total
+
+      try {
+        if (userIdsave) {
+          io.emit("fix-time", userIdsave);
+          await playerSchema.findOneAndUpdate(
+            { _id: userIdsave },
+            { lastSeen: Date.now() }
+          );
+        }
+      } catch (error) {
+        console.error("Error while handling cookies:", error);
+      }
     });
   });
 };

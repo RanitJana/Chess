@@ -31,6 +31,7 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       updatedAt: player.updatedAt,
       friend,
       views: player.views,
+      lastSeen: player.lastSeen,
     },
   });
 });

@@ -48,6 +48,10 @@ const playerSchema = new Schema(
       type: String,
       trim: true,
     },
+    lastSeen: {
+      type: Date,
+      default: Date.now(),
+    },
   },
   { timestamps: true }
 );

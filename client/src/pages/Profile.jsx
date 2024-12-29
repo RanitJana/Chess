@@ -8,6 +8,27 @@ import { getUserInfo } from "../api/user.js";
 import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
 import CompletedGames from "../components/CompletedGames.jsx";
 import { sendFriendRequest, rejectFriendRequest } from "../api/friend.js";
+import { useSocketContext } from "../context/SocketContext.jsx";
+import { socket } from "../socket.js";
+
+function timeAgo(lastSeen) {
+  const diffInSeconds = Math.floor(
+    (Date.now() - new Date(lastSeen).getTime()) / 1000
+  );
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} sec ago`;
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} min ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  }
+}
 
 function Profile() {
   const { userId } = useParams();
@@ -15,6 +36,9 @@ function Profile() {
   const [isLoading, setLoading] = useState(true);
   const [isSendFriendRequest, setIsSendFriendRequest] = useState(false);
   const [user, setUser] = useState(null);
+  const [lastSeen, setLastSeen] = useState("x min ago");
+
+  const { onlineUsers } = useSocketContext();
 
   useEffect(() => {
     const handleUser = async () => {
@@ -37,6 +61,24 @@ function Profile() {
     };
     handleUser();
   }, [userId, playerInfo]);
+
+  useEffect(() => {
+    socket.on("fix-time", (userIdSave) => {
+      if (userId == userIdSave) {
+        if (onlineUsers[userId]) delete onlineUsers[userId];
+        user.lastSeen = Date.now();
+      }
+    });
+
+    const displayLastSeenRef = setInterval(() => {
+      if (onlineUsers[userId]) setLastSeen("Online");
+      else setLastSeen(timeAgo(user?.lastSeen));
+    }, 1000);
+    return () => {
+      clearInterval(displayLastSeenRef);
+      socket.off("fix-time");
+    };
+  }, [onlineUsers, user, userId]);
 
   const handleSendFriendRequest = async () => {
     if (isSendFriendRequest) return;
@@ -101,7 +143,19 @@ function Profile() {
               </div>
               <ul className="flex w-full justify-between max-w-[20rem]">
                 <li className="flex flex-col justify-center items-center">
-                  <img className="w-8" src="/images/joined.png" alt="" />
+                  <img
+                    className="w-8 invert-[70%]"
+                    src="/images/online.png"
+                    alt=""
+                  />
+                  <span>{lastSeen}</span>
+                </li>
+                <li className="flex flex-col justify-center items-center">
+                  <img
+                    className="w-8 invert-[70%]"
+                    src="/images/joined.png"
+                    alt=""
+                  />
                   <span>
                     {new Date(user?.createdAt || Date.now()).toLocaleDateString(
                       "en-US",
@@ -114,11 +168,19 @@ function Profile() {
                   </span>
                 </li>
                 <li className="flex flex-col justify-center items-center">
-                  <img className="w-8" src="/images/followers.png" alt="" />
+                  <img
+                    className="w-8 invert-[70%]"
+                    src="/images/followers.png"
+                    alt=""
+                  />
                   <span>{user?.friends?.length || 0}</span>
                 </li>
                 <li className="flex flex-col justify-center items-center">
-                  <img className="w-8" src="/images/icons8-eye-24.png" alt="" />
+                  <img
+                    className="w-8 invert-[70%]"
+                    src="/images/views.png"
+                    alt=""
+                  />
                   <span>{user?.views || 0}</span>
                 </li>
               </ul>

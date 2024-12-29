@@ -109,6 +109,7 @@ const verify = AsyncHandler(async (req, res, _) => {
       updatedAt: req.player.updatedAt,
       friends: req.player.friends,
       views: req.player.views,
+      lastSeen: req.player.lastSeen,
     },
   });
 });
