@@ -9,6 +9,7 @@ import {
   rejectFriendRequest,
 } from "../api/friend.js";
 import toast from "react-hot-toast";
+import { useSocketContext } from "../context/SocketContext.jsx";
 
 function PendingRequestSkeleton({ isLoading }) {
   return (
@@ -66,7 +67,7 @@ function AcceptedFriendsSkeleton({ isLoading }) {
   );
 }
 
-function ListFriend({ user, navigate, setFriends }) {
+function ListFriend({ user, navigate, setFriends, isOnline }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
 
@@ -99,12 +100,15 @@ function ListFriend({ user, navigate, setFriends }) {
   return (
     <li key={user._id} className="flex justify-between">
       <div className="flex items-center gap-5">
-        <div className="w-20">
+        <div className="w-20 relative">
           <img
             src={user.avatar || "/images/user-pawn.gif"}
             alt="Dp"
             className="w-20"
           />
+          {isOnline && (
+            <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
+          )}
         </div>
         <div>
           <span
@@ -163,6 +167,8 @@ function Friends() {
     already: [],
     pending: [],
   });
+
+  const { onlineUsers } = useSocketContext();
 
   useEffect(() => {
     const handleGetAllFriends = async () => {
@@ -284,12 +290,15 @@ function Friends() {
                 return (
                   <li key={user._id} className="flex relative">
                     <div className="flex items-center gap-4 w-full">
-                      <div className="w-[6rem] min-w-[5rem]">
+                      <div className="relative w-[6rem] min-w-[5rem]">
                         <img
                           src={user.avatar || "/images/user-pawn.gif"}
                           alt="Dp"
                           className="w-full h-full"
                         />
+                        {onlineUsers[user._id] && (
+                          <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
+                        )}
                       </div>
                       <div className="grid grid-rows-2 w-full">
                         <div>
@@ -369,6 +378,7 @@ function Friends() {
                     user={user}
                     navigate={navigate}
                     setFriends={setFriends}
+                    isOnline={onlineUsers?.[user._id]}
                   />
                 );
               })}

@@ -8,6 +8,7 @@ import EmptyBoard from "./EmptyBoard.jsx";
 import { useGameContext, convertTo2DArray } from "../pages/Game.jsx";
 import { kingCheckMate } from "../utils/KingCheck.js";
 import { useAuthContext } from "../context/AuthContext.jsx";
+import { useSocketContext } from "../context/SocketContext.jsx";
 
 export default function ChessBoard() {
   const {
@@ -130,12 +131,20 @@ export default function ChessBoard() {
 
   const boardRef = useRef(null);
 
+  const { onlineUsers } = useSocketContext();
+
   return (
     <div className="flex flex-col h-fit">
       <div className="flex justify-between items-center">
         <div className="flex py-2 gap-4">
-          <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
+          <div className=" relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
             <img src="/images/user-pawn.gif" alt="" />
+            {playerColor == "white" && onlineUsers[players.player2._id] && (
+              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
+            )}
+            {playerColor == "black" && onlineUsers[players.player1._id] && (
+              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
+            )}
           </div>
           <p>
             {playerColor == "white" ? (
@@ -206,8 +215,14 @@ export default function ChessBoard() {
       </div>
       <div className="flex justify-between items-center">
         <div className="flex py-2 gap-4">
-          <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
+          <div className="relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
             <img src="/images/user-pawn.gif" alt="" />
+            {playerColor == "white" && onlineUsers[players.player2._id] && (
+              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
+            )}
+            {playerColor == "black" && onlineUsers[players.player1._id] && (
+              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
+            )}
           </div>
           <p>
             {playerColor == "black" ? (

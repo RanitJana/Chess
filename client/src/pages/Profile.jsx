@@ -127,12 +127,17 @@ function Profile() {
         {<NavBar />}
         <div className="bg-blackDarkest p-4 rounded-md">
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
-            <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
+            <div className="relative max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
               <img
                 className=""
                 src={user?.avatar || "/images/user-pawn.gif"}
                 alt=""
               />
+              {onlineUsers[userId] ? (
+                <div className="absolute bg-green-600 w-7 aspect-square right-0 bottom-0"></div>
+              ) : (
+                ""
+              )}
             </div>
             <div className="flex flex-col justify-between w-full text-[rgb(146,147,145)] gap-5">
               <div>
