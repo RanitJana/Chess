@@ -98,8 +98,8 @@ const logout = AsyncHandler(async (req, res, _) => {
 const verify = AsyncHandler(async (req, res, _) => {
   const friendsCount = await friendSchema.countDocuments({
     $or: [
-      { sender: userId, accept: true },
-      { receiver: userId, accept: true },
+      { sender: req.player._id, accept: true },
+      { receiver: req.player._id, accept: true },
     ]
   })
   return res.status(200).json({
