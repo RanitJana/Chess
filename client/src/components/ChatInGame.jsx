@@ -296,12 +296,14 @@ function ChatInGame() {
             {allMessage.map((info, idx) => (
               <div
                 key={idx}
-                className={`flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}`}
+                className={`
+                  flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}
+                `}
               >
                 <div
                   className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
-                      ? "bg-[rgb(0,93,74)]"
-                      : "bg-[rgb(32,44,51)]"
+                    ? "bg-[rgb(0,93,74)]"
+                    : "bg-[rgb(32,44,51)]"
                     }
                     ${idx > 0
                       ? allMessage[idx - 1].senderId != info.senderId
@@ -312,6 +314,10 @@ function ChatInGame() {
                       : info.senderId == userId
                         ? "parentBubbleYou rounded-tr-none"
                         : "parentBubbleOther rounded-tl-none"
+                    }
+                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ?
+                      "mt-[0.8rem]"
+                      : ""
                     }
                     `}
                 >
@@ -343,13 +349,14 @@ function ChatInGame() {
           </div>
 
           {/* Input Box */}
-          <div className="w-full relative flex gap-2 items-end p-2">
+          <div className="w-full relative flex gap-2 items-end p-2 pt-1">
             <div className="w-full relative flex items-end bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl">
-              <div className="w-10 h-full hover:cursor-pointer p-1 pb-[0.325rem]">
+              <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1 pb-[0.325rem]">
                 <img
                   src="/images/smile.png"
                   alt="E"
                   onClick={() => setIsEmojiPickerTrue((prev) => !prev)}
+                  className="w-full"
                 />
               </div>
               {isEmojiPickerTrue && (
