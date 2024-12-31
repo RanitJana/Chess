@@ -28,7 +28,7 @@ function Tab({ isActive, label, onClick, newMessageCount }) {
 }
 
 function GameSideSection() {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
 
   const { gameId } = useParams();
 
@@ -70,7 +70,7 @@ function GameSideSection() {
       setNewMessageCount((prev) => prev + 1);
       setAllMessage((prev) => [
         ...prev,
-        { senderId, message: decryptMessage(message) },
+        { senderId, message: decryptMessage(message), updatedAt: Date.now(), createdAt: Date.now() },
       ]);
       setTimeout(() => {
         chatSectionRef.current?.scrollTo(

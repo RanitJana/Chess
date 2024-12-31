@@ -60,10 +60,10 @@ function ChatInGame({
     try {
       let encryptedText = encryptMessage(text.trim());
 
-      let info = { senderId: userId, message: text.trim() };
+      let info = { senderId: userId, message: text.trim(), updatedAt: Date.now(), createdAt: Date.now() };
 
       setText("");
-      socket.emit("new-message", { senderId: userId, message: encryptedText });
+      socket.emit("new-message", { senderId: userId, message: encryptedText, updatedAt: Date.now(), createdAt: Date.now() });
 
       setAllMessage((prev) => [...prev, info]);
       await messagePost({
@@ -176,7 +176,7 @@ function ChatInGame({
             ))}
 
             <div
-              className="bg-white w-fit px-[15px] rounded-lg rounded-bl-none overflow-hidden transition-all"
+              className="bg-[rgb(32,44,51)] w-fit px-[15px] rounded-lg rounded-bl-none overflow-hidden transition-all"
               style={{
                 height: `${!isTyping ? "0px" : "30px"}`,
                 padding: `${!isTyping ? "0" : "0.5rem"}`,
@@ -192,41 +192,45 @@ function ChatInGame({
 
           {/* Input Box */}
           <div className="w-full relative flex gap-2 items-center p-2">
-            <div className="w-10 hover:cursor-pointer h-8">
-              <img
-                src="/images/smile.png"
-                alt="E"
-                onClick={() => setIsEmojiPickerTrue((prev) => !prev)}
+            <div
+              className="w-full relative flex items-center bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl"
+            >
+              <div className="w-10 h-full hover:cursor-pointer p-1">
+                <img
+                  src="/images/smile.png"
+                  alt="E"
+                  onClick={() => setIsEmojiPickerTrue((prev) => !prev)}
+                />
+              </div>
+              {isEmojiPickerTrue && (
+                <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
+              )}
+              <input
+                type="text"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  handleDraftMessages(e.target.value);
+                }}
+                className="w-full bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
+                placeholder="Send a message..."
+                onKeyDown={(e) => {
+                  if (typingRef.current) clearTimeout(typingRef.current);
+                  if (e.key === "Enter") {
+                    socket.emit("not-typing", userId);
+                    handleSendMessage();
+                  } else {
+                    socket.emit("typing", { userId, gameId });
+                  }
+                }}
+                onKeyUp={() => {
+                  typingRef.current = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 2000);
+                }}
+                onFocus={() => setIsEmojiPickerTrue(false)}
               />
             </div>
-            {isEmojiPickerTrue && (
-              <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
-            )}
-            <input
-              type="text"
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                handleDraftMessages(e.target.value);
-              }}
-              className="w-full bg-transparent border-[1px] p-2 px-4 text-white outline-none rounded-3xl"
-              placeholder="Send a message..."
-              onKeyDown={(e) => {
-                if (typingRef.current) clearTimeout(typingRef.current);
-                if (e.key === "Enter") {
-                  socket.emit("not-typing", userId);
-                  handleSendMessage();
-                } else {
-                  socket.emit("typing", { userId, gameId });
-                }
-              }}
-              onKeyUp={() => {
-                typingRef.current = setTimeout(() => {
-                  socket.emit("not-typing", userId);
-                }, 2000);
-              }}
-              onFocus={() => setIsEmojiPickerTrue(false)}
-            />
             <button
               className="h-full flex justify-center items-center text-white border rounded-[50%] aspect-square bg-slate-100"
               onClick={handleSendMessage}
