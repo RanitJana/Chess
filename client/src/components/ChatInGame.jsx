@@ -155,21 +155,26 @@ function ChatInGame({
             {allMessage.map((info, idx) => (
               <div
                 key={idx}
-                className={`flex ${
-                  info.senderId === userId ? "justify-end" : "justify-start"
-                }`}
+                className={`flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`p-1 px-2 rounded-lg break-words ${
-                    info.senderId === userId
-                      ? "bg-blue-500 rounded-br-none"
-                      : "bg-white text-black rounded-bl-none"
-                  } max-w-[90%]`}
+                  className={`relative max-w-[80%] px-4 py-2 rounded-lg shadow-md break-words text-white min-h-[3.2rem] ${info.senderId === userId
+                    ? "bg-[rgb(0,93,74)] rounded-br-none"
+                    : "bg-[rgb(32,44,51)] rounded-bl-none"
+                    }`}
                 >
-                  {info.message}
+                  <span className="block min-w-[2rem]">{info.message}</span>
+                  <span className="absolute bottom-1 right-2 text-xs text-gray-300">
+                    {new Date(info.createdAt).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    })}
+                  </span>
                 </div>
               </div>
             ))}
+
             <div
               className="bg-white w-fit px-[15px] rounded-lg rounded-bl-none overflow-hidden transition-all"
               style={{

@@ -11,9 +11,8 @@ import { socket } from "../socket.js";
 function Tab({ isActive, label, onClick, newMessageCount }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
-        isActive ? "border-white" : "border-transparent"
-      } cursor-pointer`}
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${isActive ? "border-white" : "border-transparent"
+        } cursor-pointer`}
       onClick={onClick}
     >
       {label == "Chat" && newMessageCount > 0 ? (
@@ -48,12 +47,12 @@ function GameSideSection() {
         if (response) {
           const { success, info } = response.data;
           if (success) {
-            // console.log(info);
-            
             setAllMessage(() => {
               return info.map((value) => ({
                 senderId: value.senderId,
                 message: decryptMessage(value.content),
+                createdAt: value.createdAt,
+                updatedAt: value.updatedAt
               }));
             });
           } else setAllMessage([]);
