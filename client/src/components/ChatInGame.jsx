@@ -59,7 +59,6 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
     if (!text.trim() || !opponent || !userId) return;
 
     setIsEmojiPickerTrue(false);
-    chatSectionRef.current?.scrollTo(0 + 20, chatSectionRef.current.scrollHeight);
     try {
       let encryptedText = encryptMessage(text.trim());
       let info = {
@@ -79,8 +78,9 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
         updatedAt: Date.now(),
         createdAt: Date.now(),
       });
-
+      
       setAllMessage((prev) => [...prev, info]);
+      chatSectionRef.current?.scrollTo(0 + 20, chatSectionRef.current.scrollHeight);
       await messagePost({
         receiverId: opponent._id,
         gameId,
