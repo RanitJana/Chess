@@ -44,7 +44,7 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
       textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to content
-      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight + 100);
+      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
     }
   };
 
@@ -59,7 +59,9 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
     if (!text.trim() || !opponent || !userId) return;
 
     setIsEmojiPickerTrue(false);
-    chatSectionRef.current?.scrollTo(0, chatSectionRef?.current.scrollHeight + 100);
+    setTimeout(() => {
+      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
+    }, 100)
     try {
       let encryptedText = encryptMessage(text.trim());
       let info = {
