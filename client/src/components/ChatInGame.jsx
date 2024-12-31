@@ -304,7 +304,7 @@ function ChatInGame() {
                 `}
               >
                 <div
-                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
+                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
                     ? "bg-[rgb(0,93,74)]"
                     : "bg-[rgb(32,44,51)]"
                     }
