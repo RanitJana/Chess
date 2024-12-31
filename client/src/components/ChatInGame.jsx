@@ -299,21 +299,19 @@ function ChatInGame() {
                 className={`flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${
-                    info.senderId === userId
+                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
                       ? "bg-[rgb(0,93,74)]"
                       : "bg-[rgb(32,44,51)]"
-                  }
-                    ${
-                      idx > 0
-                        ? allMessage[idx - 1].senderId != info.senderId
-                          ? info.senderId == userId
-                            ? "parentBubbleYou rounded-tr-none"
-                            : "parentBubbleOther rounded-tl-none"
-                          : ""
-                        : info.senderId == userId
+                    }
+                    ${idx > 0
+                      ? allMessage[idx - 1].senderId != info.senderId
+                        ? info.senderId == userId
                           ? "parentBubbleYou rounded-tr-none"
                           : "parentBubbleOther rounded-tl-none"
+                        : ""
+                      : info.senderId == userId
+                        ? "parentBubbleYou rounded-tr-none"
+                        : "parentBubbleOther rounded-tl-none"
                     }
                     `}
                 >
@@ -347,7 +345,7 @@ function ChatInGame() {
           {/* Input Box */}
           <div className="w-full relative flex gap-2 items-end p-2">
             <div className="w-full relative flex items-end bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl">
-              <div className="w-10 h-full hover:cursor-pointer p-1">
+              <div className="w-10 h-full hover:cursor-pointer p-1 pb-[0.325rem]">
                 <img
                   src="/images/smile.png"
                   alt="E"
@@ -367,8 +365,8 @@ function ChatInGame() {
                   handleDraftMessages(e.target.value);
                 }}
                 rows={1}
-                className="w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
-                placeholder="Send a message..."
+                className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
+                placeholder="Message"
                 onKeyDown={(e) => {
                   if (typingRef.current) clearTimeout(typingRef.current);
                   if (e.key === "Enter") {
