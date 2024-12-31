@@ -75,7 +75,7 @@ const handleGetMessage = AsyncHandler(async (req, res, _) => {
       message: "Empty",
     });
 
-  await conversation.populate("messages", "senderId receiverId content");
+  await conversation.populate("messages", "senderId receiverId content createdAt updatedAt");
 
   return res.status(200).json({
     success: true,

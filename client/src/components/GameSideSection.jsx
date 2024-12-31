@@ -48,6 +48,8 @@ function GameSideSection() {
         if (response) {
           const { success, info } = response.data;
           if (success) {
+            // console.log(info);
+            
             setAllMessage(() => {
               return info.map((value) => ({
                 senderId: value.senderId,

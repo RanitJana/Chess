@@ -160,7 +160,7 @@ function ChatInGame({
                 }`}
               >
                 <div
-                  className={`p-1 px-2 rounded-lg ${
+                  className={`p-1 px-2 rounded-lg break-words ${
                     info.senderId === userId
                       ? "bg-blue-500 rounded-br-none"
                       : "bg-white text-black rounded-bl-none"
