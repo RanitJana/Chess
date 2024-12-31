@@ -40,3 +40,24 @@
     background-color: #b5d9cb;
   }
 }
+
+.parentBubbleYou::after,
+.parentBubbleOther::after {
+  content: " ";
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 0px; /* Position relative to the top of the bubble */
+  border-style: solid;
+}
+
+.parentBubbleYou::after {
+  right: -13px; /* Adjust based on positioning */
+  border-width: 14px 14px 0 0; /* Adjust dimensions for the triangle */
+  border-color: rgb(0, 93, 74) transparent transparent transparent;
+}
+.parentBubbleOther::after {
+  left: -13px;
+  border-width: 0 14px 14px 0;
+  border-color: transparent rgb(32, 44, 51) transparent transparent;
+}

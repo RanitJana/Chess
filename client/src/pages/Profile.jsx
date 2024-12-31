@@ -45,7 +45,7 @@ function Profile() {
       if (userId != playerInfo?._id) {
         try {
           setLoading(true);
-          let response = await getUserInfo(userId);        
+          let response = await getUserInfo(userId);
           if (response?.data.success) {
             setUser(response.data.player);
           }

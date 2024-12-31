@@ -8,27 +8,21 @@ import { decryptMessage } from "../utils/encryptDecryptMessage.js";
 import { messageGet } from "../api/message.js";
 import { socket } from "../socket.js";
 
-function Tab({ isActive, label, onClick, newMessageCount }) {
+function Tab({ isActive, label, onClick }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-[3px] transition ${isActive ? "border-white" : "border-transparent"
-        } cursor-pointer`}
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
+        isActive ? "border-white" : "border-transparent"
+      } cursor-pointer`}
       onClick={onClick}
     >
-      {label == "Chat" && newMessageCount > 0 ? (
-        <div className="absolute top-0 right-0 aspect-square h-5 rounded-full flex justify-center items-center text-[10px] bg-red-500 translate-x-2">
-          {newMessageCount}
-        </div>
-      ) : (
-        ""
-      )}
       {label}
     </li>
   );
 }
 
 function GameSideSection() {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
 
   const { gameId } = useParams();
 
@@ -36,8 +30,6 @@ function GameSideSection() {
   const [allMessage, setAllMessage] = useState(null);
 
   const chatSectionRef = useRef(null);
-
-  const [newMessageCount, setNewMessageCount] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -52,7 +44,7 @@ function GameSideSection() {
                 senderId: value.senderId,
                 message: decryptMessage(value.content),
                 createdAt: value.createdAt,
-                updatedAt: value.updatedAt
+                updatedAt: value.updatedAt,
               }));
             });
           } else setAllMessage([]);
@@ -67,10 +59,14 @@ function GameSideSection() {
   useEffect(() => {
     const handleReceiveMessage = (info) => {
       const { senderId, message } = info;
-      setNewMessageCount((prev) => prev + 1);
       setAllMessage((prev) => [
         ...prev,
-        { senderId, message: decryptMessage(message), updatedAt: Date.now(), createdAt: Date.now() },
+        {
+          senderId,
+          message: decryptMessage(message),
+          updatedAt: Date.now(),
+          createdAt: Date.now(),
+        },
       ]);
       setTimeout(() => {
         chatSectionRef.current?.scrollTo(
@@ -98,7 +94,6 @@ function GameSideSection() {
             setAllMessage={setAllMessage}
             gameId={gameId}
             chatSectionRef={chatSectionRef}
-            setNewMessageCount={setNewMessageCount}
           />
         );
       default:
@@ -113,13 +108,11 @@ function GameSideSection() {
           isActive={activeTab === 0}
           label="Moves"
           onClick={() => setActiveTab(0)}
-          newMessageCount={newMessageCount}
         />
         <Tab
           isActive={activeTab === 1}
           label="Chat"
           onClick={() => setActiveTab(1)}
-          newMessageCount={newMessageCount}
         />
       </ul>
       <div className="overflow-y-scroll h-full">{renderContent()}</div>

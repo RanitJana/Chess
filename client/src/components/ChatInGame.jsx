@@ -27,13 +27,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
 let draftMessageTimeout = null;
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 
-function ChatInGame({
-  allMessage,
-  setAllMessage,
-  gameId,
-  chatSectionRef,
-  setNewMessageCount,
-}) {
+function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
   const { opponent } = useGameContext();
   const { playerInfo } = useAuthContext();
 
@@ -43,9 +37,18 @@ function ChatInGame({
   const [text, setText] = useState("");
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
   const typingRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const adjustHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto"; // Reset height
+      textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to content
+      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
+    }
+  };
 
   useEffect(() => {
-    setNewMessageCount(0);
     let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
     if (allDrafts[gameId]) {
       setText(allDrafts[gameId]);
@@ -56,14 +59,26 @@ function ChatInGame({
     if (!text.trim() || !opponent || !userId) return;
 
     setIsEmojiPickerTrue(false);
-
+    chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
     try {
       let encryptedText = encryptMessage(text.trim());
+      let info = {
+        senderId: userId,
+        message: text.trim(),
+        updatedAt: Date.now(),
+        createdAt: Date.now(),
+      };
 
-      let info = { senderId: userId, message: text.trim(), updatedAt: Date.now(), createdAt: Date.now() };
+      setText(() => "");
+      textareaRef.current.value = "";
+      adjustHeight();
 
-      setText("");
-      socket.emit("new-message", { senderId: userId, message: encryptedText, updatedAt: Date.now(), createdAt: Date.now() });
+      socket.emit("new-message", {
+        senderId: userId,
+        message: encryptedText,
+        updatedAt: Date.now(),
+        createdAt: Date.now(),
+      });
 
       setAllMessage((prev) => [...prev, info]);
       await messagePost({
@@ -83,8 +98,6 @@ function ChatInGame({
     } catch (error) {
       console.error(error);
       toast.error("Unable to send the message");
-    } finally {
-      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
     }
   }, [gameId, opponent, text, userId]);
 
@@ -138,7 +151,7 @@ function ChatInGame({
       {allMessage ? (
         <>
           <div
-            className="w-full h-full text-white overflow-y-auto px-3 space-y-1"
+            className="w-full h-full text-white overflow-y-auto px-4 space-y-1"
             ref={chatSectionRef}
           >
             <div className="flex justify-center mt-2">
@@ -158,16 +171,29 @@ function ChatInGame({
                 className={`flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`relative max-w-[80%] px-4 py-2 rounded-lg shadow-md break-words text-white min-h-[3.2rem] ${info.senderId === userId
-                    ? "bg-[rgb(0,93,74)] rounded-br-none"
-                    : "bg-[rgb(32,44,51)] rounded-bl-none"
-                    }`}
+                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${
+                    info.senderId === userId
+                      ? "bg-[rgb(0,93,74)]"
+                      : "bg-[rgb(32,44,51)]"
+                  }
+                    ${
+                      idx > 0
+                        ? allMessage[idx - 1].senderId != info.senderId
+                          ? info.senderId == userId
+                            ? "parentBubbleYou rounded-tr-none"
+                            : "parentBubbleOther rounded-tl-none"
+                          : ""
+                        : info.senderId == userId
+                          ? "parentBubbleYou rounded-tr-none"
+                          : "parentBubbleOther rounded-tl-none"
+                    }
+                    `}
                 >
-                  <span className="block min-w-[2rem]">{info.message}</span>
+                  <span className="block">{info.message}</span>
                   <span className="absolute bottom-1 right-2 text-xs text-gray-300">
-                    {new Date(info.createdAt).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: 'numeric',
+                    {new Date(info.createdAt).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "numeric",
                       hour12: true,
                     })}
                   </span>
@@ -176,7 +202,7 @@ function ChatInGame({
             ))}
 
             <div
-              className="bg-[rgb(32,44,51)] w-fit px-[15px] rounded-lg rounded-bl-none overflow-hidden transition-all"
+              className="bg-[rgb(32,44,51)] w-fit px-[15px] rounded-lg rounded-tl-none overflow-hidden transition-all"
               style={{
                 height: `${!isTyping ? "0px" : "30px"}`,
                 padding: `${!isTyping ? "0" : "0.5rem"}`,
@@ -191,10 +217,8 @@ function ChatInGame({
           </div>
 
           {/* Input Box */}
-          <div className="w-full relative flex gap-2 items-center p-2">
-            <div
-              className="w-full relative flex items-center bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl"
-            >
+          <div className="w-full relative flex gap-2 items-end p-2">
+            <div className="w-full relative flex items-end bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl">
               <div className="w-10 h-full hover:cursor-pointer p-1">
                 <img
                   src="/images/smile.png"
@@ -205,18 +229,22 @@ function ChatInGame({
               {isEmojiPickerTrue && (
                 <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
               )}
-              <input
+              <textarea
+                ref={textareaRef}
                 type="text"
                 value={text}
                 onChange={(e) => {
                   setText(e.target.value);
+                  adjustHeight();
                   handleDraftMessages(e.target.value);
                 }}
-                className="w-full bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
+                rows={1}
+                className="w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
                 placeholder="Send a message..."
                 onKeyDown={(e) => {
                   if (typingRef.current) clearTimeout(typingRef.current);
                   if (e.key === "Enter") {
+                    e.preventDefault();
                     socket.emit("not-typing", userId);
                     handleSendMessage();
                   } else {
@@ -226,16 +254,16 @@ function ChatInGame({
                 onKeyUp={() => {
                   typingRef.current = setTimeout(() => {
                     socket.emit("not-typing", userId);
-                  }, 2000);
+                  }, 1500);
                 }}
                 onFocus={() => setIsEmojiPickerTrue(false)}
               />
             </div>
             <button
-              className="h-full flex justify-center items-center text-white border rounded-[50%] aspect-square bg-slate-100"
+              className="h-[3rem] flex justify-center items-center text-white border rounded-[50%] aspect-square bg-slate-100"
               onClick={handleSendMessage}
             >
-              <img src="/images/send.png" alt="" className="w-6" />
+              <img src="/images/send.png" alt="" className="w-6 max-h-6" />
             </button>
           </div>
         </>
