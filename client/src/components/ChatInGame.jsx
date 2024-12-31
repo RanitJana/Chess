@@ -44,7 +44,7 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
       textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to content
-      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
+      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight + 100);
     }
   };
 
@@ -59,6 +59,7 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
     if (!text.trim() || !opponent || !userId) return;
 
     setIsEmojiPickerTrue(false);
+    chatSectionRef.current?.scrollTo(0, chatSectionRef?.current.scrollHeight + 100);
     try {
       let encryptedText = encryptMessage(text.trim());
       let info = {
@@ -78,9 +79,8 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
         updatedAt: Date.now(),
         createdAt: Date.now(),
       });
-      
+
       setAllMessage((prev) => [...prev, info]);
-      chatSectionRef.current?.scrollTo(0 + 20, chatSectionRef.current.scrollHeight);
       await messagePost({
         receiverId: opponent._id,
         gameId,
@@ -172,8 +172,8 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
               >
                 <div
                   className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
-                      ? "bg-[rgb(0,93,74)]"
-                      : "bg-[rgb(32,44,51)]"
+                    ? "bg-[rgb(0,93,74)]"
+                    : "bg-[rgb(32,44,51)]"
                     }
                     ${idx > 0
                       ? allMessage[idx - 1].senderId != info.senderId
