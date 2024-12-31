@@ -22,6 +22,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
       bottom: "3.5rem",
       left: "0.5rem",
       height: "25rem",
+      width: "18rem"
     }}
     lazyLoadEmojis={true}
     onEmojiClick={onEmojiClick}
