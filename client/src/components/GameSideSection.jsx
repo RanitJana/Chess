@@ -22,7 +22,7 @@ function Tab({ isActive, label, onClick }) {
 }
 
 function GameSideSection() {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
 
   const { gameId } = useParams();
 

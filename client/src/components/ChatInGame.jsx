@@ -59,7 +59,7 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
     if (!text.trim() || !opponent || !userId) return;
 
     setIsEmojiPickerTrue(false);
-    chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
+    chatSectionRef.current?.scrollTo(0 + 20, chatSectionRef.current.scrollHeight);
     try {
       let encryptedText = encryptMessage(text.trim());
       let info = {
@@ -171,21 +171,19 @@ function ChatInGame({ allMessage, setAllMessage, gameId, chatSectionRef }) {
                 className={`flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${
-                    info.senderId === userId
+                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-lg shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
                       ? "bg-[rgb(0,93,74)]"
                       : "bg-[rgb(32,44,51)]"
-                  }
-                    ${
-                      idx > 0
-                        ? allMessage[idx - 1].senderId != info.senderId
-                          ? info.senderId == userId
-                            ? "parentBubbleYou rounded-tr-none"
-                            : "parentBubbleOther rounded-tl-none"
-                          : ""
-                        : info.senderId == userId
+                    }
+                    ${idx > 0
+                      ? allMessage[idx - 1].senderId != info.senderId
+                        ? info.senderId == userId
                           ? "parentBubbleYou rounded-tr-none"
                           : "parentBubbleOther rounded-tl-none"
+                        : ""
+                      : info.senderId == userId
+                        ? "parentBubbleYou rounded-tr-none"
+                        : "parentBubbleOther rounded-tl-none"
                     }
                     `}
                 >
