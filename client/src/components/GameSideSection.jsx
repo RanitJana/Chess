@@ -1,12 +1,7 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import ChatInGame from "./ChatInGame.jsx";
 import Moves from "./Moves.jsx";
-import { useParams } from "react-router";
-import { toast } from "react-hot-toast";
-import { decryptMessage } from "../utils/encryptDecryptMessage.js";
-import { messageGet } from "../api/message.js";
-import { socket } from "../socket.js";
 
 function Tab({ isActive, label, onClick }) {
   return (
@@ -24,78 +19,10 @@ function Tab({ isActive, label, onClick }) {
 function GameSideSection() {
   const [activeTab, setActiveTab] = useState(1);
 
-  const { gameId } = useParams();
-
-  // { senderId: '674dbfff3b2690acf11ad9cb', message: 'Hey' },
-  const [allMessage, setAllMessage] = useState(null);
-
-  const chatSectionRef = useRef(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        let response = await messageGet(gameId);
-
-        if (response) {
-          const { success, info } = response.data;
-          if (success) {
-            setAllMessage(() => {
-              return info.map((value) => ({
-                senderId: value.senderId,
-                message: decryptMessage(value.content),
-                createdAt: value.createdAt,
-                updatedAt: value.updatedAt,
-              }));
-            });
-          } else setAllMessage([]);
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error("Please try to refresh the page");
-      }
-    })();
-  }, [gameId]);
-
-  useEffect(() => {
-    const handleReceiveMessage = (info) => {
-      const { senderId, message } = info;
-      setAllMessage((prev) => [
-        ...prev,
-        {
-          senderId,
-          message: decryptMessage(message),
-          updatedAt: Date.now(),
-          createdAt: Date.now(),
-        },
-      ]);
-      setTimeout(() => {
-        chatSectionRef.current?.scrollTo(
-          0,
-          chatSectionRef.current.scrollHeight
-        );
-      }, 0);
-    };
-
-    // Register socket event listener
-    socket.on("receive-new-message", handleReceiveMessage);
-
-    // Cleanup function to avoid multiple registrations
-    return () => {
-      socket.off("receive-new-message", handleReceiveMessage);
-    };
-  }, []);
-
   const renderContent = () => {
     switch (activeTab) {
       case 1:
-        return (
-          <ChatInGame
-            allMessage={allMessage}
-            setAllMessage={setAllMessage}
-            gameId={gameId}
-            chatSectionRef={chatSectionRef}
-          />
-        );
+        return <ChatInGame />;
       default:
         return <Moves />;
     }

@@ -22,8 +22,8 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
     $or: [
       { sender: userId, accept: true },
       { receiver: userId, accept: true },
-    ]
-  })
+    ],
+  });
   return res.status(200).json({
     success: true,
     message: "Success",

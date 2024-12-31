@@ -16,10 +16,10 @@ const messagePost = async function (body = {}) {
   }
 };
 
-const messageGet = async function (gameId) {
+const messageGet = async function (gameId, lengthNow) {
   try {
     let response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URI}/api/v1/message/${gameId}`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/message/${gameId}?lengthNow=${lengthNow}`,
       {
         withCredentials: true,
       }

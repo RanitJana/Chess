@@ -100,8 +100,8 @@ const verify = AsyncHandler(async (req, res, _) => {
     $or: [
       { sender: req.player._id, accept: true },
       { receiver: req.player._id, accept: true },
-    ]
-  })
+    ],
+  });
   return res.status(200).json({
     success: true,
     message: "Verified",
