@@ -47,6 +47,8 @@ function ChatInGame() {
   const typingRef = useRef(null);
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
+  const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
+
 
   const loadMessages = async () => {
     try {
@@ -321,7 +323,10 @@ function ChatInGame() {
                     }
                     `}
                 >
-                  <span className="block">{info.message}</span>
+                  <span className="block"
+                    style={{
+                      fontSize: emojiRegex.test(info.message) ? "2.5rem" : ""
+                    }}>{info.message}</span>
                   <span className="absolute bottom-1 right-2 text-xs text-gray-300">
                     {new Date(info.createdAt).toLocaleTimeString("en-US", {
                       hour: "numeric",
