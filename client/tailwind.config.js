@@ -17,6 +17,7 @@ export default {
       },
       screens: {
         'lg-976': '976px',
+        'lg-1008': '1008px',
         'lg-930':"930px"
       }
 
