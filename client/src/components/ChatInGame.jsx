@@ -29,6 +29,14 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
   />
 );
 
+function areDatesSame(date1, date2) {
+  return (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() && // Note: getMonth() returns 0 for January, 1 for February, etc.
+    date1.getFullYear() === date2.getFullYear()
+  );
+}
+
 let draftMessageTimeout = null;
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 
@@ -101,7 +109,7 @@ function ChatInGame() {
     const container = chatSectionRef.current;
     if (!container) return;
 
-    if (container.scrollTop <= 50 && hasMoreMessages && allMessage) {
+    if (container.scrollTop <= 0 && hasMoreMessages && allMessage) {
       loadMessages();
     }
   };
@@ -299,42 +307,66 @@ function ChatInGame() {
             {allMessage.map((info, idx) => (
               <div
                 key={idx}
-                className={`
-                  flex mb-2 ${info.senderId === userId ? "justify-end" : "justify-start"}
-                `}
               >
-                <div
-                  className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
-                    ? "bg-[rgb(0,93,74)]"
-                    : "bg-[rgb(32,44,51)]"
-                    }
+                <div className={`
+                  flex flex-col ${info.senderId === userId ? "items-end" : "items-start"}
+                `}>
+                  {
+                    idx > 0 ?
+                      !areDatesSame(new Date(allMessage[idx - 1].createdAt), new Date(info.createdAt)) ?
+                        <div className="w-full flex items-center justify-center mb-1">
+                          <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">{
+                            new Intl.DateTimeFormat('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            }).format(new Date(info.createdAt))
+                          }</div>
+                        </div>
+                        : ""
+                      : <div className="w-full flex items-center justify-center mb-1">
+                        <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">{
+                          new Intl.DateTimeFormat('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          }).format(new Date(info.createdAt))
+                        }</div>
+                      </div>
+                  }
+                  <div
+                    className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
+                      ? "bg-[rgb(0,93,74)]"
+                      : "bg-[rgb(32,44,51)]"
+                      }
                     ${idx > 0
-                      ? allMessage[idx - 1].senderId != info.senderId
-                        ? info.senderId == userId
+                        ? allMessage[idx - 1].senderId != info.senderId
+                          ? info.senderId == userId
+                            ? "parentBubbleYou rounded-tr-none"
+                            : "parentBubbleOther rounded-tl-none"
+                          : ""
+                        : info.senderId == userId
                           ? "parentBubbleYou rounded-tr-none"
                           : "parentBubbleOther rounded-tl-none"
-                        : ""
-                      : info.senderId == userId
-                        ? "parentBubbleYou rounded-tr-none"
-                        : "parentBubbleOther rounded-tl-none"
-                    }
+                      }
                     ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ?
-                      "mt-[0.8rem]"
-                      : ""
-                    }
+                        "mt-[0.8rem]"
+                        : ""
+                      }
                     `}
-                >
-                  <span className="block"
-                    style={{
-                      fontSize: emojiRegex.test(info.message) ? "2.5rem" : ""
-                    }}>{info.message}</span>
-                  <span className="absolute bottom-1 right-2 text-xs text-gray-300">
-                    {new Date(info.createdAt).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    })}
-                  </span>
+                  >
+                    <span className="block"
+                      style={{
+                        fontSize: emojiRegex.test(info.message) ? "2.5rem" : ""
+                      }}>{info.message}</span>
+                    <span className="absolute bottom-1 right-2 text-xs text-gray-300">
+                      {new Date(info.createdAt).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      })}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
