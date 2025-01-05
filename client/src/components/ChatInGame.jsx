@@ -54,6 +54,7 @@ function ChatInGame() {
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
   const previousScrollHeight = useRef(null);
   const typingRef = useRef(null);
+  const focusingTextArea = useRef(null);
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
   const textAreaFocus = useRef(null);
@@ -427,9 +428,13 @@ function ChatInGame() {
                 placeholder="Message"
                 onKeyDown={(e) => {
                   if (typingRef.current) clearTimeout(typingRef.current);
-                  setTimeout(() => {
-                    textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }, 100)
+
+                  if (!focusingTextArea.current)
+                    focusingTextArea.current = setTimeout(() => {
+                      clearTimeout(focusingTextArea.current);
+                      textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+
                   if (e.key === "Enter") {
                     e.preventDefault();
                     socket.emit("not-typing", userId);
@@ -444,9 +449,12 @@ function ChatInGame() {
                   }, 1500);
                 }}
                 onFocus={() => {
-                  setTimeout(() => {
-                    textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }, 100)
+                  if (!focusingTextArea.current)
+                    focusingTextArea.current = setTimeout(() => {
+                      clearTimeout(focusingTextArea.current);
+                      textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+
                   setIsEmojiPickerTrue(false);
                 }}
                 onBlur={() => typingRef.current = setTimeout(() => {
