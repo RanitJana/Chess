@@ -54,7 +54,6 @@ function ChatInGame() {
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
   const previousScrollHeight = useRef(null);
   const typingRef = useRef(null);
-  const focusingTextArea = useRef(null)
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
   const textAreaFocus = useRef(null);
@@ -189,8 +188,10 @@ function ChatInGame() {
 
     const handleResize = () => {
       setTimeout(() => {
-        focusingTextArea.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 200);
+        console.log(textAreaFocus.current);
+
+        textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
     };
 
     window.addEventListener('resize', handleResize);
