@@ -9,7 +9,7 @@ import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
 import { useAuthContext } from "../context/AuthContext.jsx";
-import { messageGet } from "../api/message.js";
+import { messageGet, messageReaction } from "../api/message.js";
 import { useParams } from "react-router";
 import { decryptMessage } from "../utils/encryptDecryptMessage.js";
 
@@ -72,10 +72,12 @@ function ChatInGame() {
             setAllMessage((prev) => {
               return [
                 ...info.map((value) => ({
+                  _id: value._id,
                   senderId: value.senderId,
                   message: decryptMessage(value.content),
                   createdAt: value.createdAt,
                   updatedAt: value.updatedAt,
+                  reaction: value.reaction
                 })),
                 ...prev,
               ];
@@ -83,10 +85,12 @@ function ChatInGame() {
           else
             setAllMessage(() => {
               return info.map((value) => ({
+                _id: value._id,
                 senderId: value.senderId,
                 message: decryptMessage(value.content),
                 createdAt: value.createdAt,
                 updatedAt: value.updatedAt,
+                reaction: value.reaction
               }));
             });
         } else setAllMessage([]);
@@ -96,6 +100,28 @@ function ChatInGame() {
       toast.error("Please try to refresh the page");
     }
   };
+
+  const handleReaction = async (messageId) => {
+    try {
+      const response = await messageReaction(messageId, { reaction: '🥰' });
+      if (response.data) {
+        const { success, reaction } = response.data;
+        if (success) {
+          setAllMessage(prev => prev.map(val => {
+            if (val._id != messageId) return val;
+            return { ...val, reaction }
+          }))
+          socket.emit("chat-reaction", {
+            senderId: userId,
+            messageId,
+            reaction
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const scrollChatElementBottom = function () {
     const chatSectionRefCurrent = chatSectionRef.current;
@@ -165,10 +191,12 @@ function ChatInGame() {
 
   useEffect(() => {
     const handleReceiveMessage = (info) => {
-      const { senderId, message } = info;
+      const { senderId, message, _id } = info;
       setAllMessage((prev) => [
         ...prev,
         {
+          _id,
+          reaction: "",
           senderId,
           message: decryptMessage(message),
           updatedAt: Date.now(),
@@ -178,8 +206,17 @@ function ChatInGame() {
       scrollChatElementBottom();
     };
 
+    function handleNewReaction(info) {
+      setAllMessage(prev => prev.map(val => {
+        if (val._id != info.messageId) return val;
+        return { ...val, reaction: info.reaction }
+      }))
+    }
+
     // Register socket event listener
     socket.on("receive-new-message", handleReceiveMessage);
+
+    socket.on("chat-reaction-receiver", handleNewReaction)
 
     let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
     if (allDrafts[gameId]) {
@@ -229,6 +266,7 @@ function ChatInGame() {
     try {
       let encryptedText = encryptMessage(text.trim());
       let info = {
+        _id: "",
         senderId: userId,
         message: text.trim(),
         updatedAt: Date.now(),
@@ -239,7 +277,16 @@ function ChatInGame() {
       textareaRef.current.value = "";
       adjustHeight();
 
+      let response = await messagePost({
+        receiverId: opponent._id,
+        gameId,
+        content: encryptedText,
+      });
+
+      if (response.data) info._id = response.data.messageId
+
       socket.emit("new-message", {
+        _id: response?.data?.messageId || "",
         senderId: userId,
         message: encryptedText,
         updatedAt: Date.now(),
@@ -247,11 +294,6 @@ function ChatInGame() {
       });
 
       setAllMessage((prev) => [...prev, info]);
-      await messagePost({
-        receiverId: opponent._id,
-        gameId,
-        content: encryptedText,
-      });
       let allDrafts = JSON.parse(localStorage.getItem("draft-messages"));
       if (allDrafts) {
         try {
@@ -336,6 +378,7 @@ function ChatInGame() {
                 <div
                   className={`
                   flex flex-col ${info.senderId === userId ? "items-end" : "items-start"}
+                  ${info.reaction?.length ? "mb-7" : ""}
                 `}
                 >
                   {!areDatesSame(
@@ -369,7 +412,15 @@ function ChatInGame() {
                         : ""
                       }
                     `}
+                    onDoubleClick={() => handleReaction(info._id)}
                   >
+                    {/* reactions */}
+                    {
+                      info.reaction &&
+                      <div
+                        className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.1rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
+                      >{info.reaction}</div>
+                    }
                     <span
                       className="block"
                       style={{
@@ -408,7 +459,7 @@ function ChatInGame() {
           {/* Input Box */}
           <div className="w-full relative flex gap-2 items-end p-2 pt-1">
             <div className="w-full relative flex items-end bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl">
-              <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1 pb-[0.325rem]">
+              <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
                 <img
                   src="/images/smile.png"
                   alt="E"

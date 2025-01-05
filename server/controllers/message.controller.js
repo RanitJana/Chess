@@ -51,6 +51,7 @@ const handlePostMessage = AsyncHandler(async (req, res, _) => {
   return res.status(200).json({
     success: true,
     message: "Success",
+    messageId: message._id
   });
 });
 
@@ -81,7 +82,7 @@ const handleGetMessage = AsyncHandler(async (req, res, _) => {
   // Ensure messages are sorted by createdAt (assuming older messages first)
   const totalMessages = await conversation.populate(
     "messages",
-    "senderId receiverId content createdAt updatedAt"
+    "senderId receiverId content createdAt updatedAt reaction"
   );
   const messages = totalMessages.messages.sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
@@ -101,4 +102,31 @@ const handleGetMessage = AsyncHandler(async (req, res, _) => {
   });
 });
 
-export { handleGetMessage, handlePostMessage };
+const handleReaction = AsyncHandler(async (req, res, _) => {
+  const { messageId } = req.params;
+  if (!messageId) return res.status(400).json({
+    success: false,
+    message: "Invalid message id"
+  })
+
+  const { reaction } = req.body;
+
+  if (!reaction) return res.status(200).json({
+    success: false,
+    message: "Invalid request"
+  })
+
+  let message = await messageSchema.findById(messageId);
+
+  message.reaction += reaction;
+
+  await message.save({ validateBeforeSave: false });
+
+  return res.status(200).json({
+    success: true,
+    messgae: "Success",
+    reaction
+  })
+})
+
+export { handleGetMessage, handlePostMessage, handleReaction };

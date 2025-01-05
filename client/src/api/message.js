@@ -31,4 +31,20 @@ const messageGet = async function (gameId, lengthNow) {
   }
 };
 
-export { messageGet, messagePost };
+const messageReaction = async function (messageId, body = {}) {
+  try {
+    let response = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/message/${messageId}`,
+      body,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+
+export { messageGet, messagePost, messageReaction };

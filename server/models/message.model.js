@@ -16,6 +16,10 @@ const messageSchema = new Schema(
       type: String,
       required: true,
     },
+    reaction: {
+      type: String,
+      default: ""
+    }
   },
   { timestamps: true }
 );
