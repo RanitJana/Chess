@@ -56,6 +56,7 @@ function ChatInGame() {
   const typingRef = useRef(null);
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
+  const textAreaFocus = useRef(null);
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
 
@@ -439,7 +440,10 @@ function ChatInGame() {
                     socket.emit("not-typing", userId);
                   }, 1500);
                 }}
-                onFocus={() => setIsEmojiPickerTrue(false)}
+                onFocus={() => {
+                  setIsEmojiPickerTrue(false)
+                  textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
               />
             </div>
             <button
@@ -449,6 +453,7 @@ function ChatInGame() {
               <img src="/images/send.png" alt="" className="w-6 max-h-6" />
             </button>
           </div>
+          <div ref={textAreaFocus}></div>
         </>
       ) : (
         <div className="relative w-full h-full flex items-center justify-center">
