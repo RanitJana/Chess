@@ -187,9 +187,7 @@ function ChatInGame() {
     }
 
     const handleResize = () => {
-      setTimeout(() => {
-        textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+      textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
     window.addEventListener('resize', handleResize);
