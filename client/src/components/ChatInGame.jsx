@@ -103,8 +103,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-            chatSectionRefCurrent.scrollTop -
-            chatSectionRefCurrent.clientHeight
+          chatSectionRefCurrent.scrollTop -
+          chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -331,26 +331,12 @@ function ChatInGame() {
                   flex flex-col ${info.senderId === userId ? "items-end" : "items-start"}
                 `}
                 >
-                  {idx > 0 ? (
-                    !areDatesSame(
-                      new Date(allMessage[idx - 1].createdAt),
-                      new Date(info.createdAt)
-                    ) ? (
-                      <div className="w-full flex items-center justify-center mb-1">
-                        <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
-                          {new Intl.DateTimeFormat("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          }).format(new Date(info.createdAt))}
-                        </div>
-                      </div>
-                    ) : (
-                      ""
-                    )
-                  ) : (
+                  {!areDatesSame(
+                    new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt),
+                    new Date(info.createdAt)
+                  ) || idx === 0 ? (
                     <div className="w-full flex items-center justify-center mb-1">
-                      <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
+                      <div className="flex text-sm w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
                         {new Intl.DateTimeFormat("en-GB", {
                           day: "numeric",
                           month: "short",
@@ -358,29 +344,23 @@ function ChatInGame() {
                         }).format(new Date(info.createdAt))}
                       </div>
                     </div>
+                  ) : (
+                    ""
                   )}
                   <div
-                    className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${
-                      info.senderId === userId
-                        ? "bg-[rgb(0,93,74)]"
-                        : "bg-[rgb(32,44,51)]"
-                    }
-                    ${
-                      idx > 0
-                        ? allMessage[idx - 1].senderId != info.senderId
-                          ? info.senderId == userId
-                            ? "parentBubbleYou rounded-tr-none"
-                            : "parentBubbleOther rounded-tl-none"
-                          : ""
-                        : info.senderId == userId
+                    className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
+                      ? "bg-[rgb(0,93,74)]"
+                      : "bg-[rgb(32,44,51)]"
+                      }
+                    ${idx === 0 || allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId
+                        ? info.senderId == userId
                           ? "parentBubbleYou rounded-tr-none"
                           : "parentBubbleOther rounded-tl-none"
-                    }
-                    ${
-                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+                        : ""}
+                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
                         ? "mt-[0.8rem]"
                         : ""
-                    }
+                      }
                     `}
                   >
                     <span
