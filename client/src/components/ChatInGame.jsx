@@ -443,7 +443,15 @@ function ChatInGame() {
                     socket.emit("not-typing", userId);
                   }, 1500);
                 }}
-                onFocus={() => setIsEmojiPickerTrue(false)}
+                onFocus={() => {
+                  setTimeout(() => {
+                    textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 100)
+                  setIsEmojiPickerTrue(false);
+                }}
+                onBlur={() => typingRef.current = setTimeout(() => {
+                  socket.emit("not-typing", userId);
+                }, 100)}
               />
             </div>
             <button
