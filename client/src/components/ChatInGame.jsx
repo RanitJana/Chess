@@ -442,7 +442,9 @@ function ChatInGame() {
                 }}
                 onFocus={() => {
                   setIsEmojiPickerTrue(false)
-                  textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  setTimeout(() => {
+                    textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 500)
                 }}
               />
             </div>
