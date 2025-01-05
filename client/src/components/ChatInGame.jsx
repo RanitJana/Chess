@@ -22,7 +22,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
       bottom: "3.5rem",
       left: "0.5rem",
       height: "25rem",
-      width: "18rem"
+      width: "18rem",
     }}
     lazyLoadEmojis={true}
     onEmojiClick={onEmojiClick}
@@ -56,8 +56,8 @@ function ChatInGame() {
   const typingRef = useRef(null);
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
-  const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
-
+  const emojiRegex =
+    /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
 
   const loadMessages = async () => {
     try {
@@ -96,12 +96,33 @@ function ChatInGame() {
     }
   };
 
+  const scrollChatElementBottom = function () {
+    const chatSectionRefCurrent = chatSectionRef.current;
+
+    if (chatSectionRefCurrent) {
+      const isAtBottom =
+        Math.abs(
+          chatSectionRefCurrent.scrollHeight -
+            chatSectionRefCurrent.scrollTop -
+            chatSectionRefCurrent.clientHeight
+        ) < 200;
+
+      if (isAtBottom) {
+        setTimeout(() => {
+          chatSectionRefCurrent.scrollTo({
+            top: chatSectionRefCurrent.scrollHeight,
+            behavior: "smooth",
+          });
+        }, 100);
+      }
+    }
+  };
+
   const adjustHeight = () => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
       textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to content
-      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
     }
   };
 
@@ -153,12 +174,7 @@ function ChatInGame() {
           createdAt: Date.now(),
         },
       ]);
-      setTimeout(() => {
-        chatSectionRef.current?.scrollTo(
-          0,
-          chatSectionRef.current.scrollHeight
-        );
-      }, 0);
+      scrollChatElementBottom();
     };
 
     // Register socket event listener
@@ -192,13 +208,17 @@ function ChatInGame() {
     };
   }, [gameId]);
 
+  useEffect(() => {
+    if (isTyping) scrollChatElementBottom();
+  }, [isTyping]);
+
   const handleSendMessage = useCallback(async () => {
     if (!text.trim() || !opponent || !userId) return;
 
     setIsEmojiPickerTrue(false);
-    setTimeout(() => {
-      chatSectionRef.current?.scrollTo(0, chatSectionRef.current.scrollHeight);
-    }, 100);
+
+    scrollChatElementBottom();
+
     try {
       let encryptedText = encryptMessage(text.trim());
       let info = {
@@ -305,41 +325,48 @@ function ChatInGame() {
               ""
             )}
             {allMessage.map((info, idx) => (
-              <div
-                key={idx}
-              >
-                <div className={`
+              <div key={idx}>
+                <div
+                  className={`
                   flex flex-col ${info.senderId === userId ? "items-end" : "items-start"}
-                `}>
-                  {
-                    idx > 0 ?
-                      !areDatesSame(new Date(allMessage[idx - 1].createdAt), new Date(info.createdAt)) ?
-                        <div className="w-full flex items-center justify-center mb-1">
-                          <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">{
-                            new Intl.DateTimeFormat('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            }).format(new Date(info.createdAt))
-                          }</div>
+                `}
+                >
+                  {idx > 0 ? (
+                    !areDatesSame(
+                      new Date(allMessage[idx - 1].createdAt),
+                      new Date(info.createdAt)
+                    ) ? (
+                      <div className="w-full flex items-center justify-center mb-1">
+                        <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
+                          {new Intl.DateTimeFormat("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }).format(new Date(info.createdAt))}
                         </div>
-                        : ""
-                      : <div className="w-full flex items-center justify-center mb-1">
-                        <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">{
-                          new Intl.DateTimeFormat('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          }).format(new Date(info.createdAt))
-                        }</div>
                       </div>
-                  }
+                    ) : (
+                      ""
+                    )
+                  ) : (
+                    <div className="w-full flex items-center justify-center mb-1">
+                      <div className="flex w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
+                        {new Intl.DateTimeFormat("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }).format(new Date(info.createdAt))}
+                      </div>
+                    </div>
+                  )}
                   <div
-                    className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
-                      ? "bg-[rgb(0,93,74)]"
-                      : "bg-[rgb(32,44,51)]"
-                      }
-                    ${idx > 0
+                    className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${
+                      info.senderId === userId
+                        ? "bg-[rgb(0,93,74)]"
+                        : "bg-[rgb(32,44,51)]"
+                    }
+                    ${
+                      idx > 0
                         ? allMessage[idx - 1].senderId != info.senderId
                           ? info.senderId == userId
                             ? "parentBubbleYou rounded-tr-none"
@@ -348,17 +375,22 @@ function ChatInGame() {
                         : info.senderId == userId
                           ? "parentBubbleYou rounded-tr-none"
                           : "parentBubbleOther rounded-tl-none"
-                      }
-                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ?
-                        "mt-[0.8rem]"
+                    }
+                    ${
+                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+                        ? "mt-[0.8rem]"
                         : ""
-                      }
+                    }
                     `}
                   >
-                    <span className="block"
+                    <span
+                      className="block"
                       style={{
-                        fontSize: emojiRegex.test(info.message) ? "2.5rem" : ""
-                      }}>{info.message}</span>
+                        fontSize: emojiRegex.test(info.message) ? "2.5rem" : "",
+                      }}
+                    >
+                      {info.message}
+                    </span>
                     <span className="absolute bottom-1 right-2 text-xs text-gray-300">
                       {new Date(info.createdAt).toLocaleTimeString("en-US", {
                         hour: "numeric",

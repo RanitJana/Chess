@@ -6,8 +6,9 @@ import Moves from "./Moves.jsx";
 function Tab({ isActive, label, onClick }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-[3px] transition ${isActive ? "border-white" : "border-transparent"
-        } cursor-pointer`}
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
+        isActive ? "border-white" : "border-transparent"
+      } cursor-pointer`}
       onClick={onClick}
     >
       {label}
