@@ -427,6 +427,9 @@ function ChatInGame() {
                 placeholder="Message"
                 onKeyDown={(e) => {
                   if (typingRef.current) clearTimeout(typingRef.current);
+                  setTimeout(() => {
+                    textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 100)
                   if (e.key === "Enter") {
                     e.preventDefault();
                     socket.emit("not-typing", userId);
@@ -440,12 +443,7 @@ function ChatInGame() {
                     socket.emit("not-typing", userId);
                   }, 1500);
                 }}
-                onFocus={() => {
-                  setIsEmojiPickerTrue(false)
-                  setTimeout(() => {
-                    textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }, 500)
-                }}
+                onFocus={() => setIsEmojiPickerTrue(false)}
               />
             </div>
             <button
