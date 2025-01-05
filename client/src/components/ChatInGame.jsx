@@ -54,7 +54,7 @@ function ChatInGame() {
   const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
   const previousScrollHeight = useRef(null);
   const typingRef = useRef(null);
-  const focusingTextArea = useRef(null);
+  const focusingTextArea = useRef(null)
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
   const textAreaFocus = useRef(null);
@@ -187,9 +187,17 @@ function ChatInGame() {
       setText(allDrafts[gameId]);
     }
 
-    // Cleanup function to avoid multiple registrations
+    const handleResize = () => {
+      setTimeout(() => {
+        focusingTextArea.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 200);
+    };
+
+    window.addEventListener('resize', handleResize);
+
     return () => {
       socket.off("receive-new-message", handleReceiveMessage);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -428,13 +436,6 @@ function ChatInGame() {
                 placeholder="Message"
                 onKeyDown={(e) => {
                   if (typingRef.current) clearTimeout(typingRef.current);
-
-                  if (!focusingTextArea.current)
-                    focusingTextArea.current = setTimeout(() => {
-                      clearTimeout(focusingTextArea.current);
-                      textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
-
                   if (e.key === "Enter") {
                     e.preventDefault();
                     socket.emit("not-typing", userId);
@@ -448,15 +449,7 @@ function ChatInGame() {
                     socket.emit("not-typing", userId);
                   }, 1500);
                 }}
-                onFocus={() => {
-                  if (!focusingTextArea.current)
-                    focusingTextArea.current = setTimeout(() => {
-                      clearTimeout(focusingTextArea.current);
-                      textAreaFocus.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
-
-                  setIsEmojiPickerTrue(false);
-                }}
+                onFocus={() => setIsEmojiPickerTrue(false)}
                 onBlur={() => typingRef.current = setTimeout(() => {
                   socket.emit("not-typing", userId);
                 }, 100)}
