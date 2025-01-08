@@ -5,6 +5,8 @@ function Picker({ position, handleReaction, messageId }) {
         "👍", // Thumbs Up
         "👎", // Thumbs Down
         "❤️", // Heart
+        "😍",
+        "🥰",
         "😄", // Smiling Face
         "🎉", // Party Popper
         "😢", // Sad Face
