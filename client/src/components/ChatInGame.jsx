@@ -99,8 +99,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-            chatSectionRefCurrent.scrollTop -
-            chatSectionRefCurrent.clientHeight
+          chatSectionRefCurrent.scrollTop -
+          chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -165,7 +165,7 @@ function ChatInGame() {
         ...prev,
         {
           _id,
-          reaction: "",
+          reaction: [],
           senderId,
           message: decryptMessage(message),
           updatedAt: Date.now(),
@@ -345,11 +345,19 @@ function ChatInGame() {
               ""
             )}
             {
-              <SingleChat
-                allMessage={allMessage}
-                setAllMessage={setAllMessage}
-                userId={userId}
-              />
+              allMessage.map((info, idx) => {
+                return <div
+                  key={idx}
+                >
+                  <SingleChat
+                    allMessage={allMessage}
+                    setAllMessage={setAllMessage}
+                    idx={idx}
+                    info={info}
+                    userId={userId}
+                  />
+                </ div>
+              })
             }
 
             <div
@@ -410,9 +418,9 @@ function ChatInGame() {
                 }}
                 onFocus={() => setIsEmojiPickerTrue(false)}
                 onBlur={() =>
-                  (typingRef.current = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
+                (typingRef.current = setTimeout(() => {
+                  socket.emit("not-typing", userId);
+                }, 100))
                 }
               />
             </div>
