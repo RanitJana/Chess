@@ -83,7 +83,7 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
     return (
         <div
             className={`
-                  flex flex-col ${info.senderId === userId ? "items-end" : "items-start"}
+                  flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"}
                   ${info.reaction?.length ? "mb-7" : ""}
                 `}
         >
