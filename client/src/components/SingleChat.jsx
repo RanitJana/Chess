@@ -92,7 +92,7 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
                     openReactionBox &&
                     <Picker handleReaction={handleReaction} messageId={info._id} position={info.senderId === userId ? "right-0" : "left-0"} />
                 }
-                {info.reaction && (
+                {info.reaction?.length > 0 && (
                     <div
                         className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
                     >
