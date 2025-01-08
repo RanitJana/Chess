@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 /* eslint-disable react/prop-types */
 function Picker({ position, handleReaction, messageId }) {
     const reactionEmojis = [

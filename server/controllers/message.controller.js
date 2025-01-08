@@ -125,7 +125,11 @@ const handleReaction = AsyncHandler(async (req, res, _) => {
   );
 
   if (index !== -1) {
-    message.reaction.splice(index, 1);
+    
+    if (message.reaction[index].symbol == reaction)
+      message.reaction.splice(index, 1);
+    else message.reaction[index].symbol = reaction;
+
   } else {
     message.reaction.push({ user: req.player._id, symbol: reaction });
   }

@@ -13,7 +13,7 @@ function areDatesSame(date1, date2) {
 }
 
 function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
-    
+
     const [openReactionBox, setOpenReactionBox] = useState(false);
     const emojiRegex =
         /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
@@ -94,7 +94,7 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
                 }
                 {info.reaction && (
                     <div
-                        className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] px-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
+                        className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
                     >
                         {info?.reaction?.map((val) => val?.symbol)}
                     </div>
