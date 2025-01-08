@@ -2,7 +2,7 @@
 import { socket } from "../socket.js";
 import { messageReaction } from "../api/message.js";
 import Picker from "./Picker.jsx";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function areDatesSame(date1, date2) {
     return (
@@ -43,6 +43,42 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
         }
     };
 
+    const singleChatRef = useRef(null);
+    useEffect(() => {
+        const handleUnsetReactionMenu = (e) => {
+            // Correct the typo in "e.target" and ensure the check uses `.contains`
+            if (singleChatRef.current && !singleChatRef.current.contains(e.target)) {
+
+                setOpenReactionBox(false); // Ensure `setOpenReactionBox` is properly defined
+            }
+        };
+
+        // Add the event listener
+        window.addEventListener("click", handleUnsetReactionMenu);
+
+        return () => {
+            // Correct the typo in `removeEventListener`
+            window.removeEventListener("click", handleUnsetReactionMenu);
+        };
+    }, []);
+
+    let holdTimeout;
+
+    const handleMouseDown = () => {
+        holdTimeout = setTimeout(() => {
+            setOpenReactionBox(true);
+        }, 1000); // 1000ms = 1 second
+    };
+
+    const handleMouseUp = () => {
+        clearTimeout(holdTimeout); // Clear timeout if released early
+    };
+
+    const handleMouseLeave = () => {
+        clearTimeout(holdTimeout); // Clear timeout if the mouse leaves the element
+    };
+
+
 
     return (
         <div
@@ -68,6 +104,7 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
                 ""
             )}
             <div
+                ref={singleChatRef}
                 className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId
                     ? "bg-[rgb(0,93,74)]"
                     : "bg-[rgb(32,44,51)]"
@@ -86,6 +123,11 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
                     }
                     `}
                 onDoubleClick={() => setOpenReactionBox(prev => !prev)}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={handleMouseDown}
+                onTouchEnd={handleMouseUp}
             >
                 {/* reactions */}
                 {
