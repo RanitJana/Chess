@@ -9,9 +9,10 @@ import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
 import { useAuthContext } from "../context/AuthContext.jsx";
-import { messageGet, messageReaction } from "../api/message.js";
+import { messageGet } from "../api/message.js";
 import { useParams } from "react-router";
 import { decryptMessage } from "../utils/encryptDecryptMessage.js";
+import SingleChat from "./SingleChat.jsx";
 
 const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
@@ -28,14 +29,6 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
     onEmojiClick={onEmojiClick}
   />
 );
-
-function areDatesSame(date1, date2) {
-  return (
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() && // Note: getMonth() returns 0 for January, 1 for February, etc.
-    date1.getFullYear() === date2.getFullYear()
-  );
-}
 
 let draftMessageTimeout = null;
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
@@ -57,8 +50,6 @@ function ChatInGame() {
   const textareaRef = useRef(null);
   const chatSectionRef = useRef(null);
   const textAreaFocus = useRef(null);
-  const emojiRegex =
-    /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
 
   const loadMessages = async () => {
     try {
@@ -77,7 +68,7 @@ function ChatInGame() {
                   message: decryptMessage(value.content),
                   createdAt: value.createdAt,
                   updatedAt: value.updatedAt,
-                  reaction: value.reaction
+                  reaction: value.reaction,
                 })),
                 ...prev,
               ];
@@ -90,7 +81,7 @@ function ChatInGame() {
                 message: decryptMessage(value.content),
                 createdAt: value.createdAt,
                 updatedAt: value.updatedAt,
-                reaction: value.reaction
+                reaction: value.reaction,
               }));
             });
         } else setAllMessage([]);
@@ -101,28 +92,6 @@ function ChatInGame() {
     }
   };
 
-  const handleReaction = async (messageId) => {
-    try {
-      const response = await messageReaction(messageId, { reaction: '🥰' });
-      if (response.data) {
-        const { success, reaction } = response.data;
-        if (success) {
-          setAllMessage(prev => prev.map(val => {
-            if (val._id != messageId) return val;
-            return { ...val, reaction }
-          }))
-          socket.emit("chat-reaction", {
-            senderId: userId,
-            messageId,
-            reaction
-          });
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   const scrollChatElementBottom = function () {
     const chatSectionRefCurrent = chatSectionRef.current;
 
@@ -130,8 +99,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-          chatSectionRefCurrent.scrollTop -
-          chatSectionRefCurrent.clientHeight
+            chatSectionRefCurrent.scrollTop -
+            chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -207,16 +176,18 @@ function ChatInGame() {
     };
 
     function handleNewReaction(info) {
-      setAllMessage(prev => prev.map(val => {
-        if (val._id != info.messageId) return val;
-        return { ...val, reaction: info.reaction }
-      }))
+      setAllMessage((prev) =>
+        prev.map((val) => {
+          if (val._id != info.messageId) return val;
+          return { ...val, reaction: info.reaction };
+        })
+      );
     }
 
     // Register socket event listener
     socket.on("receive-new-message", handleReceiveMessage);
 
-    socket.on("chat-reaction-receiver", handleNewReaction)
+    socket.on("chat-reaction-receiver", handleNewReaction);
 
     let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
     if (allDrafts[gameId]) {
@@ -227,11 +198,11 @@ function ChatInGame() {
       textAreaFocus.current?.scrollIntoView();
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       socket.off("receive-new-message", handleReceiveMessage);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -283,7 +254,7 @@ function ChatInGame() {
         content: encryptedText,
       });
 
-      if (response.data) info._id = response.data.messageId
+      if (response.data) info._id = response.data.messageId;
 
       socket.emit("new-message", {
         _id: response?.data?.messageId || "",
@@ -373,73 +344,13 @@ function ChatInGame() {
             ) : (
               ""
             )}
-            {allMessage.map((info, idx) => (
-              <div key={idx}>
-                <div
-                  className={`
-                  flex flex-col ${info.senderId === userId ? "items-end" : "items-start"}
-                  ${info.reaction?.length ? "mb-7" : ""}
-                `}
-                >
-                  {!areDatesSame(
-                    new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt),
-                    new Date(info.createdAt)
-                  ) || idx === 0 ? (
-                    <div className="w-full flex items-center justify-center mb-1">
-                      <div className="flex text-sm w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
-                        {new Intl.DateTimeFormat("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        }).format(new Date(info.createdAt))}
-                      </div>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                  <div
-                    className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] ${info.senderId === userId
-                      ? "bg-[rgb(0,93,74)]"
-                      : "bg-[rgb(32,44,51)]"
-                      }
-                    ${idx === 0 || allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId
-                        ? info.senderId == userId
-                          ? "parentBubbleYou rounded-tr-none"
-                          : "parentBubbleOther rounded-tl-none"
-                        : ""}
-                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-                        ? "mt-[0.8rem]"
-                        : ""
-                      }
-                    `}
-                    onDoubleClick={() => handleReaction(info._id)}
-                  >
-                    {/* reactions */}
-                    {
-                      info.reaction &&
-                      <div
-                        className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.1rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
-                      >{info.reaction}</div>
-                    }
-                    <span
-                      className="block"
-                      style={{
-                        fontSize: emojiRegex.test(info.message) ? "2.5rem" : "",
-                      }}
-                    >
-                      {info.message}
-                    </span>
-                    <span className="absolute bottom-1 right-2 text-xs text-gray-300">
-                      {new Date(info.createdAt).toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+            {
+              <SingleChat
+                allMessage={allMessage}
+                setAllMessage={setAllMessage}
+                userId={userId}
+              />
+            }
 
             <div
               className="bg-[rgb(32,44,51)] w-fit px-[15px] rounded-lg rounded-tl-none overflow-hidden transition-all"
@@ -498,9 +409,11 @@ function ChatInGame() {
                   }, 1500);
                 }}
                 onFocus={() => setIsEmojiPickerTrue(false)}
-                onBlur={() => typingRef.current = setTimeout(() => {
-                  socket.emit("not-typing", userId);
-                }, 100)}
+                onBlur={() =>
+                  (typingRef.current = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
+                }
               />
             </div>
             <button

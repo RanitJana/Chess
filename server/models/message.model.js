@@ -17,9 +17,17 @@ const messageSchema = new Schema(
       required: true,
     },
     reaction: {
-      type: String,
-      default: ""
-    }
+      type: [
+        {
+          user: {
+            type: Schema.Types.ObjectId,
+            ref: "Player",
+          },
+          symbol: String,
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

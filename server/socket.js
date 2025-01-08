@@ -42,9 +42,9 @@ const realTimeInit = function (server) {
     socket.on("new-message", (info) => {
       socket.to(roomId).emit("receive-new-message", info);
     });
-    socket.on("chat-reaction", info => {
+    socket.on("chat-reaction", (info) => {
       socket.to(roomId).emit("chat-reaction-receiver", info);
-    })
+    });
 
     socket.on("typing", (value) => {
       socket.to(roomId).emit("server-typing", value);

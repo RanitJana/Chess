@@ -51,7 +51,7 @@ const handlePostMessage = AsyncHandler(async (req, res, _) => {
   return res.status(200).json({
     success: true,
     message: "Success",
-    messageId: message._id
+    messageId: message._id,
   });
 });
 
@@ -104,29 +104,39 @@ const handleGetMessage = AsyncHandler(async (req, res, _) => {
 
 const handleReaction = AsyncHandler(async (req, res, _) => {
   const { messageId } = req.params;
-  if (!messageId) return res.status(400).json({
-    success: false,
-    message: "Invalid message id"
-  })
+  if (!messageId)
+    return res.status(400).json({
+      success: false,
+      message: "Invalid message id",
+    });
 
   const { reaction } = req.body;
 
-  if (!reaction) return res.status(200).json({
-    success: false,
-    message: "Invalid request"
-  })
+  if (!reaction)
+    return res.status(200).json({
+      success: false,
+      message: "Invalid request",
+    });
 
   let message = await messageSchema.findById(messageId);
 
-  message.reaction += reaction;
+  const index = message.reaction.findIndex(
+    (value) => value.user.toString() === req.player._id.toString()
+  );
+
+  if (index !== -1) {
+    message.reaction.splice(index, 1);
+  } else {
+    message.reaction.push({ user: req.player._id, symbol: reaction });
+  }
 
   await message.save({ validateBeforeSave: false });
 
   return res.status(200).json({
     success: true,
     messgae: "Success",
-    reaction
-  })
-})
+    reaction: message.reaction,
+  });
+});
 
 export { handleGetMessage, handlePostMessage, handleReaction };

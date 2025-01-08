@@ -3,7 +3,7 @@ import verifyPlayer from "../middlewares/verify.player.js";
 import {
   handleGetMessage,
   handlePostMessage,
-  handleReaction
+  handleReaction,
 } from "../controllers/message.controller.js";
 
 const router = express.Router();
