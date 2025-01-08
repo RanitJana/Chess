@@ -67,7 +67,7 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
     const handleMouseDown = () => {
         holdTimeout = setTimeout(() => {
             setOpenReactionBox(true);
-        }, 1000); // 1000ms = 1 second
+        }, 500);
     };
 
     const handleMouseUp = () => {
