@@ -31,7 +31,6 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
   />
 );
 
-let draftMessageTimeout = null;
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 
 function ChatInGame() {
@@ -205,11 +204,6 @@ function ChatInGame() {
 
     socket.on("chat-reaction-receiver", handleNewReaction);
 
-    let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
-    if (allDrafts[gameId]) {
-      setText(allDrafts[gameId]);
-    }
-
     const handleResize = () => {
       textAreaFocus.current?.scrollIntoView();
     };
@@ -315,24 +309,6 @@ function ChatInGame() {
     [setText]
   );
 
-  const handleDraftMessages = function (value) {
-    if (draftMessageTimeout) {
-      clearTimeout(draftMessageTimeout);
-    }
-
-    draftMessageTimeout = setTimeout(() => {
-      let allDrafts = JSON.parse(localStorage.getItem("draft-messages")) || {};
-      allDrafts[gameId] = value;
-      localStorage.setItem("draft-messages", JSON.stringify(allDrafts));
-    }, 1000);
-
-    return () => {
-      if (draftMessageTimeout) {
-        clearTimeout(draftMessageTimeout);
-      }
-    };
-  };
-
   return (
     <div className="relative h-full w-full flex flex-col">
       {/* Chat Messages */}
@@ -423,7 +399,6 @@ function ChatInGame() {
                 onChange={(e) => {
                   setText(e.target.value);
                   adjustHeight();
-                  handleDraftMessages(e.target.value);
                 }}
                 rows={1}
                 className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
