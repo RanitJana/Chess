@@ -97,11 +97,21 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
             ) || idx === 0 ? (
                 <div className="w-full flex items-center justify-center mb-1">
                     <div className="flex text-sm w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
-                        {new Intl.DateTimeFormat("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                        }).format(new Date(info.createdAt))}
+                        {(() => {
+                            const prevDate = new Intl.DateTimeFormat("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                            }).format(new Date(info.createdAt));
+
+                            const today = new Intl.DateTimeFormat("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                            }).format(new Date(Date.now()));
+
+                            return today == prevDate ? "Today" : prevDate
+                        })()}
                     </div>
                 </div>
             ) : (

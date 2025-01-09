@@ -100,8 +100,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-            chatSectionRefCurrent.scrollTop -
-            chatSectionRefCurrent.clientHeight
+          chatSectionRefCurrent.scrollTop -
+          chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -387,10 +387,11 @@ function ChatInGame() {
             })}
 
             <div
-              className="bg-[rgb(32,44,51)] w-fit px-[15px] rounded-lg rounded-tl-none overflow-hidden transition-all"
+              className="bg-[rgb(32,44,51)] flex items-center justify-center w-fit px-[15px] rounded-xl rounded-tl-none overflow-hidden transition-all"
               style={{
-                height: `${!isTyping ? "0px" : "30px"}`,
+                height: `${!isTyping ? "0px" : "35px"}`,
                 padding: `${!isTyping ? "0" : "0.5rem"}`,
+                opacity: isTyping ? '1' : '0'
               }}
             >
               <div className="typing">
@@ -444,17 +445,17 @@ function ChatInGame() {
                 }}
                 onFocus={() => setIsEmojiPickerTrue(false)}
                 onBlur={() =>
-                  (typingRef.current = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
+                (typingRef.current = setTimeout(() => {
+                  socket.emit("not-typing", userId);
+                }, 100))
                 }
               />
             </div>
             <button
-              className="h-[3rem] flex justify-center items-center text-white border rounded-[50%] aspect-square bg-slate-100"
+              className="h-[3rem] flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] hover:brightness-75 transition-colors"
               onClick={handleSendMessage}
             >
-              <img src="/images/send.png" alt="" className="w-6 max-h-6" />
+              <img src="/images/send.png" alt="" className="w-6 max-h-6 rotate-45 brightness-0" />
             </button>
           </div>
           <div ref={textAreaFocus}></div>

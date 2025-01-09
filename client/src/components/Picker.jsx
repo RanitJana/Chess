@@ -4,17 +4,18 @@ import { useEffect } from "react";
 function Picker({ position, handleReaction, messageId, openReactionBox }) {
   const reactionEmojis = [
     "👍", // Thumbs Up
-    "👎", // Thumbs Down
     "❤️", // Heart
+    "😂", // Laughing Face
+    "😮",
+    "😢", // Sad Face
+    "🙏", // Thank You/Praying
+    "👎", // Thumbs Down
     "😍",
     "🥰",
     "😄", // Smiling Face
     "🎉", // Party Popper
-    "😢", // Sad Face
-    "😂", // Laughing Face
     "😡", // Angry Face
     "🤔", // Thinking Face
-    "🙏", // Thank You/Praying
     "🚀", // Rocket
     "👏", // Clapping Hands
     "🥳", // Partying Face
