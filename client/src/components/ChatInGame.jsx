@@ -31,6 +31,10 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
   />
 );
 
+const cleanUpSocketEvents = (events) => {
+  events.forEach(([event, listener]) => socket.off(event, listener));
+};
+
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 
 function ChatInGame() {
@@ -40,24 +44,31 @@ function ChatInGame() {
   const userId = playerInfo._id;
 
   const [allMessage, setAllMessage] = useState(null);
-  const [initialLoad, setInitialLoad] = useState(true);
-  const [isTyping, setTyping] = useState(false);
-  const [text, setText] = useState("");
-  const [hasMoreMessages, setHasMoreMessages] = useState(true);
-  const [isEmojiPickerTrue, setIsEmojiPickerTrue] = useState(false);
-  const previousScrollHeight = useRef(null);
-  const typingRef = useRef(null);
-  const textareaRef = useRef(null);
-  const chatSectionRef = useRef(null);
-  const textAreaFocus = useRef(null);
 
-  const loadMessages = async () => {
+  const [trueFalseStates, setTrueFalseStates] = useState({
+    initialLoad: true,
+    isTyping: false,
+    hasMoreMessages: true,
+    isEmojiPickerTrue: false,
+  });
+
+  const [text, setText] = useState("");
+
+  const allRefs = useRef({
+    previousScrollHeight: null,
+    typingRef: null,
+    textareaRef: null,
+    chatSectionRef: null,
+    textAreaFocus: null,
+  });
+
+  const loadMessages = useCallback(async () => {
     try {
       let response = await messageGet(gameId, allMessage?.length || 0);
 
       if (response) {
         const { success, info, hasMore } = response.data;
-        setHasMoreMessages(hasMore);
+        setTrueFalseStates((prev) => ({ ...prev, hasMoreMessages: hasMore }));
         if (success) {
           if (allMessage)
             setAllMessage((prev) => {
@@ -90,17 +101,78 @@ function ChatInGame() {
       console.log(error);
       toast.error("Please try to refresh the page");
     }
-  };
+  }, [allMessage, gameId]);
+
+  const handleSendMessage = useCallback(async () => {
+    if (!text.trim() || !opponent || !userId) return;
+
+    setTrueFalseStates((prev) => ({ ...prev, isEmojiPickerTrue: false }));
+    scrollChatElementBottom();
+
+    let encryptedText = encryptMessage(text.trim());
+    const tempId = uuidv4();
+
+    let info = {
+      _id: tempId,
+      senderId: userId,
+      message: text.trim(),
+      updatedAt: Date.now(),
+      createdAt: Date.now(),
+    };
+
+    try {
+      setAllMessage((prev) => [...prev, info]);
+      setText(() => "");
+
+      socket.emit("new-message", { ...info, message: encryptedText });
+
+      allRefs.current.textareaRef.value = "";
+      adjustHeight();
+
+      let response = await messagePost({
+        receiverId: opponent._id,
+        gameId,
+        content: encryptedText,
+      });
+
+      if (response.data) {
+        socket.emit("new-message-update-id", {
+          prev: tempId,
+          current: response.data.messageId,
+        });
+
+        setAllMessage((prev) => {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i]._id == tempId) {
+              prev[i]._id = response.data.messageId;
+              break;
+            }
+          }
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to send the message");
+    }
+  }, [gameId, opponent, text, userId]);
+
+  const handleEmojiClick = useCallback(
+    (emojiObject) => {
+      setText((prev) => prev + emojiObject.emoji);
+    },
+    [setText]
+  );
 
   const scrollChatElementBottom = function () {
-    const chatSectionRefCurrent = chatSectionRef.current;
+    const chatSectionRefCurrent = allRefs.current.chatSectionRef;
 
     if (chatSectionRefCurrent) {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-          chatSectionRefCurrent.scrollTop -
-          chatSectionRefCurrent.clientHeight
+            chatSectionRefCurrent.scrollTop -
+            chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -115,7 +187,7 @@ function ChatInGame() {
   };
 
   const adjustHeight = () => {
-    const textarea = textareaRef.current;
+    const textarea = allRefs.current.textareaRef;
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
       textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to content
@@ -123,10 +195,15 @@ function ChatInGame() {
   };
 
   const handleScroll = () => {
-    const container = chatSectionRef.current;
+    const container = allRefs.current.chatSectionRef;
+
     if (!container) return;
 
-    if (container.scrollTop <= 0 && hasMoreMessages && allMessage) {
+    if (
+      container.scrollTop <= 0 &&
+      trueFalseStates.hasMoreMessages &&
+      allMessage
+    ) {
       loadMessages();
     }
   };
@@ -134,28 +211,29 @@ function ChatInGame() {
   useEffect(() => {
     if (!allMessage) return;
 
-    const container = chatSectionRef.current;
+    const container = allRefs.current.chatSectionRef;
     if (!container) return;
 
     const newScrollHeight = container.scrollHeight;
 
     // Handle initial load separately
-    if (initialLoad) {
+    if (trueFalseStates.initialLoad) {
       container.scrollTo(0, newScrollHeight);
-      setInitialLoad(false);
-      previousScrollHeight.current = newScrollHeight;
+      setTrueFalseStates((prev) => ({ ...prev, initialLoad: false }));
+      allRefs.current.previousScrollHeight = newScrollHeight;
       return;
     }
 
     // Handle subsequent updates (e.g., new messages)
-    if (previousScrollHeight.current != null) {
-      if (newScrollHeight !== previousScrollHeight.current) {
+    if (allRefs.current.previousScrollHeight != null) {
+      if (newScrollHeight !== allRefs.current.previousScrollHeight) {
         // Only adjust scroll for new content
-        container.scrollTop += newScrollHeight - previousScrollHeight.current;
+        container.scrollTop +=
+          newScrollHeight - allRefs.current.previousScrollHeight;
       }
     }
 
-    previousScrollHeight.current = newScrollHeight;
+    allRefs.current.previousScrollHeight = newScrollHeight;
   }, [allMessage]);
 
   useEffect(() => {
@@ -197,24 +275,23 @@ function ChatInGame() {
       });
     }
 
+    const listeners = [
+      ["receive-new-message", handleReceiveMessage],
+      ["new-message-update-id-user", updateMessageId],
+      ["chat-reaction-receiver", handleNewReaction],
+    ];
+
     // Register socket event listener
-    socket.on("receive-new-message", handleReceiveMessage);
-
-    socket.on("new-message-update-id-user", updateMessageId);
-
-    socket.on("chat-reaction-receiver", handleNewReaction);
+    listeners.forEach(([event, listener]) => socket.on(event, listener));
 
     const handleResize = () => {
-      textAreaFocus.current?.scrollIntoView();
+      allRefs.current.textAreaFocus?.scrollIntoView();
     };
 
     window.addEventListener("resize", handleResize);
 
     return () => {
-      socket.off("receive-new-message", handleReceiveMessage);
-      socket.off("new-message-update-id-user", updateMessageId);
-      socket.off("chat-reaction-receiver", handleNewReaction);
-
+      cleanUpSocketEvents(listeners);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
@@ -222,92 +299,30 @@ function ChatInGame() {
   useEffect(() => {
     loadMessages();
 
-    socket.on("server-typing", (value) => {
-      if (userId !== value.userId && gameId === value.gameId) setTyping(true);
-    });
+    const listeners = [
+      [
+        "server-typing",
+        (value) => {
+          if (userId !== value.userId && gameId === value.gameId)
+            setTrueFalseStates((prev) => ({ ...prev, isTyping: true }));
+        },
+      ],
+      [
+        "server-not-typing",
+        () => {
+          setTrueFalseStates((prev) => ({ ...prev, isTyping: false }));
+        },
+      ],
+    ];
 
-    socket.on("server-not-typing", () => {
-      setTyping(false);
-    });
+    listeners.forEach(([event, listener]) => socket.on(event, listener));
 
-    return () => {
-      socket.off("server-typing");
-      socket.off("server-not-typing");
-    };
+    return () => cleanUpSocketEvents(listeners);
   }, [gameId]);
 
   useEffect(() => {
-    if (isTyping) scrollChatElementBottom();
-  }, [isTyping]);
-
-  const handleSendMessage = useCallback(async () => {
-    if (!text.trim() || !opponent || !userId) return;
-
-    setIsEmojiPickerTrue(false);
-
-    scrollChatElementBottom();
-
-    try {
-      let encryptedText = encryptMessage(text.trim());
-      const tempId = uuidv4();
-      let info = {
-        _id: tempId,
-        senderId: userId,
-        message: text.trim(),
-        updatedAt: Date.now(),
-        createdAt: Date.now(),
-      };
-
-      setText(() => "");
-      textareaRef.current.value = "";
-      adjustHeight();
-
-      socket.emit("new-message", { ...info, message: encryptedText });
-      setAllMessage((prev) => [...prev, info]);
-
-      let response = await messagePost({
-        receiverId: opponent._id,
-        gameId,
-        content: encryptedText,
-      });
-
-      if (response.data) {
-        socket.emit("new-message-update-id", {
-          prev: tempId,
-          current: response.data.messageId,
-        });
-        setAllMessage((prev) => {
-          for (let i = prev.length - 1; i >= 0; i--) {
-            if (prev[i]._id == tempId) {
-              prev[i]._id = response.data.messageId;
-              break;
-            }
-          }
-          return prev;
-        });
-      }
-
-      let allDrafts = JSON.parse(localStorage.getItem("draft-messages"));
-      if (allDrafts) {
-        try {
-          delete allDrafts[gameId];
-          localStorage.setItem("draft-messages", JSON.stringify(allDrafts));
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Unable to send the message");
-    }
-  }, [gameId, opponent, text, userId]);
-
-  const handleEmojiClick = useCallback(
-    (emojiObject) => {
-      setText((prev) => prev + emojiObject.emoji);
-    },
-    [setText]
-  );
+    if (trueFalseStates.isTyping) scrollChatElementBottom();
+  }, [trueFalseStates.isTyping]);
 
   return (
     <div className="relative h-full w-full flex flex-col">
@@ -316,7 +331,7 @@ function ChatInGame() {
         <>
           <div
             className="w-full h-full text-white overflow-y-auto px-4 space-y-1"
-            ref={chatSectionRef}
+            ref={(el) => (allRefs.current.chatSectionRef = el)}
             onScroll={handleScroll}
           >
             {allMessage?.length == 0 ? (
@@ -334,7 +349,7 @@ function ChatInGame() {
             ) : (
               <div className="bg-transparent h-5"></div>
             )}
-            {hasMoreMessages ? (
+            {trueFalseStates.hasMoreMessages ? (
               <div className="flex items-center justify-center pb-3">
                 <span
                   className="loader"
@@ -365,9 +380,9 @@ function ChatInGame() {
             <div
               className="bg-[rgb(32,44,51)] flex items-center justify-center w-fit px-[15px] rounded-xl rounded-tl-none overflow-hidden transition-all"
               style={{
-                height: `${!isTyping ? "0px" : "35px"}`,
-                padding: `${!isTyping ? "0" : "0.5rem"}`,
-                opacity: isTyping ? '1' : '0'
+                height: `${!trueFalseStates.isTyping ? "0px" : "35px"}`,
+                padding: `${!trueFalseStates.isTyping ? "0" : "0.5rem"}`,
+                opacity: trueFalseStates.isTyping ? "1" : "0",
               }}
             >
               <div className="typing">
@@ -385,15 +400,20 @@ function ChatInGame() {
                 <img
                   src="/images/smile.png"
                   alt="E"
-                  onClick={() => setIsEmojiPickerTrue((prev) => !prev)}
+                  onClick={() =>
+                    setTrueFalseStates((prev) => ({
+                      ...prev,
+                      isEmojiPickerTrue: !prev.isEmojiPickerTrue,
+                    }))
+                  }
                   className="w-full"
                 />
               </div>
-              {isEmojiPickerTrue && (
+              {trueFalseStates.isEmojiPickerTrue && (
                 <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
               )}
               <textarea
-                ref={textareaRef}
+                ref={(el) => (allRefs.current.textareaRef = el)}
                 type="text"
                 value={text}
                 onChange={(e) => {
@@ -404,7 +424,8 @@ function ChatInGame() {
                 className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
                 placeholder="Message"
                 onKeyDown={(e) => {
-                  if (typingRef.current) clearTimeout(typingRef.current);
+                  if (allRefs.current.typingRef)
+                    clearTimeout(allRefs.current.typingRef);
                   if (e.key === "Enter") {
                     e.preventDefault();
                     socket.emit("not-typing", userId);
@@ -414,15 +435,20 @@ function ChatInGame() {
                   }
                 }}
                 onKeyUp={() => {
-                  typingRef.current = setTimeout(() => {
+                  allRefs.current.typingRef = setTimeout(() => {
                     socket.emit("not-typing", userId);
                   }, 1500);
                 }}
-                onFocus={() => setIsEmojiPickerTrue(false)}
+                onFocus={() =>
+                  setTrueFalseStates((prev) => ({
+                    ...prev,
+                    isEmojiPickerTrue: false,
+                  }))
+                }
                 onBlur={() =>
-                (typingRef.current = setTimeout(() => {
-                  socket.emit("not-typing", userId);
-                }, 100))
+                  (allRefs.current.typingRef = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
                 }
               />
             </div>
@@ -430,10 +456,14 @@ function ChatInGame() {
               className="h-[3rem] flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] active:brightness-75 transition-colors"
               onClick={handleSendMessage}
             >
-              <img src="/images/send.png" alt="" className="w-6 max-h-6 rotate-45 brightness-0" />
+              <img
+                src="/images/send.png"
+                alt=""
+                className="w-6 max-h-6 rotate-45 brightness-0"
+              />
             </button>
           </div>
-          <div ref={textAreaFocus}></div>
+          <div ref={(el) => (allRefs.current.textAreaFocus = el)}></div>
         </>
       ) : (
         <div className="relative w-full h-full flex items-center justify-center">

@@ -41,7 +41,7 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
         navigator.vibrate(50);
       }
     }
-  }, [openReactionBox])
+  }, [openReactionBox]);
 
   return (
     <div
