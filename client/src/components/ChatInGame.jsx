@@ -171,8 +171,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-            chatSectionRefCurrent.scrollTop -
-            chatSectionRefCurrent.clientHeight
+          chatSectionRefCurrent.scrollTop -
+          chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -285,7 +285,8 @@ function ChatInGame() {
     listeners.forEach(([event, listener]) => socket.on(event, listener));
 
     const handleResize = () => {
-      allRefs.current.textAreaFocus?.scrollIntoView();
+      if (allRefs.current.textareaRef == document.activeElement)
+        allRefs.current.textAreaFocus?.scrollIntoView();
     };
 
     window.addEventListener("resize", handleResize);
@@ -446,9 +447,9 @@ function ChatInGame() {
                   }))
                 }
                 onBlur={() =>
-                  (allRefs.current.typingRef = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
+                (allRefs.current.typingRef = setTimeout(() => {
+                  socket.emit("not-typing", userId);
+                }, 100))
                 }
               />
             </div>
