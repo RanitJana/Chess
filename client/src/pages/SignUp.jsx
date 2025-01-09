@@ -55,7 +55,15 @@ export default function Login() {
         className="bg-blackDark h-fit max-w-[400px] w-[100dvw] min-w-fit rounded-xl flex flex-col gap-4 z-[2]"
       >
         <div className="p-4 flex flex-col gap-4">
-          <div className="relative bg-blackLight w-full">
+          <div className=" w-full flex items-center justify-center min-h-[3rem]">
+            <img
+              src="/images/chess.com.png"
+              alt=""
+              className="w-[10rem]"
+              decoding="sync"
+            />
+          </div>
+          <div className="relative bg-blackLight rounded-2xl w-full">
             <img
               src="/images/name.png"
               alt=""
@@ -69,7 +77,7 @@ export default function Login() {
               infoName={"name"}
             />
           </div>
-          <div className="relative bg-blackLight w-full">
+          <div className="relative bg-blackLight rounded-2xl w-full">
             <img
               src="/images/user.png"
               alt=""
@@ -83,7 +91,7 @@ export default function Login() {
               infoName={"email"}
             />
           </div>
-          <div className="relative bg-blackLight w-full">
+          <div className="relative bg-blackLight rounded-2xl w-full">
             <img
               src="/images/lock.png"
               alt=""
@@ -97,7 +105,7 @@ export default function Login() {
               infoName={"password"}
             />
           </div>
-          <div className="relative bg-blackLight w-full">
+          <div className="relative bg-blackLight rounded-2xl w-full">
             <img
               src="/images/lock.png"
               alt=""
