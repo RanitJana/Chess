@@ -452,7 +452,7 @@ function ChatInGame() {
               />
             </div>
             <button
-              className="h-[3rem] flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] hover:brightness-75 transition-colors"
+              className="h-[3rem] flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] active:brightness-75 transition-colors"
               onClick={handleSendMessage}
             >
               <img src="/images/send.png" alt="" className="w-6 max-h-6 rotate-45 brightness-0" />
