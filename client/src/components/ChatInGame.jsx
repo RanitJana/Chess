@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { messagePost } from "../api/message.js";
 import { toast } from "react-hot-toast";
 import { socket } from "../socket.js";
@@ -99,8 +100,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-          chatSectionRefCurrent.scrollTop -
-          chatSectionRefCurrent.clientHeight
+            chatSectionRefCurrent.scrollTop -
+            chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -184,8 +185,23 @@ function ChatInGame() {
       );
     }
 
+    function updateMessageId(info) {
+      const { prev, current } = info;
+      setAllMessage((temp) => {
+        for (let i = temp.length - 1; i >= 0; i--) {
+          if (temp[i]._id == prev) {
+            temp[i]._id = current;
+            break;
+          }
+        }
+        return temp;
+      });
+    }
+
     // Register socket event listener
     socket.on("receive-new-message", handleReceiveMessage);
+
+    socket.on("new-message-update-id-user", updateMessageId);
 
     socket.on("chat-reaction-receiver", handleNewReaction);
 
@@ -202,6 +218,9 @@ function ChatInGame() {
 
     return () => {
       socket.off("receive-new-message", handleReceiveMessage);
+      socket.off("new-message-update-id-user", updateMessageId);
+      socket.off("chat-reaction-receiver", handleNewReaction);
+
       window.removeEventListener("resize", handleResize);
     };
   }, []);
@@ -236,8 +255,9 @@ function ChatInGame() {
 
     try {
       let encryptedText = encryptMessage(text.trim());
+      const tempId = uuidv4();
       let info = {
-        _id: "",
+        _id: tempId,
         senderId: userId,
         message: text.trim(),
         updatedAt: Date.now(),
@@ -248,23 +268,31 @@ function ChatInGame() {
       textareaRef.current.value = "";
       adjustHeight();
 
+      socket.emit("new-message", { ...info, message: encryptedText });
+      setAllMessage((prev) => [...prev, info]);
+
       let response = await messagePost({
         receiverId: opponent._id,
         gameId,
         content: encryptedText,
       });
 
-      if (response.data) info._id = response.data.messageId;
+      if (response.data) {
+        socket.emit("new-message-update-id", {
+          prev: tempId,
+          current: response.data.messageId,
+        });
+        setAllMessage((prev) => {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i]._id == tempId) {
+              prev[i]._id = response.data.messageId;
+              break;
+            }
+          }
+          return prev;
+        });
+      }
 
-      socket.emit("new-message", {
-        _id: response?.data?.messageId || "",
-        senderId: userId,
-        message: encryptedText,
-        updatedAt: Date.now(),
-        createdAt: Date.now(),
-      });
-
-      setAllMessage((prev) => [...prev, info]);
       let allDrafts = JSON.parse(localStorage.getItem("draft-messages"));
       if (allDrafts) {
         try {
@@ -344,11 +372,9 @@ function ChatInGame() {
             ) : (
               ""
             )}
-            {
-              allMessage.map((info, idx) => {
-                return <div
-                  key={idx}
-                >
+            {allMessage.map((info, idx) => {
+              return (
+                <div key={idx}>
                   <SingleChat
                     allMessage={allMessage}
                     setAllMessage={setAllMessage}
@@ -356,9 +382,9 @@ function ChatInGame() {
                     info={info}
                     userId={userId}
                   />
-                </ div>
-              })
-            }
+                </div>
+              );
+            })}
 
             <div
               className="bg-[rgb(32,44,51)] w-fit px-[15px] rounded-lg rounded-tl-none overflow-hidden transition-all"
@@ -418,9 +444,9 @@ function ChatInGame() {
                 }}
                 onFocus={() => setIsEmojiPickerTrue(false)}
                 onBlur={() =>
-                (typingRef.current = setTimeout(() => {
-                  socket.emit("not-typing", userId);
-                }, 100))
+                  (typingRef.current = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
                 }
               />
             </div>
