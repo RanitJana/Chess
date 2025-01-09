@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 /* eslint-disable react/prop-types */
 function Picker({ position, handleReaction, messageId, openReactionBox }) {
   const reactionEmojis = [
@@ -17,7 +19,6 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
     "👏", // Clapping Hands
     "🥳", // Partying Face
     "🔥", // Fire
-    "😍", // Heart Eyes
     "😱", // Screaming Face
     "💯", // 100
     "✨", // Sparkles
@@ -32,6 +33,14 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
     "😐", // Neutral Face
     "🤨", // Raised Eyebrow
   ];
+
+  useEffect(() => {
+    if (openReactionBox) {
+      if (navigator.vibrate) {
+        navigator.vibrate(200);
+      }
+    }
+  }, [openReactionBox])
 
   return (
     <div
