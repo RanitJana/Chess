@@ -37,7 +37,8 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
   useEffect(() => {
     if (openReactionBox) {
       if (navigator.vibrate) {
-        navigator.vibrate(200);
+        const vibrationPattern = [50, 20, 50, 20, 50];
+        navigator.vibrate(vibrationPattern); // Total ~200ms
       }
     }
   }, [openReactionBox])
