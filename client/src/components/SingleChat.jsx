@@ -86,22 +86,22 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentR
 
   useEffect(() => {
     const element = parentRef;
-    let isScrolling;
-
     if (element) {
       const handleScroll = () => {
-        clearTimeout(isScrolling);
         clearTimeout(holdTimeout);
-        isScrolling = setTimeout(() => {
-        }, 100);
+        setOpenReactionBox(false);
       };
-
+      const handleScrollEnd = () => {
+        clearTimeout(holdTimeout);
+      }
       // Add scroll event listener
+      element.addEventListener('scrollend', handleScrollEnd);
       element.addEventListener('scroll', handleScroll);
 
       // Cleanup on unmount
       return () => {
         element.removeEventListener('scroll', handleScroll);
+        element.removeEventListener('scrollend', handleScrollEnd);
       };
     }
   }, [holdTimeout, parentRef]);
