@@ -45,7 +45,7 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
 
   return (
     <div
-      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex top-[-80%] p-2 rounded-full ${position} ${openReactionBox ? " w-[18rem] opacity-100" : " w-[0rem] opacity-0"}`}
+      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex top-[-80%] w-[18rem] p-2 rounded-full ${position} ${openReactionBox ? " scale-100 opacity-100" : " scale-0 opacity-0"}`}
       style={{
         transition: "all 0.2s ease-in",
       }}
