@@ -6,9 +6,8 @@ import Moves from "./Moves.jsx";
 function Tab({ isActive, label, onClick }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
-        isActive ? "border-white" : "border-transparent"
-      } cursor-pointer`}
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${isActive ? "border-white" : "border-transparent"
+        } cursor-pointer`}
       onClick={onClick}
     >
       {label}
@@ -29,7 +28,7 @@ function GameSideSection() {
   };
 
   return (
-    <div className="relative lg-1008:h-[40rem] h-dvh w-[100dvw] lg-1008:w-[27rem] lg-1008:max-h-[92%] min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
+    <div className="relative lg-1008:h-[40rem] h-dvh w-[100dvw] lg-1008:w-[27rem] lg-1008:max-h-[92%] lg-1008:min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
       <ul className="flex w-full border-b border-[rgba(255,255,255,0.16)]">
         <Tab
           isActive={activeTab === 0}

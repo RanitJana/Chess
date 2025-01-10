@@ -286,7 +286,7 @@ function ChatInGame() {
 
     const handleResize = () => {
       if (allRefs.current.textareaRef == document.activeElement)
-        allRefs.current.textAreaFocus?.scrollIntoView({behavior:"smooth"});
+        allRefs.current.textAreaFocus?.scrollIntoView();
     };
 
     window.addEventListener("resize", handleResize);
