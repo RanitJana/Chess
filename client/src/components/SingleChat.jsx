@@ -2,7 +2,7 @@
 import { socket } from "../socket.js";
 import { messageReaction } from "../api/message.js";
 import Picker from "./Picker.jsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 
 function areDatesSame(date1, date2) {
   return (
@@ -197,4 +197,6 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentR
   );
 }
 
-export default SingleChat;
+export default memo(SingleChat, (prevProps, nextProps) => {
+  return prevProps.info === nextProps.info && prevProps.userId === nextProps.userId;
+});
