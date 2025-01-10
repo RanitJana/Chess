@@ -190,7 +190,7 @@ function ChatInGame() {
     const textarea = allRefs.current.textareaRef;
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
-      textarea.style.height = `${textarea.scrollHeight}px`; // Adjust to content
+      textarea.style.height = `${Math.min(textarea.scrollHeight,180)}px`; // Adjust to content
     }
   };
 
