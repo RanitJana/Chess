@@ -368,6 +368,7 @@ function ChatInGame() {
               return (
                 <div key={idx}>
                   <SingleChat
+                    parentRef={allRefs.current.chatSectionRef}
                     allMessage={allMessage}
                     setAllMessage={setAllMessage}
                     idx={idx}

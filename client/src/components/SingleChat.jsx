@@ -12,7 +12,7 @@ function areDatesSame(date1, date2) {
   );
 }
 
-function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
+function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentRef }) {
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
@@ -84,6 +84,28 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
     clearTimeout(holdTimeout); // Clear timeout if the mouse leaves the element
   };
 
+  useEffect(() => {
+    const element = parentRef;
+    let isScrolling;
+
+    if (element) {
+      const handleScroll = () => {
+        clearTimeout(isScrolling);
+        clearTimeout(holdTimeout);
+        isScrolling = setTimeout(() => {
+        }, 100);
+      };
+
+      // Add scroll event listener
+      element.addEventListener('scroll', handleScroll);
+
+      // Cleanup on unmount
+      return () => {
+        element.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [holdTimeout, parentRef]);
+
   return (
     <div
       className={`
@@ -119,23 +141,20 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage }) {
       )}
       <div
         ref={singleChatRef}
-        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
-          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-        }
-                    ${
-                      idx === 0 ||
-                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-                        info.senderId
-                        ? info.senderId == userId
-                          ? "parentBubbleYou rounded-tr-none"
-                          : "parentBubbleOther rounded-tl-none"
-                        : ""
-                    }
-                    ${
-                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-                        ? "mt-[0.8rem]"
-                        : ""
-                    }
+        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
+          }
+                    ${idx === 0 ||
+            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
+            info.senderId
+            ? info.senderId == userId
+              ? "parentBubbleYou rounded-tr-none"
+              : "parentBubbleOther rounded-tl-none"
+            : ""
+          }
+                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+            ? "mt-[0.8rem]"
+            : ""
+          }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onMouseDown={handleMouseDown}
