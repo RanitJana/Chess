@@ -50,7 +50,6 @@ function ChatInGame() {
     isTyping: false,
     hasMoreMessages: true,
     isEmojiPickerTrue: false,
-    isKeyboardEnter: false,
   });
 
   const [text, setText] = useState("");
@@ -285,16 +284,18 @@ function ChatInGame() {
     // Register socket event listener
     listeners.forEach(([event, listener]) => socket.on(event, listener));
 
+    const handleResize = () => {
+      if (allRefs.current.textareaRef == document.activeElement)
+        allRefs.current.textAreaFocus?.scrollIntoView({behavior:"smooth"});
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       cleanUpSocketEvents(listeners);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  useEffect(() => {
-    if (trueFalseStates.isKeyboardEnter) {
-      allRefs.current.textAreaFocus?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [trueFalseStates.isKeyboardEnter])
 
   useEffect(() => {
     loadMessages();
@@ -444,20 +445,12 @@ function ChatInGame() {
                   setTrueFalseStates((prev) => ({
                     ...prev,
                     isEmojiPickerTrue: false,
-                    isKeyboardEnter: true
                   }))
                 }
-                onBlur={
-                  () => {
-
-                    allRefs.current.typingRef = setTimeout(() => {
-                      socket.emit("not-typing", userId);
-                    }, 100);
-                    setTrueFalseStates((prev) => ({
-                      ...prev,
-                      isKeyboardEnter: false
-                    }))
-                  }
+                onBlur={() =>
+                (allRefs.current.typingRef = setTimeout(() => {
+                  socket.emit("not-typing", userId);
+                }, 100))
                 }
               />
             </div>
