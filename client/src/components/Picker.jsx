@@ -9,30 +9,30 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
     "😮",
     "😢", // Sad Face
     "🙏", // Thank You/Praying
-    // "👎", // Thumbs Down
-    // "😍",
-    // "🥰",
-    // "😄", // Smiling Face
-    // "🎉", // Party Popper
-    // "😡", // Angry Face
-    // "🤔", // Thinking Face
-    // "🚀", // Rocket
-    // "👏", // Clapping Hands
-    // "🥳", // Partying Face
-    // "🔥", // Fire
-    // "😱", // Screaming Face
-    // "💯", // 100
-    // "✨", // Sparkles
-    // "👀", // Eyes
-    // "🤩", // Star-Struck
-    // "😊", // Happy Face
-    // "🙌", // Raised Hands
-    // "🌟", // Star
-    // "😞", // Disappointed Face
-    // "💔", // Broken Heart
-    // "🤷", // Shrug
-    // "😐", // Neutral Face
-    // "🤨", // Raised Eyebrow
+    "👎", // Thumbs Down
+    "😍",
+    "🥰",
+    "😄", // Smiling Face
+    "🎉", // Party Popper
+    "😡", // Angry Face
+    "🤔", // Thinking Face
+    "🚀", // Rocket
+    "👏", // Clapping Hands
+    "🥳", // Partying Face
+    "🔥", // Fire
+    "😱", // Screaming Face
+    "💯", // 100
+    "✨", // Sparkles
+    "👀", // Eyes
+    "🤩", // Star-Struck
+    "😊", // Happy Face
+    "🙌", // Raised Hands
+    "🌟", // Star
+    "😞", // Disappointed Face
+    "💔", // Broken Heart
+    "🤷", // Shrug
+    "😐", // Neutral Face
+    "🤨", // Raised Eyebrow
   ];
 
   useEffect(() => {
