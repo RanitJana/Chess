@@ -57,7 +57,7 @@ function SingleChat({
   useEffect(() => {
     const handleUnsetReactionMenu = (e) => {
       // Correct the typo in "e.target" and ensure the check uses `.contains`
-      if (chatSecRef.current && !chatSecRef.current.contains(e.target)) {
+      if (chatSecRef.current && !chatSecRef.current.contains(e.target) && !pickerRef.current.contains(e.target)) {
         setOpenReactionBox(false); // Ensure `setOpenReactionBox` is properly defined
       }
     };
@@ -135,7 +135,6 @@ function SingleChat({
         element.removeEventListener("scrollend", handleScrollEnd);
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [holdTimeout, allRefs]);
 
   return (
