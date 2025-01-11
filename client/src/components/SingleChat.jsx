@@ -3,6 +3,7 @@ import { socket } from "../socket.js";
 import { messageReaction } from "../api/message.js";
 import Picker from "./Picker.jsx";
 import { useEffect, useRef, useState, memo } from "react";
+import axios from "axios";
 
 function areDatesSame(date1, date2) {
   return (
@@ -21,8 +22,11 @@ function SingleChat({
   allRefs,
 }) {
   const [openReactionBox, setOpenReactionBox] = useState(false);
+  const [linkInfo, setLinkInfo] = useState(null);
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
+  const urlRegex = /((https?:\/\/)?([\w-]+(\.[\w-]+)+)([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)/gi;
+
 
   const handleReaction = async (messageId, reaction) => {
     try {
@@ -74,6 +78,23 @@ function SingleChat({
       window.removeEventListener("touchend", handleUnsetReactionMenu);
     };
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = info.message;
+        if (url.match(urlRegex)) {
+          // console.log(url);
+          const response = await axios.get(`https://api.microlink.io/?url=${url}`);
+          if (response.data) setLinkInfo(response.data.data);
+          // console.log(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching the URL:", error.message);
+      }
+    })();
+
+  }, [info])
 
   let holdTimeout;
 
@@ -148,23 +169,20 @@ function SingleChat({
       )}
       <div
         ref={singleChatRef}
-        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
-          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-        }
-                    ${
-                      idx === 0 ||
-                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-                        info.senderId
-                        ? info.senderId == userId
-                          ? "parentBubbleYou rounded-tr-none"
-                          : "parentBubbleOther rounded-tl-none"
-                        : ""
-                    }
-                    ${
-                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-                        ? "mt-[0.8rem]"
-                        : ""
-                    }
+        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
+          }
+                    ${idx === 0 ||
+            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
+            info.senderId
+            ? info.senderId == userId
+              ? "parentBubbleYou rounded-tr-none"
+              : "parentBubbleOther rounded-tl-none"
+            : ""
+          }
+                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+            ? "mt-[0.8rem]"
+            : ""
+          }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onMouseDown={handleMouseDown}
@@ -187,14 +205,49 @@ function SingleChat({
             {info?.reaction?.map((val) => val?.symbol)}
           </div>
         )}
-        <span
-          className="block"
-          style={{
-            fontSize: emojiRegex.test(info.message) ? "2.5rem" : "",
-          }}
-        >
-          {info.message}
-        </span>
+        {
+          urlRegex.test(info.message) ?
+            <span
+              className="block"
+            >
+              <a href={info.message} target="_blank">
+                {
+                  linkInfo ?
+                    <div>
+                      <div>
+                        <div>
+                          <img className="rounded-md" src={linkInfo.image ? (linkInfo.image.url + linkInfo.image.type) : (linkInfo.logo.url + linkInfo.log.type)} alt="" />
+                        </div>
+                        <div>{linkInfo.title}</div>
+                        <div className="truncate line-clamp-2 text-wrap">{linkInfo.description}</div>
+                      </div>
+                      <span
+                        className="text-blue-400 underline underline-offset-1"
+                      >
+                        {linkInfo.url}
+                      </span>
+                    </div>
+                    :
+                    <span
+                      className="text-blue-400 underline underline-offset-1"
+                    >
+                      {
+                        info.message
+                      }
+                    </span>
+                }
+              </a>
+            </span>
+            :
+            <span
+              className="block"
+              style={{
+                fontSize: emojiRegex.test(info.message) ? "2.5rem" : "",
+              }}
+            >
+              {info.message}
+            </span>
+        }
         <span className="absolute bottom-1 right-2 text-xs text-gray-300">
           {new Date(info.createdAt).toLocaleTimeString("en-US", {
             hour: "numeric",
