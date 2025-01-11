@@ -53,6 +53,7 @@ function ChatInGame() {
   });
 
   const [text, setText] = useState("");
+  const [chatSectionBottom, isChatSectionBottom] = useState(true);
 
   const allRefs = useRef({
     previousScrollHeight: null,
@@ -164,18 +165,20 @@ function ChatInGame() {
     [setText]
   );
 
+  function isAtBottom(element, offset) {
+    if (!element) return false;
+    return (
+      Math.abs(
+        element.scrollHeight - element.scrollTop - element.clientHeight
+      ) < offset
+    );
+  }
+
   const scrollChatElementBottom = function () {
     const chatSectionRefCurrent = allRefs.current.chatSectionRef;
 
     if (chatSectionRefCurrent) {
-      const isAtBottom =
-        Math.abs(
-          chatSectionRefCurrent.scrollHeight -
-            chatSectionRefCurrent.scrollTop -
-            chatSectionRefCurrent.clientHeight
-        ) < 200;
-
-      if (isAtBottom) {
+      if (isAtBottom(chatSectionRefCurrent, 200)) {
         setTimeout(() => {
           chatSectionRefCurrent.scrollTo({
             top: chatSectionRefCurrent.scrollHeight,
@@ -196,6 +199,7 @@ function ChatInGame() {
 
   const handleScroll = () => {
     const container = allRefs.current.chatSectionRef;
+    isChatSectionBottom(() => isAtBottom(container, 200));
 
     if (!container) return;
 
@@ -333,6 +337,22 @@ function ChatInGame() {
         alt=""
         className="absolute w-full h-full top-0 brightness-[25%] object-cover"
       />
+      <div
+        onClick={() => {
+          const chatSectionRefCurrent = allRefs.current.chatSectionRef;
+          if (!chatSectionRefCurrent) return;
+          chatSectionRefCurrent.scrollTo({
+            top: chatSectionRefCurrent.scrollHeight,
+            behavior: "smooth",
+          });
+        }}
+        className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[1rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] bottom-[5rem]"
+        style={{
+          scale: chatSectionBottom ? "0" : "1",
+        }}
+      >
+        <img src="/images/double.png" alt="" className="w-5" />
+      </div>
       {/* Chat Messages */}
       {allMessage ? (
         <div className="absolute top-0 h-full flex flex-col w-full">

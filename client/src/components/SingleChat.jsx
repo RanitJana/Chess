@@ -170,20 +170,23 @@ function SingleChat({
       )}
       <div
         ref={singleChatRef}
-        className={`relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-          }
-                    ${idx === 0 ||
-            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-            info.senderId
-            ? info.senderId == userId
-              ? "parentBubbleYou rounded-tr-none"
-              : "parentBubbleOther rounded-tl-none"
-            : ""
-          }
-                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-            ? "mt-[0.8rem]"
-            : ""
-          }
+        className={`relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
+          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
+        }
+                    ${
+                      idx === 0 ||
+                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
+                        info.senderId
+                        ? info.senderId == userId
+                          ? "parentBubbleYou rounded-tr-none"
+                          : "parentBubbleOther rounded-tl-none"
+                        : ""
+                    }
+                    ${
+                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+                        ? "mt-[0.8rem]"
+                        : ""
+                    }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onClick={() => setOpenReactionBox(false)}
@@ -215,21 +218,19 @@ function SingleChat({
                   className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-lg mb-2 w-full max-w-[30rem]`}
                 >
                   <div>
-                    {
-                      linkInfo.image ?
-                        <img
-                          className="max-w-[30rem] w-full"
-                          src={linkInfo.image.url}
-                          alt=""
-                        />
-                        :
-                        <img
-                          className="max-w-[15rem] p-2"
-                          src={linkInfo.logo.url}
-                          alt=""
-                        />
-                    }
-
+                    {linkInfo.image ? (
+                      <img
+                        className="max-w-[30rem] w-full"
+                        src={linkInfo.image.url}
+                        alt=""
+                      />
+                    ) : (
+                      <img
+                        className="max-w-[15rem] p-2"
+                        src={linkInfo.logo.url}
+                        alt=""
+                      />
+                    )}
                   </div>
                   <div className="p-2">
                     <div>{linkInfo.title || "Unknown"}</div>
@@ -244,7 +245,9 @@ function SingleChat({
                 </span>
               </a>
             ) : (
-              <span className="text-blue-400 px-1 pt-1 underline">{info.message}</span>
+              <span className="text-blue-400 px-1 pt-1 underline">
+                {info.message}
+              </span>
             )}
           </span>
         ) : (
