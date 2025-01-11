@@ -326,10 +326,11 @@ function ChatInGame() {
   }, [trueFalseStates.isTyping]);
 
   return (
-    <div className="relative h-full w-full flex flex-col">
+    <div className="relative h-full w-full flex flex-col bg-transparent">
+      <img src="/images/chat.png" decoding="sync" alt="" className="absolute w-full h-full top-0 brightness-[25%] object-cover" />
       {/* Chat Messages */}
       {allMessage ? (
-        <>
+        <div className="absolute top-0 h-full flex flex-col w-full">
           <div
             className="w-full h-full text-white overflow-y-auto px-4 space-y-1"
             ref={(el) => (allRefs.current.chatSectionRef = el)}
@@ -447,12 +448,10 @@ function ChatInGame() {
                     isEmojiPickerTrue: false,
                   }))
                 }
-                onBlur={(e) => {
-                  e.target.focus();
+                onBlur={() =>
                   allRefs.current.typingRef = setTimeout(() => {
                     socket.emit("not-typing", userId);
                   }, 100)
-                }
                 }
               />
             </div>
@@ -468,7 +467,7 @@ function ChatInGame() {
             </button>
           </div>
           <div ref={(el) => (allRefs.current.textAreaFocus = el)}></div>
-        </>
+        </div>
       ) : (
         <div className="relative w-full h-full flex items-center justify-center">
           <div className="loader"></div>
