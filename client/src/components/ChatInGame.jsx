@@ -171,8 +171,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-          chatSectionRefCurrent.scrollTop -
-          chatSectionRefCurrent.clientHeight
+            chatSectionRefCurrent.scrollTop -
+            chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -327,7 +327,12 @@ function ChatInGame() {
 
   return (
     <div className="relative h-full w-full flex flex-col bg-transparent">
-      <img src="/images/chat.png" decoding="sync" alt="" className="absolute w-full h-full top-0 brightness-[25%] object-cover" />
+      <img
+        src="/images/chat.png"
+        decoding="sync"
+        alt=""
+        className="absolute w-full h-full top-0 brightness-[25%] object-cover"
+      />
       {/* Chat Messages */}
       {allMessage ? (
         <div className="absolute top-0 h-full flex flex-col w-full">
@@ -449,9 +454,9 @@ function ChatInGame() {
                   }))
                 }
                 onBlur={() =>
-                  allRefs.current.typingRef = setTimeout(() => {
+                  (allRefs.current.typingRef = setTimeout(() => {
                     socket.emit("not-typing", userId);
-                  }, 100)
+                  }, 100))
                 }
               />
             </div>

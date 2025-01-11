@@ -25,8 +25,7 @@ function SingleChat({
   const [linkInfo, setLinkInfo] = useState(null);
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
-  const urlRegex = /((https?:\/\/)?([\w-]+(\.[\w-]+)+)([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)/gi;
-
+  const urlRegex = /\b((https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*\b/g;
 
   const handleReaction = async (messageId, reaction) => {
     try {
@@ -84,8 +83,9 @@ function SingleChat({
       try {
         const url = info.message;
         if (url.match(urlRegex)) {
-          // console.log(url);
-          const response = await axios.get(`https://api.microlink.io/?url=${url}`);
+          const response = await axios.get(
+            `https://api.microlink.io/?url=${url}`
+          );
           if (response.data) setLinkInfo(response.data.data);
           // console.log(response.data.data);
         }
@@ -94,7 +94,8 @@ function SingleChat({
       }
     })();
 
-  }, [info])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [info]);
 
   let holdTimeout;
 
@@ -169,20 +170,23 @@ function SingleChat({
       )}
       <div
         ref={singleChatRef}
-        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-          }
-                    ${idx === 0 ||
-            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-            info.senderId
-            ? info.senderId == userId
-              ? "parentBubbleYou rounded-tr-none"
-              : "parentBubbleOther rounded-tl-none"
-            : ""
-          }
-                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-            ? "mt-[0.8rem]"
-            : ""
-          }
+        className={`relative max-w-[80%] px-2 pt-2 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
+          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
+        }
+                    ${
+                      idx === 0 ||
+                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
+                        info.senderId
+                        ? info.senderId == userId
+                          ? "parentBubbleYou rounded-tr-none"
+                          : "parentBubbleOther rounded-tl-none"
+                        : ""
+                    }
+                    ${
+                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+                        ? "mt-[0.8rem]"
+                        : ""
+                    }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onMouseDown={handleMouseDown}
@@ -205,49 +209,44 @@ function SingleChat({
             {info?.reaction?.map((val) => val?.symbol)}
           </div>
         )}
-        {
-          urlRegex.test(info.message) ?
-            <span
-              className="block"
-            >
+        {info.message.match(urlRegex) ? (
+          <span className="block">
+            {linkInfo ? (
               <a href={info.message} target="_blank">
-                {
-                  linkInfo ?
-                    <div>
-                      <div>
-                        <div>
-                          <img className="rounded-md" src={linkInfo.image ? (linkInfo.image.url + linkInfo.image.type) : (linkInfo.logo.url + linkInfo.log.type)} alt="" />
-                        </div>
-                        <div>{linkInfo.title}</div>
-                        <div className="truncate line-clamp-2 text-wrap">{linkInfo.description}</div>
-                      </div>
-                      <span
-                        className="text-blue-400 underline underline-offset-1"
-                      >
-                        {linkInfo.url}
-                      </span>
-                    </div>
-                    :
-                    <span
-                      className="text-blue-400 underline underline-offset-1"
-                    >
-                      {
-                        info.message
+                <div
+                  className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-md mb-2 w-full max-w-[30rem]`}
+                >
+                  <div>
+                    <img
+                      className="max-w-[30rem] w-full"
+                      src={
+                        linkInfo.image ? linkInfo.image.url : linkInfo.logo.url
                       }
-                    </span>
-                }
+                      alt=""
+                    />
+                  </div>
+                  <div className="p-2">
+                    <div>{linkInfo.title || "Unknown"}</div>
+                    <div className="truncate line-clamp-2 text-wrap text-xs text-gray-400">
+                      {linkInfo.description}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-blue-400 underline text-sm">
+                  {linkInfo.url}
+                </span>
               </a>
-            </span>
-            :
-            <span
-              className="block"
-              style={{
-                fontSize: emojiRegex.test(info.message) ? "2.5rem" : "",
-              }}
-            >
-              {info.message}
-            </span>
-        }
+            ) : (
+              <span className="text-blue-400 underline">{info.message}</span>
+            )}
+          </span>
+        ) : (
+          <span
+            className={`block ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
+          >
+            {info.message}
+          </span>
+        )}
         <span className="absolute bottom-1 right-2 text-xs text-gray-300">
           {new Date(info.createdAt).toLocaleTimeString("en-US", {
             hour: "numeric",
