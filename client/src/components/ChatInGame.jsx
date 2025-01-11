@@ -171,8 +171,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-          chatSectionRefCurrent.scrollTop -
-          chatSectionRefCurrent.clientHeight
+            chatSectionRefCurrent.scrollTop -
+            chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -190,7 +190,7 @@ function ChatInGame() {
     const textarea = allRefs.current.textareaRef;
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
-      textarea.style.height = `${Math.min(textarea.scrollHeight,180)}px`; // Adjust to content
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`; // Adjust to content
     }
   };
 
@@ -368,7 +368,7 @@ function ChatInGame() {
               return (
                 <div key={idx}>
                   <SingleChat
-                    parentRef={allRefs.current.chatSectionRef}
+                    allRefs={allRefs}
                     allMessage={allMessage}
                     setAllMessage={setAllMessage}
                     idx={idx}
@@ -448,9 +448,9 @@ function ChatInGame() {
                   }))
                 }
                 onBlur={() =>
-                (allRefs.current.typingRef = setTimeout(() => {
-                  socket.emit("not-typing", userId);
-                }, 100))
+                  (allRefs.current.typingRef = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
                 }
               />
             </div>

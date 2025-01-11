@@ -12,7 +12,14 @@ function areDatesSame(date1, date2) {
   );
 }
 
-function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentRef }) {
+function SingleChat({
+  allMessage = [],
+  info,
+  idx,
+  userId,
+  setAllMessage,
+  allRefs,
+}) {
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
@@ -85,26 +92,31 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentR
   };
 
   useEffect(() => {
-    const element = parentRef;
+    const element = allRefs.current.chatSectionRef;
+    console.log(element);
     if (element) {
       const handleScroll = () => {
+        console.log(40);
+
         clearTimeout(holdTimeout);
         setOpenReactionBox(false);
       };
       const handleScrollEnd = () => {
+        console.log(44);
+
         clearTimeout(holdTimeout);
-      }
+      };
       // Add scroll event listener
-      element.addEventListener('scrollend', handleScrollEnd);
-      element.addEventListener('scroll', handleScroll);
+      element.addEventListener("scrollend", handleScrollEnd);
+      element.addEventListener("scroll", handleScroll);
 
       // Cleanup on unmount
       return () => {
-        element.removeEventListener('scroll', handleScroll);
-        element.removeEventListener('scrollend', handleScrollEnd);
+        element.removeEventListener("scroll", handleScroll);
+        element.removeEventListener("scrollend", handleScrollEnd);
       };
     }
-  }, [holdTimeout, parentRef]);
+  }, [holdTimeout, allRefs]);
 
   return (
     <div
@@ -141,20 +153,23 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentR
       )}
       <div
         ref={singleChatRef}
-        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-          }
-                    ${idx === 0 ||
-            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-            info.senderId
-            ? info.senderId == userId
-              ? "parentBubbleYou rounded-tr-none"
-              : "parentBubbleOther rounded-tl-none"
-            : ""
-          }
-                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-            ? "mt-[0.8rem]"
-            : ""
-          }
+        className={`relative max-w-[80%] px-3 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
+          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
+        }
+                    ${
+                      idx === 0 ||
+                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
+                        info.senderId
+                        ? info.senderId == userId
+                          ? "parentBubbleYou rounded-tr-none"
+                          : "parentBubbleOther rounded-tl-none"
+                        : ""
+                    }
+                    ${
+                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+                        ? "mt-[0.8rem]"
+                        : ""
+                    }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onMouseDown={handleMouseDown}
@@ -198,5 +213,7 @@ function SingleChat({ allMessage = [], info, idx, userId, setAllMessage, parentR
 }
 
 export default memo(SingleChat, (prevProps, nextProps) => {
-  return prevProps.info === nextProps.info && prevProps.userId === nextProps.userId;
+  return (
+    prevProps.info === nextProps.info && prevProps.userId === nextProps.userId
+  );
 });
