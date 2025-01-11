@@ -52,11 +52,12 @@ function SingleChat({
     }
   };
 
-  const singleChatRef = useRef(null);
+  const pickerRef = useRef(null);
+  const chatSecRef = useRef(null);
   useEffect(() => {
     const handleUnsetReactionMenu = (e) => {
       // Correct the typo in "e.target" and ensure the check uses `.contains`
-      if (singleChatRef.current && !singleChatRef.current.contains(e.target)) {
+      if (chatSecRef.current && !chatSecRef.current.contains(e.target)) {
         setOpenReactionBox(false); // Ensure `setOpenReactionBox` is properly defined
       }
     };
@@ -102,7 +103,8 @@ function SingleChat({
   const handleMouseDown = () => {
     holdTimeout = setTimeout(() => {
       setOpenReactionBox(true);
-    }, 500);
+      if (navigator.vibrate) navigator.vibrate(60);
+    }, 800);
   };
 
   const handleMouseUp = () => {
@@ -133,15 +135,25 @@ function SingleChat({
         element.removeEventListener("scrollend", handleScrollEnd);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [holdTimeout, allRefs]);
 
   return (
     <div
       className={`
+                  relative
                   flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"}
                   ${info.reaction?.length ? "mb-7" : ""}
                 `}
     >
+      <Picker
+        pickerRef={pickerRef}
+        openReactionBox={openReactionBox}
+        handleReaction={handleReaction}
+        messageId={info._id}
+        translate={"translate-x-[-50%] translate-y-[-50%]"}
+        position={"left-1/2 top-1/2"}
+      />
       {!areDatesSame(
         new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt),
         new Date(info.createdAt)
@@ -169,25 +181,20 @@ function SingleChat({
         ""
       )}
       <div
-        ref={singleChatRef}
-        className={`relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
-          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-        }
-                    ${
-                      idx === 0 ||
-                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-                        info.senderId
-                        ? info.senderId == userId
-                          ? "parentBubbleYou rounded-tr-none"
-                          : "parentBubbleOther rounded-tl-none"
-                        : ""
-                    }
-                    ${
-                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-                        ? "mt-[0.8rem]"
-                        : ""
-                    }
-                    `}
+        ref={chatSecRef}
+        className={`
+          relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
+          ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
+          ${
+            idx === 0 ||
+            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId
+              ? info.senderId == userId
+                ? "parentBubbleYou rounded-tr-none"
+                : "parentBubbleOther rounded-tl-none"
+              : ""
+          }
+          ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ? "mt-[0.8rem]" : ""}
+          `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onClick={() => setOpenReactionBox(false)}
         onMouseDown={handleMouseDown}
@@ -197,12 +204,19 @@ function SingleChat({
         onTouchEnd={handleMouseUp}
       >
         {/* reactions */}
-        <Picker
-          openReactionBox={openReactionBox}
-          handleReaction={handleReaction}
-          messageId={info._id}
-          position={info.senderId === userId ? "right-0" : "left-0"}
-        />
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenReactionBox((prev) => !prev);
+          }}
+          className={`absolute flex items-center justify-center top-1/2 ${info.senderId == userId ? "left-0 translate-x-[-120%]" : "right-0 translate-x-[120%]"} translate-y-[-50%] bg-[rgb(17,25,29)] rounded-full w-7 h-7`}
+        >
+          <img
+            src="/images/smile-reaction.png"
+            className="brightness-[20%] invert w-5"
+            alt=""
+          />
+        </div>
         {info.reaction?.length > 0 && (
           <div
             className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
@@ -220,7 +234,7 @@ function SingleChat({
                   <div>
                     {linkInfo.image ? (
                       <img
-                        className="max-w-[30rem] w-full"
+                        className="max-w-[30rem] w-full pointer-events-none"
                         src={linkInfo.image.url}
                         alt=""
                       />

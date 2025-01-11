@@ -1,7 +1,12 @@
-import { useEffect } from "react";
-
 /* eslint-disable react/prop-types */
-function Picker({ position, handleReaction, messageId, openReactionBox }) {
+function Picker({
+  pickerRef,
+  position,
+  translate,
+  handleReaction,
+  messageId,
+  openReactionBox,
+}) {
   const reactionEmojis = [
     "👍", // Thumbs Up
     "❤️", // Heart
@@ -35,17 +40,10 @@ function Picker({ position, handleReaction, messageId, openReactionBox }) {
     "🤨", // Raised Eyebrow
   ];
 
-  useEffect(() => {
-    if (openReactionBox) {
-      if (navigator.vibrate) {
-        navigator.vibrate(50);
-      }
-    }
-  }, [openReactionBox]);
-
   return (
     <div
-      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex top-[0%] translate-y-[-50%] w-[18rem] p-2 rounded-full ${position} ${openReactionBox ? " scale-100 opacity-100" : " scale-0 opacity-0"}`}
+      ref={pickerRef}
+      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex top-1/2 translate-y-[-130%] z-[100] w-[15.5rem] p-2 rounded-full ${translate} ${position} ${openReactionBox ? " scale-100 opacity-100" : " scale-0 opacity-0"}`}
       style={{
         transition: "all 0.2s ease-in",
       }}
