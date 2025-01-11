@@ -186,6 +186,7 @@ function SingleChat({
           }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
+        onClick={() => setOpenReactionBox(false)}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
@@ -211,22 +212,31 @@ function SingleChat({
             {linkInfo ? (
               <a href={info.message} target="_blank">
                 <div
-                  className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-md mb-2 w-full max-w-[30rem]`}
+                  className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-lg mb-2 w-full max-w-[30rem]`}
                 >
                   <div>
-                    <img
-                      className="max-w-[30rem] w-full"
-                      src={
-                        linkInfo.image ? linkInfo.image.url : linkInfo.logo.url
-                      }
-                      alt=""
-                    />
+                    {
+                      linkInfo.image ?
+                        <img
+                          className="max-w-[30rem] w-full"
+                          src={linkInfo.image.url}
+                          alt=""
+                        />
+                        :
+                        <img
+                          className="max-w-[15rem] p-2"
+                          src={linkInfo.logo.url}
+                          alt=""
+                        />
+                    }
+
                   </div>
                   <div className="p-2">
                     <div>{linkInfo.title || "Unknown"}</div>
                     <div className="truncate line-clamp-2 text-wrap text-xs text-gray-400">
                       {linkInfo.description}
                     </div>
+                    <div className="text-sm pt-2">{linkInfo.publisher}</div>
                   </div>
                 </div>
                 <span className="text-blue-400 px-1 pt-1 underline text-sm">
