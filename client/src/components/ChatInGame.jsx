@@ -171,8 +171,8 @@ function ChatInGame() {
       const isAtBottom =
         Math.abs(
           chatSectionRefCurrent.scrollHeight -
-            chatSectionRefCurrent.scrollTop -
-            chatSectionRefCurrent.clientHeight
+          chatSectionRefCurrent.scrollTop -
+          chatSectionRefCurrent.clientHeight
         ) < 200;
 
       if (isAtBottom) {
@@ -447,10 +447,12 @@ function ChatInGame() {
                     isEmojiPickerTrue: false,
                   }))
                 }
-                onBlur={() =>
-                  (allRefs.current.typingRef = setTimeout(() => {
+                onBlur={(e) => {
+                  e.target.focus();
+                  allRefs.current.typingRef = setTimeout(() => {
                     socket.emit("not-typing", userId);
-                  }, 100))
+                  }, 100)
+                }
                 }
               />
             </div>
