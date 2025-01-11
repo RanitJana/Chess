@@ -93,17 +93,12 @@ function SingleChat({
 
   useEffect(() => {
     const element = allRefs.current.chatSectionRef;
-    console.log(element);
     if (element) {
       const handleScroll = () => {
-        console.log(40);
-
         clearTimeout(holdTimeout);
         setOpenReactionBox(false);
       };
       const handleScrollEnd = () => {
-        console.log(44);
-
         clearTimeout(holdTimeout);
       };
       // Add scroll event listener
