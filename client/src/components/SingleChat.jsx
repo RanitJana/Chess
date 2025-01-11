@@ -170,23 +170,20 @@ function SingleChat({
       )}
       <div
         ref={singleChatRef}
-        className={`relative max-w-[80%] px-2 pt-2 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${
-          info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
-        }
-                    ${
-                      idx === 0 ||
-                      allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
-                        info.senderId
-                        ? info.senderId == userId
-                          ? "parentBubbleYou rounded-tr-none"
-                          : "parentBubbleOther rounded-tl-none"
-                        : ""
-                    }
-                    ${
-                      idx > 0 && info.senderId !== allMessage[idx - 1].senderId
-                        ? "mt-[0.8rem]"
-                        : ""
-                    }
+        className={`relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,44,51)]"
+          }
+                    ${idx === 0 ||
+            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId !=
+            info.senderId
+            ? info.senderId == userId
+              ? "parentBubbleYou rounded-tr-none"
+              : "parentBubbleOther rounded-tl-none"
+            : ""
+          }
+                    ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId
+            ? "mt-[0.8rem]"
+            : ""
+          }
                     `}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onMouseDown={handleMouseDown}
@@ -232,17 +229,17 @@ function SingleChat({
                     </div>
                   </div>
                 </div>
-                <span className="text-blue-400 underline text-sm">
+                <span className="text-blue-400 px-1 pt-1 underline text-sm">
                   {linkInfo.url}
                 </span>
               </a>
             ) : (
-              <span className="text-blue-400 underline">{info.message}</span>
+              <span className="text-blue-400 px-1 pt-1 underline">{info.message}</span>
             )}
           </span>
         ) : (
           <span
-            className={`block ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
+            className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
           >
             {info.message}
           </span>
