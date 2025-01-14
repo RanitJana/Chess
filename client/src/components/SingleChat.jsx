@@ -113,22 +113,63 @@ function SingleChat({
     allRefs.current.textareaRef?.focus();
   };
 
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragDistance, setDragDistance] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
   let holdTimeout;
 
-  const handleMouseDown = () => {
-    holdTimeout = setTimeout(() => {
-      setOpenReactionBox(true);
-      if (navigator.vibrate) navigator.vibrate(60);
-    }, 500);
+  const handleMouseDown = (e) => {
+    setDragStartX(e.clientX || e.touches[0].clientX);
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+
+    const currentX = e.clientX || e.touches[0].clientX;
+    let distance = currentX - dragStartX;
+
+    // Prevent dragging to the left
+    if (distance < 0) distance = 0;
+
+    // Apply dampening factor to make it slower as distance increases
+    const dampeningFactor = 1 / (1 + distance / 350); // Adjust divisor (50) for sensitivity
+    distance *= dampeningFactor;
+
+    setDragDistance(distance);
   };
 
   const handleMouseUp = () => {
-    clearTimeout(holdTimeout); // Clear timeout if released early
+    setIsDragging(false);
+
+    // Trigger reply if dragged beyond 100px
+    if (dragDistance > 100) {
+      if (navigator.vibrate) navigator.vibrate(50);
+      hanldleMentionText();
+    }
+
+    // Reset drag distance
+    setDragDistance(0);
   };
 
-  const handleMouseLeave = () => {
-    clearTimeout(holdTimeout); // Clear timeout if the mouse leaves the element
-  };
+  // Add and remove global event listeners
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDragging]); // Only re-run when isDragging changes
 
   useEffect(() => {
     const element = allRefs.current.chatSectionRef;
@@ -159,6 +200,12 @@ function SingleChat({
         flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"}
         ${info.reaction?.length ? "mb-7" : ""}
       `}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onTouchStart={handleMouseDown}
+      onTouchMove={handleMouseMove}
+      onTouchEnd={handleMouseUp}
     >
       <Picker
         pickerRef={pickerRef}
@@ -209,36 +256,26 @@ function SingleChat({
           }
           ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ? "mt-[0.8rem]" : ""}
           `}
+        style={{
+          transform: `translateX(${dragDistance}px)`,
+          transition: !isDragging ? "transform 0.2s ease" : "none",
+        }}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onClick={() => setOpenReactionBox(false)}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleMouseDown}
-        onTouchEnd={handleMouseUp}
       >
         {/* reactions */}
         <div
-          className={`absolute flex flex-col gap-1 items-center justify-center top-1/2 ${info.senderId == userId ? "left-0 translate-x-[-120%]" : "right-0 translate-x-[120%]"} translate-y-[-50%]`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenReactionBox((prev) => !prev);
+          }}
+          className={`absolute flex items-center justify-center top-1/2 bg-[rgb(17,25,29)] p-[0.1rem] rounded-full ${info.senderId == userId ? "left-0 translate-x-[-120%]" : "right-0 translate-x-[120%]"} translate-y-[-50%]`}
         >
-          {/* <div
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpenReactionBox((prev) => !prev);
-            }}
-            className="bg-[rgb(17,25,29)] ">
-            <img
-              src="/images/smile-reaction.png"
-              className="brightness-[20%] invert w-5"
-              alt=""
-            />
-          </div> */}
-          <div
-            className="bg-[rgb(17,25,29)] rounded-full w-7 h-7 flex items-center justify-center p-1"
-            onClick={hanldleMentionText}
-          >
-            <img src="/images/reply.png" alt="" className="invert w-4" />
-          </div>
+          <img
+            src="/images/smile-reaction.png"
+            className="brightness-[20%] invert w-4"
+            alt=""
+          />
         </div>
         {info.reaction?.length > 0 && (
           <div

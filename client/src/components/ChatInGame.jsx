@@ -544,9 +544,9 @@ function ChatInGame() {
                     }))
                   }
                   onBlur={() =>
-                  (allRefs.current.typingRef = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
+                    (allRefs.current.typingRef = setTimeout(() => {
+                      socket.emit("not-typing", userId);
+                    }, 100))
                   }
                 />
               </div>
