@@ -19,17 +19,17 @@ function MentionSection({ mentionText, senderId, userId }) {
     <>
       {mentionText?._id && (
         <div
-          className={`${senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} rounded-md overflow-hidden transition-all`}
+          className={`${senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} mb-1 rounded-md overflow-hidden transition-all`}
         >
           <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
-            <div className="flex items-center justify-between w-full px-3 pt-1 transition-all">
+            <div className="flex items-center justify-between w-full px-2 pt-1 transition-all">
               <span className="text-[rgb(13,160,157)] font-bold">
                 {mentionText.owner == userId ? "You" : "Opponent"}
               </span>
             </div>
 
             <span
-              className={`px-2 pb-1 w-[98%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
+              className={`px-2 pb-1 w-[99%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
             >
               {mentionText.text}
             </span>
