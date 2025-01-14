@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { socket } from "../socket.js";
 import { messageReaction } from "../api/message.js";
@@ -13,6 +14,32 @@ function areDatesSame(date1, date2) {
   );
 }
 
+function MentionSection({ mentionText, senderId, userId }) {
+  return (
+    <>
+      {mentionText?._id && (
+        <div
+          className={`${senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} rounded-md overflow-hidden transition-all`}
+        >
+          <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
+            <div className="flex items-center justify-between w-full px-3 pt-1 transition-all">
+              <span className="text-[rgb(13,160,157)] font-bold">
+                {mentionText.owner == userId ? "You" : "Opponent"}
+              </span>
+            </div>
+
+            <span
+              className={`px-2 pb-1 w-[98%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
+            >
+              {mentionText.text}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 function SingleChat({
   allMessage = [],
   info,
@@ -22,10 +49,24 @@ function SingleChat({
   allRefs,
   setMentionText,
 }) {
+
   const [openReactionBox, setOpenReactionBox] = useState(false);
+
   const [linkInfo, setLinkInfo] = useState(null);
+
+  const [dragStart, setDragStart] = useState({
+    x: 0, y: 0
+  });
+  const [dragDistance, setDragDistance] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const pickerRef = useRef(null);
+  const chatSecRef = useRef(null);
+
+  let holdTimeout;
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
+
   const urlRegex = /\b((https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*\b/g;
 
   const handleReaction = async (messageId, reaction) => {
@@ -53,56 +94,6 @@ function SingleChat({
     }
   };
 
-  const pickerRef = useRef(null);
-  const chatSecRef = useRef(null);
-  useEffect(() => {
-    const handleUnsetReactionMenu = (e) => {
-      // Correct the typo in "e.target" and ensure the check uses `.contains`
-      if (
-        chatSecRef.current &&
-        !chatSecRef.current.contains(e.target) &&
-        !pickerRef.current.contains(e.target)
-      ) {
-        setOpenReactionBox(false); // Ensure `setOpenReactionBox` is properly defined
-      }
-    };
-
-    // Add the event listener
-    window.addEventListener("click", handleUnsetReactionMenu);
-    window.addEventListener("mousedown", handleUnsetReactionMenu);
-    window.addEventListener("mouseup", handleUnsetReactionMenu);
-    window.addEventListener("touchstart", handleUnsetReactionMenu);
-    window.addEventListener("touchend", handleUnsetReactionMenu);
-
-    return () => {
-      // Correct the typo in `removeEventListener`
-      window.removeEventListener("click", handleUnsetReactionMenu);
-      window.removeEventListener("mousedown", handleUnsetReactionMenu);
-      window.removeEventListener("mouseup", handleUnsetReactionMenu);
-      window.removeEventListener("touchstart", handleUnsetReactionMenu);
-      window.removeEventListener("touchend", handleUnsetReactionMenu);
-    };
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const url = info.message;
-        if (url.match(urlRegex)) {
-          const response = await axios.get(
-            `https://api.microlink.io/?url=${url}`
-          );
-          if (response.data) setLinkInfo(response.data.data);
-          // console.log(response.data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching the URL:", error.message);
-      }
-    })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [info]);
-
   const hanldleMentionText = function () {
     setMentionText(() => ({
       text: info.message,
@@ -113,18 +104,10 @@ function SingleChat({
     allRefs.current.textareaRef?.focus();
   };
 
-  const [dragStart, setDragStart] = useState({
-    x: 0, y: 0
-  });
-  const [dragDistance, setDragDistance] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  let holdTimeout;
-
   const handleMouseDown = (e) => {
     setDragStart(() => ({
-      x: e.clientX || e.touches[0].clientX,
-      y: e.clientY || e.touches[0].clientY
+      x: e.clientX || e.touches[0].clientX || 0,
+      y: e.clientY || e.touches[0].clientY || 0
     }));
     setIsDragging(true);
   };
@@ -132,8 +115,8 @@ function SingleChat({
   const handleMouseMove = (e) => {
     if (!isDragging) return;
 
-    const currentX = e.clientX || e.touches[0].clientX;
-    const currentY = e.clientY || e.touches[0].clientY;
+    const currentX = e.clientX || e.touches[0].clientX || 0;
+    const currentY = e.clientY || e.touches[0].clientY || 0;
     let distanceX = currentX - dragStart.x;
     const distanceY = currentY - dragStart.y;
 
@@ -165,6 +148,47 @@ function SingleChat({
     // Reset drag distance
     setDragDistance(0);
   };
+
+  //remove reaction list
+  useEffect(() => {
+    const handleUnsetReactionMenu = (e) => {
+      if (
+        chatSecRef.current &&
+        !chatSecRef.current.contains(e.target) &&
+        pickerRef.current &&
+        !pickerRef.current.contains(e.target)
+      ) {
+        setOpenReactionBox(false);
+      }
+    };
+
+    const listeners = ["click", "mousedown"];
+    listeners.forEach((event) => window.addEventListener(event, handleUnsetReactionMenu));
+
+    return () => {
+      listeners.forEach((event) => window.removeEventListener(event, handleUnsetReactionMenu));
+    };
+  }, []);
+
+  //fetch info if only message is link
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = info.message;
+        if (url.match(urlRegex)) {
+          const response = await axios.get(
+            `https://api.microlink.io/?url=${url}`
+          );
+          if (response.data) setLinkInfo(response.data.data);
+          // console.log(response.data.data);
+        }
+      } catch (error) {
+        // console.error("Error fetching the URL:", error.message);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [info]);
 
   // Add and remove global event listeners
   useEffect(() => {
@@ -207,19 +231,16 @@ function SingleChat({
   }, [holdTimeout, allRefs]);
 
   return (
-    <div
-      className={`
-        relative
-        flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"}
-        ${info.reaction?.length ? "mb-7" : ""}
-      `}
+    <div className={`relative flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+
       onTouchStart={handleMouseDown}
       onTouchMove={handleMouseMove}
       onTouchEnd={handleMouseUp}
     >
+      {/* all emojis */}
       <Picker
         pickerRef={pickerRef}
         openReactionBox={openReactionBox}
@@ -228,10 +249,9 @@ function SingleChat({
         translate={"translate-x-[-50%] translate-y-[-130%]"}
         position={"left-1/2 top-1/2"}
       />
-      {!areDatesSame(
-        new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt),
-        new Date(info.createdAt)
-      ) || idx === 0 ? (
+
+      {/* different day's message */}
+      {!areDatesSame(new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt), new Date(info.createdAt)) || idx === 0 ? (
         <div className="w-full flex items-center justify-center mb-1">
           <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
             {(() => {
@@ -251,21 +271,14 @@ function SingleChat({
             })()}
           </div>
         </div>
-      ) : (
-        ""
-      )}
-      <div
-        ref={chatSecRef}
+      ) : ("")}
+
+      {/* main chat bubble */}
+      <div ref={chatSecRef}
         className={`
           relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
           ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
-          ${idx === 0 ||
-            allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId
-            ? info.senderId == userId
-              ? "parentBubbleYou rounded-tr-none"
-              : "parentBubbleOther rounded-tl-none"
-            : ""
-          }
+          ${(idx === 0 || allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId) ? info.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none" : ""}
           ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ? "mt-[0.8rem]" : ""}
           `}
         style={{
@@ -286,16 +299,21 @@ function SingleChat({
           <img
             src="/images/smile-reaction.png"
             className="brightness-[20%] invert w-4"
-            alt=""
+            alt="😊"
+            decoding="async"
           />
         </div>
+
+        {/* text reactions */}
         {info.reaction?.length > 0 && (
           <div
             className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
           >
-            {info?.reaction?.map((val) => val?.symbol)}
+            {info.reaction?.map((val) => val?.symbol)}
           </div>
         )}
+
+        {/* link detection */}
         {info.message.match(urlRegex) ? (
           <span className="block">
             {linkInfo ? (
@@ -350,33 +368,18 @@ function SingleChat({
             )}
           </span>
         ) : (
-          <div>
-            {info.mentionText?._id && (
-              <div
-                className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} rounded-md overflow-hidden transition-all`}
-              >
-                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
-                  <div className="flex items-center justify-between w-full px-3 pt-1 transition-all">
-                    <span className="text-[rgb(13,160,157)] font-bold">
-                      {info.mentionText.owner == userId ? "You" : "Opponent"}
-                    </span>
-                  </div>
-
-                  <span
-                    className={`px-2 pb-1 w-[98%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
-                  >
-                    {info.mentionText.text}
-                  </span>
-                </div>
-              </div>
-            )}
+          <>
+            <MentionSection mentionText={info.mentionText} senderId={info.senderId} userId={userId} />
+            {/* main text */}
             <span
               className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
             >
               {info.message}
             </span>
-          </div>
+          </>
         )}
+
+        {/* message sent time */}
         <span className="absolute bottom-1 right-2 text-xs text-gray-300">
           {new Date(info.createdAt).toLocaleTimeString("en-US", {
             hour: "numeric",
@@ -384,6 +387,7 @@ function SingleChat({
             hour12: true,
           })}
         </span>
+
       </div>
     </div>
   );
