@@ -371,6 +371,23 @@ function ChatInGame() {
         alt=""
         className="absolute w-full h-full top-0 brightness-[25%] object-cover"
       />
+      {/* scroll to bottom */}
+      <div
+        onClick={() => {
+          const chatSectionRefCurrent = allRefs.current.chatSectionRef;
+          if (!chatSectionRefCurrent) return;
+          chatSectionRefCurrent.scrollTo({
+            top: chatSectionRefCurrent.scrollHeight,
+            behavior: "smooth",
+          });
+        }}
+        className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[1rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] bottom-[5rem]"
+        style={{
+          scale: chatSectionBottom ? "0" : "1",
+        }}
+      >
+        <img src="/images/double.png" alt="" className="w-5" />
+      </div>
       {/* Chat Messages */}
       {allMessage ? (
         <div className="absolute top-0 h-full flex flex-col w-full">
@@ -442,23 +459,6 @@ function ChatInGame() {
 
           {/* Input Box */}
           <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
-            {/* scroll to bottom */}
-            <div
-              onClick={() => {
-                const chatSectionRefCurrent = allRefs.current.chatSectionRef;
-                if (!chatSectionRefCurrent) return;
-                chatSectionRefCurrent.scrollTo({
-                  top: chatSectionRefCurrent.scrollHeight,
-                  behavior: "smooth",
-                });
-              }}
-              className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[1rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] top-0 translate-y-[-110%]"
-              style={{
-                scale: chatSectionBottom ? "0" : "1",
-              }}
-            >
-              <img src="/images/double.png" alt="" className="w-5" />
-            </div>
             <div className="w-full  p-1 bg-[rgb(42,56,67)] rounded-2xl">
               {/* mention text */}
               <div
@@ -541,9 +541,9 @@ function ChatInGame() {
                     }))
                   }
                   onBlur={() =>
-                    (allRefs.current.typingRef = setTimeout(() => {
-                      socket.emit("not-typing", userId);
-                    }, 100))
+                  (allRefs.current.typingRef = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
                   }
                 />
               </div>
