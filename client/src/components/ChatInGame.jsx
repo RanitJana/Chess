@@ -355,9 +355,9 @@ function ChatInGame() {
     return () => cleanUpSocketEvents(listeners);
   }, [gameId]);
 
-  useEffect(() => {
-    if (trueFalseStates.isTyping) scrollChatElementBottom();
-  }, [trueFalseStates.isTyping]);
+  // useEffect(() => {
+  //   // if (trueFalseStates.isTyping) scrollChatElementBottom();
+  // }, [trueFalseStates.isTyping]);
 
   useEffect(() => {
     scrollChatElementBottom();
