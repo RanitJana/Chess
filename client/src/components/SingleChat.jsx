@@ -318,6 +318,7 @@ function SingleChat({
           <span className="block">
             {linkInfo ? (
               <a href={info.message} target="_blank">
+                <MentionSection mentionText={info.mentionText} senderId={info.senderId} userId={userId} />
                 <div
                   className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-lg mb-2 w-full max-w-[30rem]`}
                 >

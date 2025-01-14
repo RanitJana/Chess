@@ -7,10 +7,10 @@
   animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
   background-color: #6cad96;
   border-radius: 50%;
-  height: 7px;
+  height: 5px;
   margin-right: 4px;
   vertical-align: middle;
-  width: 7px;
+  width: 5px;
   display: inline-block;
 }
 .typing .dot:nth-child(1) {
