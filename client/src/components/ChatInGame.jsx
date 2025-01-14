@@ -359,6 +359,10 @@ function ChatInGame() {
     if (trueFalseStates.isTyping) scrollChatElementBottom();
   }, [trueFalseStates.isTyping]);
 
+  useEffect(() => {
+    scrollChatElementBottom();
+  }, [mentionText]);
+
   return (
     <div className="relative h-full w-full flex flex-col bg-transparent">
       <img
@@ -367,22 +371,6 @@ function ChatInGame() {
         alt=""
         className="absolute w-full h-full top-0 brightness-[25%] object-cover"
       />
-      <div
-        onClick={() => {
-          const chatSectionRefCurrent = allRefs.current.chatSectionRef;
-          if (!chatSectionRefCurrent) return;
-          chatSectionRefCurrent.scrollTo({
-            top: chatSectionRefCurrent.scrollHeight,
-            behavior: "smooth",
-          });
-        }}
-        className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[1rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] bottom-[5rem]"
-        style={{
-          scale: chatSectionBottom ? "0" : "1",
-        }}
-      >
-        <img src="/images/double.png" alt="" className="w-5" />
-      </div>
       {/* Chat Messages */}
       {allMessage ? (
         <div className="absolute top-0 h-full flex flex-col w-full">
@@ -453,15 +441,32 @@ function ChatInGame() {
           </div>
 
           {/* Input Box */}
-          <div className="w-full relative flex gap-2 items-end p-2 pt-1">
-            <div className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl">
+          <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
+            {/* scroll to bottom */}
+            <div
+              onClick={() => {
+                const chatSectionRefCurrent = allRefs.current.chatSectionRef;
+                if (!chatSectionRefCurrent) return;
+                chatSectionRefCurrent.scrollTo({
+                  top: chatSectionRefCurrent.scrollHeight,
+                  behavior: "smooth",
+                });
+              }}
+              className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[1rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] top-0 translate-y-[-110%]"
+              style={{
+                scale: chatSectionBottom ? "0" : "1",
+              }}
+            >
+              <img src="/images/double.png" alt="" className="w-5" />
+            </div>
+            <div className="w-full  p-1 bg-[rgb(42,56,67)] rounded-2xl">
               {/* mention text */}
               <div
-                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "m-1" : ""} overflow-hidden transition-all`}
+                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "m-1" : ""} overflow-hidden`}
               >
-                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
+                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center transition-all">
                   {mentionText && (
-                    <div className="flex items-center justify-between w-full px-3 pt-1 transition-all">
+                    <div className="flex items-center justify-between w-full px-3 pt-1">
                       <span className="text-[rgb(13,160,157)] font-bold">
                         {mentionText.owner}
                       </span>
@@ -469,12 +474,17 @@ function ChatInGame() {
                         className="text-white hover:cursor-pointer"
                         onClick={() => setMentionText(() => null)}
                       >
-                        X
+                        <img
+                          src="/images/cross.png"
+                          alt="x"
+                          decoding="sync"
+                          className="w-5"
+                        />
                       </span>
                     </div>
                   )}
                   <span
-                    className={`${mentionText ? "px-2 pb-1" : ""} w-[98%] text-[rgb(114,104,96)] line-clamp-2 transition-all`}
+                    className={`${mentionText ? "px-2 pb-1" : ""} w-[98%] text-[rgb(114,104,96)] line-clamp-2 break-all text-pretty transition-all`}
                   >
                     {mentionText?.text}
                   </span>
