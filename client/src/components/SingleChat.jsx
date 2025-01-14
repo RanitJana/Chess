@@ -113,14 +113,19 @@ function SingleChat({
     allRefs.current.textareaRef?.focus();
   };
 
-  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStart, setDragStart] = useState({
+    x: 0, y: 0
+  });
   const [dragDistance, setDragDistance] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   let holdTimeout;
 
   const handleMouseDown = (e) => {
-    setDragStartX(e.clientX || e.touches[0].clientX);
+    setDragStart(() => ({
+      x: e.clientX || e.touches[0].clientX,
+      y: e.clientY || e.touches[0].clientY
+    }));
     setIsDragging(true);
   };
 
@@ -128,16 +133,20 @@ function SingleChat({
     if (!isDragging) return;
 
     const currentX = e.clientX || e.touches[0].clientX;
-    let distance = currentX - dragStartX;
+    const currentY = e.clientY || e.touches[0].clientY;
+    let distanceX = currentX - dragStart.x;
+    const distanceY = currentY - dragStart.y;
+
+    if (distanceY > distanceX) return setIsDragging(false);
 
     // Prevent dragging to the left
-    if (distance < 0) distance = 0;
+    if (distanceX < 0) distanceX = 0;
 
-    // Apply dampening factor to make it slower as distance increases
-    const dampeningFactor = 1 / (1 + distance / 350); // Adjust divisor (50) for sensitivity
-    distance *= dampeningFactor;
+    // Apply dampening factor to make it slower as distanceX increases
+    const dampeningFactor = 1 / (1 + distanceX / 350); // Adjust divisor (50) for sensitivity
+    distanceX *= dampeningFactor;
 
-    setDragDistance(distance);
+    setDragDistance(distanceX);
   };
 
   const handleMouseUp = () => {
@@ -257,7 +266,7 @@ function SingleChat({
           `}
         style={{
           transform: `translateX(${dragDistance}px)`,
-          transition: !isDragging ? "transform 0.2s ease" : "none",
+          transition: !isDragging ? "transform 0.5s ease" : "none",
         }}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onClick={() => setOpenReactionBox(false)}

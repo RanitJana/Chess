@@ -474,7 +474,6 @@ function ChatInGame() {
                         className="text-white hover:cursor-pointer"
                         onClick={() => {
                           setMentionText(() => null);
-                          allRefs.current.textareaRef?.focus();
                         }}
                       >
                         <img
@@ -544,9 +543,9 @@ function ChatInGame() {
                     }))
                   }
                   onBlur={() =>
-                    (allRefs.current.typingRef = setTimeout(() => {
-                      socket.emit("not-typing", userId);
-                    }, 100))
+                  (allRefs.current.typingRef = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
                   }
                 />
               </div>
