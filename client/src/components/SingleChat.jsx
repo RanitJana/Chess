@@ -350,22 +350,25 @@ function SingleChat({
                 </span>
               </a>
             ) : (
-              <span className="px-1 pt-1">
-                {info.message.split(" ").map((text, idx) => {
-                  if (text.match(urlRegex))
-                    return (
-                      <a
-                        href={text}
-                        key={idx}
-                        target="_blank"
-                        className="text-blue-400 px-1 pt-1 underline"
-                      >
-                        {text}
-                      </a>
-                    );
-                  return <span key={idx}>{text}</span>;
-                })}
-              </span>
+              <div>
+                <MentionSection mentionText={info.mentionText} senderId={info.senderId} userId={userId} />
+                <span className="px-1 pt-1">
+                  {info.message.split(" ").map((text, idx) => {
+                    if (text.match(urlRegex))
+                      return (
+                        <a
+                          href={text}
+                          key={idx}
+                          target="_blank"
+                          className="text-blue-400 px-1 pt-1 underline"
+                        >
+                          {text}
+                        </a>
+                      );
+                    return <span key={idx}>{text}</span>;
+                  })}
+                </span>
+              </div>
             )}
           </span>
         ) : (
