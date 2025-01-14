@@ -20,6 +20,7 @@ function SingleChat({
   userId,
   setAllMessage,
   allRefs,
+  setMentionText,
 }) {
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const [linkInfo, setLinkInfo] = useState(null);
@@ -57,7 +58,11 @@ function SingleChat({
   useEffect(() => {
     const handleUnsetReactionMenu = (e) => {
       // Correct the typo in "e.target" and ensure the check uses `.contains`
-      if (chatSecRef.current && !chatSecRef.current.contains(e.target) && !pickerRef.current.contains(e.target)) {
+      if (
+        chatSecRef.current &&
+        !chatSecRef.current.contains(e.target) &&
+        !pickerRef.current.contains(e.target)
+      ) {
         setOpenReactionBox(false); // Ensure `setOpenReactionBox` is properly defined
       }
     };
@@ -98,13 +103,23 @@ function SingleChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [info]);
 
+  const hanldleMentionText = function () {
+    setMentionText(() => ({
+      text: info.message,
+      _id: info._id,
+      owner: info.senderId == userId ? "You" : "Opponent",
+    }));
+
+    allRefs.current.textareaRef?.focus();
+  };
+
   let holdTimeout;
 
   const handleMouseDown = () => {
     holdTimeout = setTimeout(() => {
       setOpenReactionBox(true);
       if (navigator.vibrate) navigator.vibrate(60);
-    }, 800);
+    }, 500);
   };
 
   const handleMouseUp = () => {
@@ -140,17 +155,17 @@ function SingleChat({
   return (
     <div
       className={`
-                  relative
-                  flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"}
-                  ${info.reaction?.length ? "mb-7" : ""}
-                `}
+        relative
+        flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"}
+        ${info.reaction?.length ? "mb-7" : ""}
+      `}
     >
       <Picker
         pickerRef={pickerRef}
         openReactionBox={openReactionBox}
         handleReaction={handleReaction}
         messageId={info._id}
-        translate={"translate-x-[-50%] translate-y-[-50%]"}
+        translate={"translate-x-[-50%] translate-y-[-130%]"}
         position={"left-1/2 top-1/2"}
       />
       {!areDatesSame(
@@ -158,7 +173,7 @@ function SingleChat({
         new Date(info.createdAt)
       ) || idx === 0 ? (
         <div className="w-full flex items-center justify-center mb-1">
-          <div className="flex text-sm w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
+          <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
             {(() => {
               const prevDate = new Intl.DateTimeFormat("en-GB", {
                 day: "numeric",
@@ -204,17 +219,26 @@ function SingleChat({
       >
         {/* reactions */}
         <div
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpenReactionBox((prev) => !prev);
-          }}
-          className={`absolute flex items-center justify-center top-1/2 ${info.senderId == userId ? "left-0 translate-x-[-120%]" : "right-0 translate-x-[120%]"} translate-y-[-50%] bg-[rgb(17,25,29)] rounded-full w-7 h-7`}
+          className={`absolute flex flex-col gap-1 items-center justify-center top-1/2 ${info.senderId == userId ? "left-0 translate-x-[-120%]" : "right-0 translate-x-[120%]"} translate-y-[-50%]`}
         >
-          <img
-            src="/images/smile-reaction.png"
-            className="brightness-[20%] invert w-5"
-            alt=""
-          />
+          {/* <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenReactionBox((prev) => !prev);
+            }}
+            className="bg-[rgb(17,25,29)] ">
+            <img
+              src="/images/smile-reaction.png"
+              className="brightness-[20%] invert w-5"
+              alt=""
+            />
+          </div> */}
+          <div
+            className="bg-[rgb(17,25,29)] rounded-full w-7 h-7 flex items-center justify-center p-1"
+            onClick={hanldleMentionText}
+          >
+            <img src="/images/reply.png" alt="" className="invert w-4" />
+          </div>
         </div>
         {info.reaction?.length > 0 && (
           <div
@@ -258,17 +282,51 @@ function SingleChat({
                 </span>
               </a>
             ) : (
-              <span className="text-blue-400 px-1 pt-1 underline">
-                {info.message}
+              <span className="px-1 pt-1">
+                {info.message.split(" ").map((text, idx) => {
+                  if (text.match(urlRegex))
+                    return (
+                      <a
+                        href={text}
+                        key={idx}
+                        target="_blank"
+                        className="text-blue-400 px-1 pt-1 underline"
+                      >
+                        {text}
+                      </a>
+                    );
+                  return <span key={idx}>{text}</span>;
+                })}
               </span>
             )}
           </span>
         ) : (
-          <span
-            className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
-          >
-            {info.message}
-          </span>
+          <div>
+            {info.mentionText?._id && (
+              <div
+                className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} rounded-md overflow-hidden transition-all`}
+              >
+                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
+                  <div className="flex items-center justify-between w-full px-3 pt-1 transition-all">
+                    <span className="text-[rgb(13,160,157)] font-bold">
+                      {info.mentionText.owner == userId ? "You" : "Opponent"}
+                    </span>
+                  </div>
+
+                  <span
+                    className={`${"px-2 pb-1"} w-[98%] text-[rgb(174,174,174)] line-clamp-2 transition-all`}
+                  >
+                    {info.mentionText.text}
+                  </span>
+                </div>
+              </div>
+            )}
+            <span
+              className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
+            >
+              {info.message}
+            </span>
+          </div>
         )}
         <span className="absolute bottom-1 right-2 text-xs text-gray-300">
           {new Date(info.createdAt).toLocaleTimeString("en-US", {

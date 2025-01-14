@@ -6,7 +6,7 @@ import gameSchema from "../models/game.model.js";
 
 const handlePostMessage = AsyncHandler(async (req, res, _) => {
   const player = req.player;
-  const { receiverId, content, gameId } = req.body;
+  const { receiverId, content, gameId, mentionText } = req.body;
 
   if (!receiverId || !content || !gameId)
     return res.status(400).json({
@@ -34,6 +34,7 @@ const handlePostMessage = AsyncHandler(async (req, res, _) => {
     senderId: player._id,
     receiverId,
     content,
+    mentionText,
   });
 
   let conversation = await conversationShema.findOne({ game: gameId });
@@ -80,10 +81,16 @@ const handleGetMessage = AsyncHandler(async (req, res, _) => {
   }
 
   // Ensure messages are sorted by createdAt (assuming older messages first)
-  const totalMessages = await conversation.populate(
-    "messages",
-    "senderId receiverId content createdAt updatedAt reaction"
-  );
+  const totalMessages = await conversation.populate({
+    path: "messages",
+    select:
+      "senderId receiverId content createdAt updatedAt reaction mentionText",
+    populate: {
+      path: "mentionText",
+      select: "senderId content _id",
+    },
+  });
+
   const messages = totalMessages.messages.sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   );
@@ -125,11 +132,9 @@ const handleReaction = AsyncHandler(async (req, res, _) => {
   );
 
   if (index !== -1) {
-    
     if (message.reaction[index].symbol == reaction)
       message.reaction.splice(index, 1);
     else message.reaction[index].symbol = reaction;
-
   } else {
     message.reaction.push({ user: req.player._id, symbol: reaction });
   }

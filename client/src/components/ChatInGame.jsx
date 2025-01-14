@@ -53,6 +53,13 @@ function ChatInGame() {
   });
 
   const [text, setText] = useState("");
+
+  // {
+  //   text: "Hey ranit what's up. How are you?",
+  //   _id: 123,
+  //   owner:"You"
+  // }
+  const [mentionText, setMentionText] = useState(null);
   const [chatSectionBottom, isChatSectionBottom] = useState(true);
 
   const allRefs = useRef({
@@ -81,6 +88,13 @@ function ChatInGame() {
                   createdAt: value.createdAt,
                   updatedAt: value.updatedAt,
                   reaction: value.reaction,
+                  mentionText: {
+                    text: value.mentionText
+                      ? decryptMessage(value.mentionText?.content)
+                      : null,
+                    _id: value.mentionText?._id,
+                    owner: value.mentionText?.senderId,
+                  },
                 })),
                 ...prev,
               ];
@@ -94,6 +108,13 @@ function ChatInGame() {
                 createdAt: value.createdAt,
                 updatedAt: value.updatedAt,
                 reaction: value.reaction,
+                mentionText: {
+                  text: value.mentionText
+                    ? decryptMessage(value.mentionText?.content)
+                    : null,
+                  _id: value.mentionText?._id,
+                  owner: value.mentionText?.senderId,
+                },
               }));
             });
         } else setAllMessage([]);
@@ -119,13 +140,19 @@ function ChatInGame() {
       message: text.trim(),
       updatedAt: Date.now(),
       createdAt: Date.now(),
+      mentionText,
     };
+
+    setMentionText(() => null);
 
     try {
       setAllMessage((prev) => [...prev, info]);
       setText(() => "");
 
-      socket.emit("new-message", { ...info, message: encryptedText });
+      socket.emit("new-message", {
+        ...{ ...info, mentionText },
+        message: encryptedText,
+      });
 
       allRefs.current.textareaRef.value = "";
       adjustHeight();
@@ -134,6 +161,7 @@ function ChatInGame() {
         receiverId: opponent._id,
         gameId,
         content: encryptedText,
+        mentionText: mentionText ? mentionText._id : null,
       });
 
       if (response.data) {
@@ -194,6 +222,7 @@ function ChatInGame() {
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
       textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`; // Adjust to content
+      scrollChatElementBottom();
     }
   };
 
@@ -242,12 +271,13 @@ function ChatInGame() {
 
   useEffect(() => {
     const handleReceiveMessage = (info) => {
-      const { senderId, message, _id } = info;
+      const { senderId, message, _id, mentionText } = info;
       setAllMessage((prev) => [
         ...prev,
         {
           _id,
           reaction: [],
+          mentionText,
           senderId,
           message: decryptMessage(message),
           updatedAt: Date.now(),
@@ -394,6 +424,7 @@ function ChatInGame() {
               return (
                 <div key={idx}>
                   <SingleChat
+                    setMentionText={setMentionText}
                     allRefs={allRefs}
                     allMessage={allMessage}
                     setAllMessage={setAllMessage}
@@ -423,62 +454,89 @@ function ChatInGame() {
 
           {/* Input Box */}
           <div className="w-full relative flex gap-2 items-end p-2 pt-1">
-            <div className="w-full relative flex items-end bg-[rgb(42,56,67)] p-1 text-white outline-none rounded-3xl">
-              <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
-                <img
-                  src="/images/smile.png"
-                  alt="E"
-                  onClick={() =>
+            <div className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl">
+              {/* mention text */}
+              <div
+                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "m-1" : ""} overflow-hidden transition-all`}
+              >
+                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
+                  {mentionText && (
+                    <div className="flex items-center justify-between w-full px-3 pt-1 transition-all">
+                      <span className="text-[rgb(13,160,157)] font-bold">
+                        {mentionText.owner}
+                      </span>
+                      <span
+                        className="text-white hover:cursor-pointer"
+                        onClick={() => setMentionText(() => null)}
+                      >
+                        X
+                      </span>
+                    </div>
+                  )}
+                  <span
+                    className={`${mentionText ? "px-2 pb-1" : ""} w-[98%] text-[rgb(114,104,96)] line-clamp-2 transition-all`}
+                  >
+                    {mentionText?.text}
+                  </span>
+                </div>
+              </div>
+              <div className="w-full relative flex items-end text-white outline-none">
+                <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
+                  <img
+                    src="/images/smile.png"
+                    alt="E"
+                    onClick={() =>
+                      setTrueFalseStates((prev) => ({
+                        ...prev,
+                        isEmojiPickerTrue: !prev.isEmojiPickerTrue,
+                      }))
+                    }
+                    className="w-full"
+                  />
+                </div>
+                {trueFalseStates.isEmojiPickerTrue && (
+                  <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
+                )}
+                <textarea
+                  ref={(el) => (allRefs.current.textareaRef = el)}
+                  type="text"
+                  value={text}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    adjustHeight();
+                  }}
+                  rows={1}
+                  className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
+                  placeholder="Message"
+                  onKeyDown={(e) => {
+                    if (allRefs.current.typingRef)
+                      clearTimeout(allRefs.current.typingRef);
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      socket.emit("not-typing", userId);
+                      handleSendMessage();
+                    } else {
+                      socket.emit("typing", { userId, gameId });
+                    }
+                  }}
+                  onKeyUp={() => {
+                    allRefs.current.typingRef = setTimeout(() => {
+                      socket.emit("not-typing", userId);
+                    }, 1500);
+                  }}
+                  onFocus={() =>
                     setTrueFalseStates((prev) => ({
                       ...prev,
-                      isEmojiPickerTrue: !prev.isEmojiPickerTrue,
+                      isEmojiPickerTrue: false,
                     }))
                   }
-                  className="w-full"
+                  onBlur={() =>
+                    (allRefs.current.typingRef = setTimeout(() => {
+                      socket.emit("not-typing", userId);
+                    }, 100))
+                  }
                 />
               </div>
-              {trueFalseStates.isEmojiPickerTrue && (
-                <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
-              )}
-              <textarea
-                ref={(el) => (allRefs.current.textareaRef = el)}
-                type="text"
-                value={text}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  adjustHeight();
-                }}
-                rows={1}
-                className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
-                placeholder="Message"
-                onKeyDown={(e) => {
-                  if (allRefs.current.typingRef)
-                    clearTimeout(allRefs.current.typingRef);
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    socket.emit("not-typing", userId);
-                    handleSendMessage();
-                  } else {
-                    socket.emit("typing", { userId, gameId });
-                  }
-                }}
-                onKeyUp={() => {
-                  allRefs.current.typingRef = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 1500);
-                }}
-                onFocus={() =>
-                  setTrueFalseStates((prev) => ({
-                    ...prev,
-                    isEmojiPickerTrue: false,
-                  }))
-                }
-                onBlur={() =>
-                  (allRefs.current.typingRef = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
-                }
-              />
             </div>
             <button
               className="h-[3rem] flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] active:brightness-75 transition-colors"

@@ -16,6 +16,10 @@ const messageSchema = new Schema(
       type: String,
       required: true,
     },
+    mentionText: {
+      type: Schema.Types.ObjectId,
+      ref: "Message",
+    },
     reaction: {
       type: [
         {
