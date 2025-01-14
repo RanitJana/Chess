@@ -459,13 +459,13 @@ function ChatInGame() {
 
           {/* Input Box */}
           <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
-            <div className="w-full  p-1 bg-[rgb(42,56,67)] rounded-2xl">
+            <div className="w-full p-1 bg-[rgb(42,56,67)] rounded-2xl">
               {/* mention text */}
               <div
-                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "max-h-[7rem] m-1" : "max-h-0"} transition-all overflow-hidden`}
+                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "max-h-[7rem] m-1 py-1 " : "max-h-0"} transition-all overflow-hidden`}
               >
                 <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
-                  <div className="flex items-center justify-between w-full px-2 pt-1">
+                  <div className="flex items-center justify-between w-full px-2">
                     <span className="text-[rgb(13,160,157)] font-bold">
                       {mentionText?.owner}
                     </span>
