@@ -137,13 +137,17 @@ function SingleChat({
     let distanceX = currentX - dragStart.x;
     const distanceY = currentY - dragStart.y;
 
-    if (distanceY > distanceX) return setIsDragging(false);
+    if (distanceY > distanceX) {
+      setIsDragging(false);
+      setDragDistance(0);
+      return;
+    }
 
     // Prevent dragging to the left
     if (distanceX < 0) distanceX = 0;
 
     // Apply dampening factor to make it slower as distanceX increases
-    const dampeningFactor = 1 / (1 + distanceX / 350); // Adjust divisor (50) for sensitivity
+    const dampeningFactor = 1 / (1 + distanceX / 180); // Adjust divisor (50) for sensitivity
     distanceX *= dampeningFactor;
 
     setDragDistance(distanceX);
@@ -153,7 +157,7 @@ function SingleChat({
     setIsDragging(false);
 
     // Trigger reply if dragged beyond 45px
-    if (dragDistance > 45) {
+    if (dragDistance > 50) {
       if (navigator.vibrate) navigator.vibrate(50);
       hanldleMentionText();
     }
@@ -253,7 +257,7 @@ function SingleChat({
       <div
         ref={chatSecRef}
         className={`
-          relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl shadow-md break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
+          relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
           ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
           ${idx === 0 ||
             allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId

@@ -462,31 +462,29 @@ function ChatInGame() {
             <div className="w-full  p-1 bg-[rgb(42,56,67)] rounded-2xl">
               {/* mention text */}
               <div
-                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "m-1" : ""} overflow-hidden`}
+                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "max-h-[7rem]" : "max-h-0"} transition-all overflow-hidden`}
               >
-                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center transition-all">
-                  {mentionText && (
-                    <div className="flex items-center justify-between w-full px-3 pt-1">
-                      <span className="text-[rgb(13,160,157)] font-bold">
-                        {mentionText.owner}
-                      </span>
-                      <span
-                        className="text-white hover:cursor-pointer"
-                        onClick={() => {
-                          setMentionText(() => null);
-                        }}
-                      >
-                        <img
-                          src="/images/cross.png"
-                          alt="x"
-                          decoding="sync"
-                          className="w-5"
-                        />
-                      </span>
-                    </div>
-                  )}
+                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
+                  <div className="flex items-center justify-between w-full px-3 pt-1">
+                    <span className="text-[rgb(13,160,157)] font-bold">
+                      {mentionText?.owner}
+                    </span>
+                    <span
+                      className="text-white hover:cursor-pointer bg-[rgba(255,255,255,0.23)] rounded-full"
+                      onClick={() => {
+                        setMentionText(() => null);
+                      }}
+                    >
+                      <img
+                        src="/images/cross.png"
+                        alt="x"
+                        decoding="sync"
+                        className="w-5"
+                      />
+                    </span>
+                  </div>
                   <span
-                    className={`${mentionText ? "px-2 pb-1" : ""} w-[98%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty transition-all mb-[-1px]`}
+                    className={`px-2 pb-1 w-[98%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty mb-[-1px]`}
                   >
                     {mentionText?.text}
                   </span>
