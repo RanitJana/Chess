@@ -314,7 +314,7 @@ function SingleChat({
                   </div>
 
                   <span
-                    className={`${"px-2 pb-1"} w-[98%] text-[rgb(174,174,174)] line-clamp-2 transition-all`}
+                    className={`px-2 pb-1 w-[98%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
                   >
                     {info.mentionText.text}
                   </span>

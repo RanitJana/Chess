@@ -484,7 +484,7 @@ function ChatInGame() {
                     </div>
                   )}
                   <span
-                    className={`${mentionText ? "px-2 pb-1" : ""} w-[98%] text-[rgb(114,104,96)] line-clamp-2 break-all text-pretty transition-all`}
+                    className={`${mentionText ? "px-2 pb-1" : ""} w-[98%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty transition-all mb-[-1px]`}
                   >
                     {mentionText?.text}
                   </span>
