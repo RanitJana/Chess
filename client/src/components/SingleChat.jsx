@@ -116,7 +116,6 @@ function SingleChat({
   const [dragStartX, setDragStartX] = useState(0);
   const [dragDistance, setDragDistance] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [isVibrate, setVibrate] = useState(false);
 
   let holdTimeout;
 
@@ -133,10 +132,6 @@ function SingleChat({
 
     // Prevent dragging to the left
     if (distance < 0) distance = 0;
-    if (distance > 48 && isVibrate) {
-      setVibrate(() => true);
-      if (navigator.vibrate) navigator.vibrate(50);
-    }
 
     // Apply dampening factor to make it slower as distance increases
     const dampeningFactor = 1 / (1 + distance / 350); // Adjust divisor (50) for sensitivity
@@ -147,10 +142,10 @@ function SingleChat({
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    setVibrate(false);
 
     // Trigger reply if dragged beyond 45px
     if (dragDistance > 45) {
+      if (navigator.vibrate) navigator.vibrate(50);
       hanldleMentionText();
     }
 
