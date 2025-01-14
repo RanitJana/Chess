@@ -472,7 +472,10 @@ function ChatInGame() {
                       </span>
                       <span
                         className="text-white hover:cursor-pointer"
-                        onClick={() => setMentionText(() => null)}
+                        onClick={() => {
+                          setMentionText(() => null);
+                          allRefs.current.textareaRef?.focus();
+                        }}
                       >
                         <img
                           src="/images/cross.png"
