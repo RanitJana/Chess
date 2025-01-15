@@ -319,8 +319,16 @@ function ChatInGame() {
     listeners.forEach(([event, listener]) => socket.on(event, listener));
 
     const handleResize = () => {
-      if (allRefs.current.textareaRef == document.activeElement)
-        allRefs.current.textAreaFocus?.scrollIntoView();
+      if (allRefs.current.textareaRef === document.activeElement) {
+        // Get the current bounding rectangle of the focused textarea
+        const { top } = allRefs.current.textareaRef.getBoundingClientRect();
+
+        // Adjust the scroll behavior to ensure it aligns smoothly
+        window.scrollTo({
+          top: window.scrollY + top - 100, // Adjust 100 as an offset for better positioning
+          behavior: "smooth", // Smooth scrolling behavior
+        });
+      }
     };
 
     window.addEventListener("resize", handleResize);
@@ -354,10 +362,6 @@ function ChatInGame() {
 
     return () => cleanUpSocketEvents(listeners);
   }, [gameId]);
-
-  // useEffect(() => {
-  //   // if (trueFalseStates.isTyping) scrollChatElementBottom();
-  // }, [trueFalseStates.isTyping]);
 
   useEffect(() => {
     scrollChatElementBottom();
