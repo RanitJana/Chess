@@ -51,6 +51,7 @@ function SingleChat({
 }) {
 
   const [openReactionBox, setOpenReactionBox] = useState(false);
+  const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 })
 
   const [linkInfo, setLinkInfo] = useState(null);
 
@@ -252,6 +253,7 @@ function SingleChat({
       {/* all emojis */}
       <Picker
         pickerRef={pickerRef}
+        reactionLocation={reactionLocation}
         openReactionBox={openReactionBox}
         handleReaction={handleReaction}
         messageId={info._id}
@@ -294,13 +296,23 @@ function SingleChat({
           `}
         style={{
           transform: `translateX(${dragDistance}px)`,
-          transition: "transform 0.1s linear",
+          transition: "transform 0.1s ease-out",
         }}
-        onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
-        onClick={() => setOpenReactionBox(false)}
+        onDoubleClick={(e) => {
+          setOpenReactionBox((prev) => !prev);
+          const target = chatSecRef.current;
+          const rect = target.getBoundingClientRect();
+          console.log((e.clientY || e.touches[0].clientY || 0) - rect.y);
+
+          setReactionLocation(() => ({
+            x: e.clientX || e.touches[0].clientX || 0,
+            y: Math.max(0, (e.clientY || e.touches[0].clientY || 0) - rect.y),
+          }))
+        }}
+        onClick={(e) => setOpenReactionBox(false)}
       >
         {/* reactions */}
-        <div
+        {/* <div
           onClick={(e) => {
             e.stopPropagation();
             setOpenReactionBox((prev) => !prev);
@@ -313,7 +325,7 @@ function SingleChat({
             alt="😊"
             decoding="async"
           />
-        </div>
+        </div> */}
 
         {/* text reactions */}
         {info.reaction?.length > 0 && (

@@ -338,14 +338,21 @@ function ChatInGame() {
       [
         "server-typing",
         (value) => {
-          if (userId !== value.userId && gameId === value.gameId)
+          if (userId !== value.userId && gameId === value.gameId) {
             setTrueFalseStates((prev) => ({ ...prev, isTyping: true }));
+            setTimeout(() => {
+              scrollChatElementBottom();
+            }, 0);
+          }
         },
       ],
       [
         "server-not-typing",
         () => {
           setTrueFalseStates((prev) => ({ ...prev, isTyping: false }));
+          setTimeout(() => {
+            scrollChatElementBottom();
+          }, 0);
         },
       ],
     ];
@@ -438,12 +445,7 @@ function ChatInGame() {
             })}
 
             <div
-              className="bg-[rgb(32,44,51)] flex items-center justify-center w-fit px-[15px] rounded-xl rounded-tl-none overflow-hidden transition-all"
-              style={{
-                height: `${!trueFalseStates.isTyping ? "0px" : "35px"}`,
-                padding: `${!trueFalseStates.isTyping ? "0" : "0.5rem"}`,
-                opacity: trueFalseStates.isTyping ? "1" : "0",
-              }}
+              className={`bg-[rgb(32,44,51)] ${trueFalseStates.isTyping ? "p-2 h-[35px]" : "h-0"} flex items-center justify-center w-fit px-[15px] rounded-xl rounded-tl-none overflow-hidden transition-all`}
             >
               <div className="typing">
                 <div className="dot"></div>

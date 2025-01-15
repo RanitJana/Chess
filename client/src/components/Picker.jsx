@@ -1,51 +1,67 @@
+import { useEffect } from "react";
+
 /* eslint-disable react/prop-types */
 function Picker({
   pickerRef,
-  position,
   translate,
   handleReaction,
   messageId,
   openReactionBox,
+  reactionLocation,
 }) {
   const reactionEmojis = [
-    "👍", // Thumbs Up
-    "❤️", // Heart
-    "😂", // Laughing Face
-    "😮",
-    "😢", // Sad Face
-    "🙏", // Thank You/Praying
-    "👎", // Thumbs Down
-    "😍",
-    "🥰",
-    "😄", // Smiling Face
-    "🎉", // Party Popper
-    "😡", // Angry Face
-    "🤔", // Thinking Face
-    "🚀", // Rocket
-    "👏", // Clapping Hands
-    "🥳", // Partying Face
-    "🔥", // Fire
-    "😱", // Screaming Face
-    "💯", // 100
-    "✨", // Sparkles
-    "👀", // Eyes
-    "🤩", // Star-Struck
-    "😊", // Happy Face
-    "🙌", // Raised Hands
-    "🌟", // Star
-    "😞", // Disappointed Face
-    "💔", // Broken Heart
-    "🤷", // Shrug
-    "😐", // Neutral Face
-    "🤨", // Raised Eyebrow
+    "👍", "❤️", "😂", "😮", "😢", "🙏", "👎", "😍", "🥰", "😄", "🎉",
+    "😡", "🤔", "🚀", "👏", "🥳", "🔥", "😱", "💯", "✨", "👀", "🤩",
+    "😊", "🙌", "🌟", "😞", "💔", "🤷", "😐", "🤨",
   ];
+
+  useEffect(() => {
+    const picker = pickerRef.current;
+    if (picker) {
+      // Get picker dimensions
+      const pickerWidth = picker.offsetWidth;
+      const pickerHeight = picker.offsetHeight;
+
+      // Get viewport dimensions
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Calculate adjusted position
+      let adjustedX = reactionLocation.x;
+      let adjustedY = reactionLocation.y;
+
+      // Prevent picker from overflowing on the right
+      if (adjustedX + (pickerWidth / 2) > viewportWidth) {
+        adjustedX = viewportWidth - (pickerWidth / 2) - 20; // Add padding
+      }
+
+      if (adjustedX - (pickerWidth / 2) < 0) {
+        adjustedX = pickerWidth / 2 - 10;
+      }
+
+      // Check space below and above the reaction
+      const spaceBelow = viewportHeight - reactionLocation.y;
+      if (spaceBelow < pickerHeight + 10) {
+        // Not enough space below, move above
+        adjustedY = reactionLocation.y - pickerHeight - 10;
+      } else {
+        // Enough space below, position normally
+        adjustedY = reactionLocation.y + 10;
+      }
+
+      // Apply adjusted position
+      picker.style.left = `${adjustedX}px`;
+      picker.style.top = `${adjustedY}px`;
+    }
+  }, [reactionLocation, pickerRef]);
 
   return (
     <div
       ref={pickerRef}
-      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex top-1/2 translate-y-[-130%] z-[100] w-[15.5rem] p-2 rounded-full ${translate} ${position} ${openReactionBox ? " scale-100 opacity-100" : " scale-0 opacity-0"}`}
+      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex z-[100] w-[15.5rem] p-2 rounded-full ${translate
+        } ${openReactionBox ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}
       style={{
-        transition: "all 0.2s ease-in",
+        transition: "opacity 0.2s ease-in",
       }}
     >
       {reactionEmojis.map((emoji, idx) => (
