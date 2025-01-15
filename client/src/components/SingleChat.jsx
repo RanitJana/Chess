@@ -240,6 +240,15 @@ function SingleChat({
       onTouchMove={handleMouseMove}
       onTouchEnd={handleMouseUp}
     >
+      <div className="bg-[rgb(20,20,18)] p-2 rounded-full absolute top-1/2 left-0"
+        style={{
+          opacity: `${50 / (150 - dragDistance)}`,
+          transform: `translate(${(dragDistance - 50)}px,-50%)`,
+          transition: "transform 0.1s linear",
+        }}
+      >
+        <img src="/images/reply.png" alt="" decoding="sync" className="invert w-4" />
+      </div>
       {/* all emojis */}
       <Picker
         pickerRef={pickerRef}
@@ -251,27 +260,29 @@ function SingleChat({
       />
 
       {/* different day's message */}
-      {!areDatesSame(new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt), new Date(info.createdAt)) || idx === 0 ? (
-        <div className="w-full flex items-center justify-center mb-1">
-          <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
-            {(() => {
-              const prevDate = new Intl.DateTimeFormat("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(new Date(info.createdAt));
+      {
+        !areDatesSame(new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt), new Date(info.createdAt)) || idx === 0 ? (
+          <div className="w-full flex items-center justify-center mb-1">
+            <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
+              {(() => {
+                const prevDate = new Intl.DateTimeFormat("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                }).format(new Date(info.createdAt));
 
-              const today = new Intl.DateTimeFormat("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(new Date(Date.now()));
+                const today = new Intl.DateTimeFormat("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                }).format(new Date(Date.now()));
 
-              return today == prevDate ? "Today" : prevDate;
-            })()}
+                return today == prevDate ? "Today" : prevDate;
+              })()}
+            </div>
           </div>
-        </div>
-      ) : ("")}
+        ) : ("")
+      }
 
       {/* main chat bubble */}
       <div ref={chatSecRef}
@@ -283,7 +294,7 @@ function SingleChat({
           `}
         style={{
           transform: `translateX(${dragDistance}px)`,
-          transition: !isDragging ? "transform 0.5s ease" : "none",
+          transition: "transform 0.1s linear",
         }}
         onDoubleClick={() => setOpenReactionBox((prev) => !prev)}
         onClick={() => setOpenReactionBox(false)}
@@ -393,7 +404,7 @@ function SingleChat({
         </span>
 
       </div>
-    </div>
+    </div >
   );
 }
 

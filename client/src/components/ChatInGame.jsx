@@ -459,18 +459,23 @@ function ChatInGame() {
 
           {/* Input Box */}
           <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
-            <div className="w-full p-1 bg-[rgb(42,56,67)] rounded-2xl">
+            <div className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl"
+              style={{
+                borderTopLeftRadius: mentionText ? "1rem" : "1.5rem",
+                borderTopRightRadius: mentionText ? "1rem" : "1.5rem"
+              }}
+            >
               {/* mention text */}
               <div
-                className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "max-h-[7rem] m-1 py-1 " : "max-h-0"} transition-all overflow-hidden`}
+                className={`bg-[rgb(17,26,33)] rounded-xl  ${mentionText ? "opacity-100 m-[0.15rem]" : "h-0 opacity-0"} transition-opacity overflow-hidden`}
               >
                 <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
-                  <div className="flex items-center justify-between w-full px-2">
-                    <span className="text-[rgb(13,160,157)] font-bold">
+                  <div className="flex items-center justify-between w-full px-2 py-1">
+                    <span className="text-[rgb(13,160,157)] font-bold transition-all">
                       {mentionText?.owner}
                     </span>
                     <span
-                      className="text-white hover:cursor-pointer bg-[rgba(255,255,255,0.23)] rounded-full"
+                      className="text-white hover:cursor-pointer"
                       onClick={() => {
                         setMentionText(() => null);
                       }}
@@ -479,12 +484,12 @@ function ChatInGame() {
                         src="/images/cross.png"
                         alt="x"
                         decoding="sync"
-                        className="w-5"
+                        className="w-4"
                       />
                     </span>
                   </div>
                   <span
-                    className={`px-2 pb-1 w-[99%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty mb-[-1px]`}
+                    className={`px-2 pb-1 w-[99%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty mb-1`}
                   >
                     {mentionText?.text}
                   </span>
