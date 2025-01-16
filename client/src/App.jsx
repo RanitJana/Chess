@@ -14,43 +14,43 @@ export default function App() {
   const { isAuth } = useAuthContext();
 
   useEffect(() => {
-    function toggleFullscreen() {
-      const element = document.documentElement;
+    // function toggleFullscreen() {
+    //   const element = document.documentElement;
 
-      try {
-        if (!document.fullscreenElement &&    // Standard
-          !document.webkitFullscreenElement &&  // Safari
-          !document.mozFullScreenElement &&     // Firefox
-          !document.msFullscreenElement) {      // IE/Edge
-          // Enter fullscreen
-          if (element.requestFullscreen) {
-            element.requestFullscreen();
-          } else if (element.webkitRequestFullscreen) { // Safari
-            element.webkitRequestFullscreen();
-          } else if (element.mozRequestFullScreen) { // Firefox
-            element.mozRequestFullScreen();
-          } else if (element.msRequestFullscreen) { // IE/Edge
-            element.msRequestFullscreen();
-          }
-        } else {
-          // Exit fullscreen
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if (document.webkitExitFullscreen) { // Safari
-            document.webkitExitFullscreen();
-          } else if (document.mozCancelFullScreen) { // Firefox
-            document.mozCancelFullScreen();
-          } else if (document.msExitFullscreen) { // IE/Edge
-            document.msExitFullscreen();
-          }
-        }
-      } catch (error) {
-        console.log(error);
+    //   try {
+    //     if (!document.fullscreenElement &&    // Standard
+    //       !document.webkitFullscreenElement &&  // Safari
+    //       !document.mozFullScreenElement &&     // Firefox
+    //       !document.msFullscreenElement) {      // IE/Edge
+    //       // Enter fullscreen
+    //       if (element.requestFullscreen) {
+    //         element.requestFullscreen();
+    //       } else if (element.webkitRequestFullscreen) { // Safari
+    //         element.webkitRequestFullscreen();
+    //       } else if (element.mozRequestFullScreen) { // Firefox
+    //         element.mozRequestFullScreen();
+    //       } else if (element.msRequestFullscreen) { // IE/Edge
+    //         element.msRequestFullscreen();
+    //       }
+    //     } else {
+    //       // Exit fullscreen
+    //       if (document.exitFullscreen) {
+    //         document.exitFullscreen();
+    //       } else if (document.webkitExitFullscreen) { // Safari
+    //         document.webkitExitFullscreen();
+    //       } else if (document.mozCancelFullScreen) { // Firefox
+    //         document.mozCancelFullScreen();
+    //       } else if (document.msExitFullscreen) { // IE/Edge
+    //         document.msExitFullscreen();
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.log(error);
 
-      }
-    }
+    //   }
+    // }
 
-    toggleFullscreen();
+    // toggleFullscreen();
   }, [])
 
   return (
