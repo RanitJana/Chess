@@ -19,6 +19,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
     theme="dark"
     autoFocusSearch={false}
+    emojiStyle="native"
     style={{
       position: "absolute",
       bottom: "3.5rem",
@@ -45,6 +46,7 @@ const EmojiPickerComponentForReaction = ({
       </div>
     </div>
     <EmojiPicker
+      emojiStyle="native"
       theme="dark"
       autoFocusSearch={false}
       searchDisabled={true}
@@ -622,9 +624,9 @@ function ChatInGame() {
                     }))
                   }
                   onBlur={() =>
-                    (allRefs.current.typingRef = setTimeout(() => {
-                      socket.emit("not-typing", userId);
-                    }, 100))
+                  (allRefs.current.typingRef = setTimeout(() => {
+                    socket.emit("not-typing", userId);
+                  }, 100))
                   }
                 />
               </div>
