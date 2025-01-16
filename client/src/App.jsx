@@ -8,9 +8,45 @@ import SignUp from "./pages/SignUp.jsx";
 import Profile from "./pages/Profile.jsx";
 import Friends from "./pages/Friends.jsx";
 import { useAuthContext } from "./context/AuthContext.jsx";
+import { useEffect } from "react";
 
 export default function App() {
   const { isAuth } = useAuthContext();
+
+  useEffect(() => {
+    function toggleFullscreen() {
+      const element = document.documentElement;
+
+      if (!document.fullscreenElement &&    // Standard
+        !document.webkitFullscreenElement &&  // Safari
+        !document.mozFullScreenElement &&     // Firefox
+        !document.msFullscreenElement) {      // IE/Edge
+        // Enter fullscreen
+        if (element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if (element.webkitRequestFullscreen) { // Safari
+          element.webkitRequestFullscreen();
+        } else if (element.mozRequestFullScreen) { // Firefox
+          element.mozRequestFullScreen();
+        } else if (element.msRequestFullscreen) { // IE/Edge
+          element.msRequestFullscreen();
+        }
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { // Safari
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    toggleFullscreen();
+  }, [])
 
   return (
     <>
