@@ -12,14 +12,7 @@ function Picker({
   reactionLocation,
   setIsOpenReactionMore,
 }) {
-  const reactionEmojis = [
-    "❤️",
-    "😂",
-    "😮",
-    "😢",
-    "😡",
-    "👍",
-  ];
+  const reactionEmojis = ["❤️", "😂", "😮", "😢", "😡", "👍"];
 
   useEffect(() => {
     const picker = pickerRef.current;
@@ -58,8 +51,6 @@ function Picker({
       }
 
       // Apply adjusted position
-      console.log(adjustedX, adjustedY);
-
       picker.style.left = `${adjustedX}px`;
       picker.style.top = `${adjustedY}px`;
     }

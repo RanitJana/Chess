@@ -294,6 +294,11 @@ function SingleChat({
             className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
           >
             {info.reaction?.map((val) => val?.symbol)}
+            {info.reaction?.length > 1 && (
+              <span className="text-gray-400 px-1">
+                {info.reaction?.length}
+              </span>
+            )}
           </div>
         )}
 
@@ -372,7 +377,7 @@ function SingleChat({
             />
             {/* main text */}
             <span
-              className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
+              className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[3rem]" : ""}`}
             >
               {info.message}
             </span>

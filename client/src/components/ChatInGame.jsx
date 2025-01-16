@@ -2,7 +2,6 @@
 /* eslint-disable react/prop-types */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { messagePost } from "../api/message.js";
 import { toast } from "react-hot-toast";
 import { socket } from "../socket.js";
 import "./Chat.css";
@@ -10,14 +9,14 @@ import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
 import { useAuthContext } from "../context/AuthContext.jsx";
-import { messageGet, messageReaction } from "../api/message.js";
+import { messageGet, messageReaction, messagePost } from "../api/message.js";
 import { useParams } from "react-router";
 import { decryptMessage } from "../utils/encryptDecryptMessage.js";
 import SingleChat from "./SingleChat.jsx";
 
 const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
-    previewConfig={{ showPreview: false, }}
+    previewConfig={{ showPreview: false }}
     theme="dark"
     autoFocusSearch={false}
     emojiStyle="native"
@@ -36,6 +35,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
 const EmojiPickerComponentForReaction = ({
   onEmojiClick,
   setIsOpenReactionMore,
+  isOpenReactionMore
 }) => (
   <div className="w-full">
     <div className="flex justify-center items-center w-full p-2">
@@ -46,21 +46,26 @@ const EmojiPickerComponentForReaction = ({
         <img src="/images/cross.png" alt="X" className="w-7" />
       </div>
     </div>
-    <EmojiPicker
-      emojiStyle="native"
-      previewConfig={{ showPreview: false, }}
-      theme="dark"
-      autoFocusSearch={false}
-      searchDisabled={true}
-      skinTonesDisabled={true}
-      style={{
-        position: "absolute",
-        height: "90%",
-        width: "100%",
-      }}
-      lazyLoadEmojis={true}
-      onEmojiClick={onEmojiClick}
-    />
+    <div className="bg-gray-800 h-full">
+      {
+        isOpenReactionMore &&
+        <EmojiPicker
+          emojiStyle="native"
+          previewConfig={{ showPreview: false }}
+          theme="dark"
+          autoFocusSearch={false}
+          searchDisabled={true}
+          skinTonesDisabled={true}
+          style={{
+            position: "absolute",
+            height: "90%",
+            width: "100%",
+          }}
+          lazyLoadEmojis={true}
+          onEmojiClick={onEmojiClick}
+        />
+      }
+    </div>
   </div>
 );
 
@@ -98,7 +103,7 @@ function ChatInGame() {
   //   owner:"You"
   // }
   const [mentionText, setMentionText] = useState(null);
-  const [chatSectionBottom, isChatSectionBottom] = useState(true);
+  const [chatSectionBottom, setIsChatSectionBottom] = useState(true);
 
   const allRefs = useRef({
     previousScrollHeight: null,
@@ -266,7 +271,7 @@ function ChatInGame() {
 
   const handleScroll = () => {
     const container = allRefs.current.chatSectionRef;
-    isChatSectionBottom(() => isAtBottom(container, 200));
+    setIsChatSectionBottom(() => isAtBottom(container, 200));
 
     if (!container) return;
 
@@ -287,27 +292,41 @@ function ChatInGame() {
 
     const newScrollHeight = container.scrollHeight;
 
-    // Handle initial load separately
     if (trueFalseStates.initialLoad) {
-      container.scrollTo(0, newScrollHeight);
+      container.scrollTo(0, newScrollHeight); // Scroll to the bottom initially
       setTrueFalseStates((prev) => ({ ...prev, initialLoad: false }));
-      allRefs.current.previousScrollHeight = newScrollHeight;
+      allRefs.current.previousScrollHeight = newScrollHeight; // Save initial scroll height
       return;
     }
 
-    // Handle subsequent updates (e.g., new messages)
-    if (allRefs.current.previousScrollHeight != null) {
-      if (newScrollHeight !== allRefs.current.previousScrollHeight) {
-        // Only adjust scroll for new content
-        container.scrollTop +=
-          newScrollHeight - allRefs.current.previousScrollHeight;
-      }
+    const previousScrollHeight = allRefs.current.previousScrollHeight;
+
+    if (container.scrollTop + container.clientHeight === previousScrollHeight) {
+      container.scrollTop = newScrollHeight;
+    } else {
+      container.scrollTop =
+        container.scrollHeight - previousScrollHeight + container.scrollTop;
     }
 
     allRefs.current.previousScrollHeight = newScrollHeight;
   }, [allMessage]);
 
   useEffect(() => {
+    const handleResize = () => {
+      if (allRefs.current.textareaRef == document.activeElement)
+        allRefs.current.textAreaFocus?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    loadMessages();
+
     const handleReceiveMessage = (info) => {
       const { senderId, message, _id, mentionText } = info;
       setAllMessage((prev) => [
@@ -348,31 +367,6 @@ function ChatInGame() {
     }
 
     const listeners = [
-      ["receive-new-message", handleReceiveMessage],
-      ["new-message-update-id-user", updateMessageId],
-      ["chat-reaction-receiver", handleNewReaction],
-    ];
-
-    // Register socket event listener
-    listeners.forEach(([event, listener]) => socket.on(event, listener));
-
-    const handleResize = () => {
-      if (allRefs.current.textareaRef == document.activeElement)
-        allRefs.current.textAreaFocus?.scrollIntoView({ behavior: "smooth" });
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      cleanUpSocketEvents(listeners);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    loadMessages();
-
-    const listeners = [
       [
         "server-typing",
         (value) => {
@@ -393,6 +387,9 @@ function ChatInGame() {
           }, 0);
         },
       ],
+      ["receive-new-message", handleReceiveMessage],
+      ["new-message-update-id-user", updateMessageId],
+      ["chat-reaction-receiver", handleNewReaction],
     ];
 
     listeners.forEach(([event, listener]) => socket.on(event, listener));
@@ -443,16 +440,19 @@ function ChatInGame() {
         alt=""
         className="absolute w-full h-full top-0 brightness-[25%] object-cover"
       />
-      {isOpenReactionMore && (
-        <div className="absolute bottom-0 left-0 w-full flex z-[1000] h-[80%] transition-all overflow-hidden">
-          {
-            <MemoizedEmojiPickerForReaction
-              onEmojiClick={passReactionReference}
-              setIsOpenReactionMore={setIsOpenReactionMore}
-            />
-          }
-        </div>
-      )}
+
+      <div className="absolute bottom-0 left-0 w-full flex z-[1000] h-[80%] overflow-hidden"
+        style={{
+          height: isOpenReactionMore ? "80%" : "0",
+          transition: "height 0.5s ease"
+        }}
+      >
+        <MemoizedEmojiPickerForReaction
+          onEmojiClick={passReactionReference}
+          isOpenReactionMore={isOpenReactionMore}
+          setIsOpenReactionMore={setIsOpenReactionMore}
+        />
+      </div>
       {/* scroll to bottom */}
       <div
         onClick={() => {
