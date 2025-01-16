@@ -457,10 +457,11 @@ function ChatInGame() {
 
           {/* Input Box */}
           <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
-            <div className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl"
+            <div
+              className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl"
               style={{
                 borderTopLeftRadius: mentionText ? "1rem" : "1.5rem",
-                borderTopRightRadius: mentionText ? "1rem" : "1.5rem"
+                borderTopRightRadius: mentionText ? "1rem" : "1.5rem",
               }}
             >
               {/* mention text */}
@@ -544,9 +545,9 @@ function ChatInGame() {
                     }))
                   }
                   onBlur={() =>
-                  (allRefs.current.typingRef = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
+                    (allRefs.current.typingRef = setTimeout(() => {
+                      socket.emit("not-typing", userId);
+                    }, 100))
                   }
                 />
               </div>

@@ -10,9 +10,36 @@ function Picker({
   reactionLocation,
 }) {
   const reactionEmojis = [
-    "👍", "❤️", "😂", "😮", "😢", "🙏", "👎", "😍", "🥰", "😄", "🎉",
-    "😡", "🤔", "🚀", "👏", "🥳", "🔥", "😱", "💯", "✨", "👀", "🤩",
-    "😊", "🙌", "🌟", "😞", "💔", "🤷", "😐", "🤨",
+    "👍",
+    "❤️",
+    "😂",
+    "😮",
+    "😢",
+    "🙏",
+    "👎",
+    "😍",
+    "🥰",
+    "😄",
+    "🎉",
+    "😡",
+    "🤔",
+    "🚀",
+    "👏",
+    "🥳",
+    "🔥",
+    "😱",
+    "💯",
+    "✨",
+    "👀",
+    "🤩",
+    "😊",
+    "🙌",
+    "🌟",
+    "😞",
+    "💔",
+    "🤷",
+    "😐",
+    "🤨",
   ];
 
   useEffect(() => {
@@ -31,11 +58,11 @@ function Picker({
       let adjustedY = reactionLocation.y;
 
       // Prevent picker from overflowing on the right
-      if (adjustedX + (pickerWidth / 2) > viewportWidth) {
-        adjustedX = viewportWidth - (pickerWidth / 2) - 20; // Add padding
+      if (adjustedX + pickerWidth / 2 + 20 >= viewportWidth) {
+        adjustedX = viewportWidth - pickerWidth / 2 - 20; // Add padding
       }
 
-      if (adjustedX - (pickerWidth / 2) < 0) {
+      if (adjustedX - pickerWidth / 2 < 0) {
         adjustedX = pickerWidth / 2 - 10;
       }
 
@@ -58,10 +85,11 @@ function Picker({
   return (
     <div
       ref={pickerRef}
-      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex z-[100] w-[15.5rem] p-2 rounded-full ${translate
-        } ${openReactionBox ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}
+      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex z-[100] w-[15.5rem] p-2 rounded-full ${
+        translate
+      } ${openReactionBox ? "opacity-100 scale-100" : "opacity-0 scale-0"} translate-y-[-10%]`}
       style={{
-        transition: "opacity 0.2s ease-in",
+        transition: "all 0.2s ease-in",
       }}
     >
       {reactionEmojis.map((emoji, idx) => (

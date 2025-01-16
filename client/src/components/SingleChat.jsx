@@ -37,7 +37,7 @@ function MentionSection({ mentionText, senderId, userId }) {
         </div>
       )}
     </>
-  )
+  );
 }
 
 function SingleChat({
@@ -49,14 +49,14 @@ function SingleChat({
   allRefs,
   setMentionText,
 }) {
-
   const [openReactionBox, setOpenReactionBox] = useState(false);
-  const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 })
+  const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 });
 
   const [linkInfo, setLinkInfo] = useState(null);
 
   const [dragStart, setDragStart] = useState({
-    x: 0, y: 0
+    x: 0,
+    y: 0,
   });
   const [dragDistance, setDragDistance] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -64,7 +64,6 @@ function SingleChat({
   const pickerRef = useRef(null);
   const chatSecRef = useRef(null);
 
-  let holdTimeout;
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
 
@@ -108,7 +107,7 @@ function SingleChat({
   const handleMouseDown = (e) => {
     setDragStart(() => ({
       x: e.clientX || e.touches[0].clientX || 0,
-      y: e.clientY || e.touches[0].clientY || 0
+      y: e.clientY || e.touches[0].clientY || 0,
     }));
     setIsDragging(true);
   };
@@ -164,10 +163,14 @@ function SingleChat({
     };
 
     const listeners = ["click", "mousedown"];
-    listeners.forEach((event) => window.addEventListener(event, handleUnsetReactionMenu));
+    listeners.forEach((event) =>
+      window.addEventListener(event, handleUnsetReactionMenu)
+    );
 
     return () => {
-      listeners.forEach((event) => window.removeEventListener(event, handleUnsetReactionMenu));
+      listeners.forEach((event) =>
+        window.removeEventListener(event, handleUnsetReactionMenu)
+      );
     };
   }, []);
 
@@ -209,46 +212,30 @@ function SingleChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging]); // Only re-run when isDragging changes
 
-  useEffect(() => {
-    const element = allRefs.current.chatSectionRef;
-    if (element) {
-      const handleScroll = () => {
-        clearTimeout(holdTimeout);
-        setOpenReactionBox(false);
-      };
-      const handleScrollEnd = () => {
-        clearTimeout(holdTimeout);
-      };
-      // Add scroll event listener
-      element.addEventListener("scrollend", handleScrollEnd);
-      element.addEventListener("scroll", handleScroll);
-
-      // Cleanup on unmount
-      return () => {
-        element.removeEventListener("scroll", handleScroll);
-        element.removeEventListener("scrollend", handleScrollEnd);
-      };
-    }
-  }, [holdTimeout, allRefs]);
-
   return (
-    <div className={`relative flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
+    <div
+      className={`relative flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-
       onTouchStart={handleMouseDown}
       onTouchMove={handleMouseMove}
       onTouchEnd={handleMouseUp}
     >
-      <div className="bg-[rgb(20,20,18)] p-2 rounded-full absolute top-1/2 left-0"
+      <div
+        className="bg-[rgb(20,20,18)] p-2 rounded-full absolute top-1/2 left-0"
         style={{
           opacity: `${50 / (150 - dragDistance)}`,
-          transform: `translate(${(dragDistance - 50)}px,-50%)`,
+          transform: `translate(${dragDistance - 50}px,-50%)`,
           transition: "transform 0.1s linear",
         }}
       >
-        <img src="/images/reply.png" alt="" decoding="sync" className="invert w-4" />
+        <img
+          src="/images/reply.png"
+          alt=""
+          decoding="sync"
+          className="invert w-4"
+        />
       </div>
       {/* all emojis */}
       <Picker
@@ -262,36 +249,40 @@ function SingleChat({
       />
 
       {/* different day's message */}
-      {
-        !areDatesSame(new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt), new Date(info.createdAt)) || idx === 0 ? (
-          <div className="w-full flex items-center justify-center mb-1">
-            <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
-              {(() => {
-                const prevDate = new Intl.DateTimeFormat("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                }).format(new Date(info.createdAt));
+      {!areDatesSame(
+        new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt),
+        new Date(info.createdAt)
+      ) || idx === 0 ? (
+        <div className="w-full flex items-center justify-center mb-1">
+          <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
+            {(() => {
+              const prevDate = new Intl.DateTimeFormat("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }).format(new Date(info.createdAt));
 
-                const today = new Intl.DateTimeFormat("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                }).format(new Date(Date.now()));
+              const today = new Intl.DateTimeFormat("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }).format(new Date(Date.now()));
 
-                return today == prevDate ? "Today" : prevDate;
-              })()}
-            </div>
+              return today == prevDate ? "Today" : prevDate;
+            })()}
           </div>
-        ) : ("")
-      }
+        </div>
+      ) : (
+        ""
+      )}
 
       {/* main chat bubble */}
-      <div ref={chatSecRef}
+      <div
+        ref={chatSecRef}
         className={`
           relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
           ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
-          ${(idx === 0 || allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId) ? info.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none" : ""}
+          ${idx === 0 || allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId ? (info.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none") : ""}
           ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ? "mt-[0.8rem]" : ""}
           `}
         style={{
@@ -307,26 +298,10 @@ function SingleChat({
           setReactionLocation(() => ({
             x: e.clientX || e.touches[0].clientX || 0,
             y: Math.max(0, (e.clientY || e.touches[0].clientY || 0) - rect.y),
-          }))
+          }));
         }}
         onClick={(e) => setOpenReactionBox(false)}
       >
-        {/* reactions */}
-        {/* <div
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpenReactionBox((prev) => !prev);
-          }}
-          className={`absolute flex items-center justify-center top-1/2 bg-[rgb(17,25,29)] p-[0.1rem] rounded-full ${info.senderId == userId ? "left-0 translate-x-[-120%]" : "right-0 translate-x-[120%]"} translate-y-[-50%]`}
-        >
-          <img
-            src="/images/smile-reaction.png"
-            className="brightness-[20%] invert w-4"
-            alt="😊"
-            decoding="async"
-          />
-        </div> */}
-
         {/* text reactions */}
         {info.reaction?.length > 0 && (
           <div
@@ -341,7 +316,11 @@ function SingleChat({
           <span className="block">
             {linkInfo ? (
               <a href={info.message} target="_blank">
-                <MentionSection mentionText={info.mentionText} senderId={info.senderId} userId={userId} />
+                <MentionSection
+                  mentionText={info.mentionText}
+                  senderId={info.senderId}
+                  userId={userId}
+                />
                 <div
                   className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-lg mb-2 w-full max-w-[30rem]`}
                 >
@@ -374,7 +353,11 @@ function SingleChat({
               </a>
             ) : (
               <div>
-                <MentionSection mentionText={info.mentionText} senderId={info.senderId} userId={userId} />
+                <MentionSection
+                  mentionText={info.mentionText}
+                  senderId={info.senderId}
+                  userId={userId}
+                />
                 <span className="px-1 pt-1">
                   {info.message.split(" ").map((text, idx) => {
                     if (text.match(urlRegex))
@@ -396,7 +379,11 @@ function SingleChat({
           </span>
         ) : (
           <>
-            <MentionSection mentionText={info.mentionText} senderId={info.senderId} userId={userId} />
+            <MentionSection
+              mentionText={info.mentionText}
+              senderId={info.senderId}
+              userId={userId}
+            />
             {/* main text */}
             <span
               className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[2.5rem]" : ""}`}
@@ -414,9 +401,8 @@ function SingleChat({
             hour12: true,
           })}
         </span>
-
       </div>
-    </div >
+    </div>
   );
 }
 
