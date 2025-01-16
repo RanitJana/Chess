@@ -1,9 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 *::-webkit-scrollbar {
   display: none;
 }
-body{
+
+body {
   background-color: 'hsl(40,7%,18%)';
+}
+
+@media (max-width: 768px) {
+
+  .search-bar {
+
+    display: none;
+
+  }
+
+}
+
+html {
+  overflow: hidden;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }
