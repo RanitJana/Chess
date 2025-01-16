@@ -36,7 +36,7 @@ function Profile() {
   const [isLoading, setLoading] = useState(true);
   const [isSendFriendRequest, setIsSendFriendRequest] = useState(false);
   const [user, setUser] = useState(null);
-  const [lastSeen, setLastSeen] = useState("x min ago");
+  const [lastSeen, setLastSeen] = useState("Loading...");
 
   const { onlineUsers } = useSocketContext();
 
@@ -71,7 +71,7 @@ function Profile() {
     });
 
     const displayLastSeenRef = setInterval(() => {
-      if (onlineUsers[userId]) setLastSeen("Online");
+      if (onlineUsers[userId]) setLastSeen("Online Now");
       else setLastSeen(timeAgo(user?.lastSeen));
     }, 1000);
     return () => {
@@ -125,7 +125,7 @@ function Profile() {
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
         {<NavBar />}
-        <div className="bg-blackDarkest p-4 rounded-md">
+        <div className="bg-blackDark p-4 rounded-md">
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
             <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
               <div className="relative">
@@ -148,14 +148,14 @@ function Profile() {
                 </p>
                 <p>{user?.about || "Loading.."}</p>
               </div>
-              <ul className="flex w-full justify-between max-w-[20rem]">
+              <ul className="grid grid-cols-3 w-full max-w-[23rem]">
                 <li className="flex flex-col justify-center items-center">
                   <img
                     className="w-8 invert-[70%]"
                     src="/images/online.png"
                     alt=""
                   />
-                  <span>{lastSeen}</span>
+                  <span className="text-[0.85rem]">{lastSeen}</span>
                 </li>
                 <li className="flex flex-col justify-center items-center">
                   <img
@@ -163,7 +163,7 @@ function Profile() {
                     src="/images/joined.png"
                     alt=""
                   />
-                  <span>
+                  <span className="text-[0.85rem]">
                     {new Date(user?.createdAt || Date.now()).toLocaleDateString(
                       "en-US",
                       {
@@ -180,16 +180,16 @@ function Profile() {
                     src="/images/followers.png"
                     alt=""
                   />
-                  <span>{user?.friendsCount || 0}</span>
+                  <span className="text-[0.85rem]">{user?.friendsCount || 0}</span>
                 </li>
-                <li className="flex flex-col justify-center items-center">
+                {/* <li className="flex flex-col justify-center items-center">
                   <img
                     className="w-8 invert-[70%]"
                     src="/images/views.png"
                     alt=""
                   />
-                  <span>{user?.views || 0}</span>
-                </li>
+                  <span className="text-[0.85rem]">{user?.views || 0}</span>
+                </li> */}
               </ul>
             </div>
           </div>

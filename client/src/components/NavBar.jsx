@@ -30,7 +30,7 @@ function NavBar() {
     }
   };
   return (
-    <div className="flex items-center max-w-[970px] w-full justify-between sm:p-0 p-4">
+    <div className="flex items-center max-w-[970px] w-full justify-between sm:p-0 sm:mb-0 mb-[-1rem] p-4">
       {isLoggingOut && <Loader />}
       <div
         className="flex gap-2 items-center hover:cursor-pointer"
@@ -44,9 +44,9 @@ function NavBar() {
         />
       </div>
       <div className=" flex gap-3">
-        {/* <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
+        <div className=" hover:cursor-pointer" onClick={() => navigate("/")}>
           <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
-        </div> */}
+        </div>
         <div
           className=" hover:cursor-pointer"
           onClick={() => navigate("/friends/" + playerInfo?._id)}

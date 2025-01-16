@@ -53,7 +53,7 @@ function CompletedGames({ userId }) {
   }, [userId]);
 
   return (
-    <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
+    <div className="w-full max-w-[970px] bg-blackDark rounded-md">
       <p className="text-white p-4 border-b-[2px] border-blackLight flex items-center justify-between">
         <span className="font-bold py-1">
           Completed Games ({totalDoneGames || 0})

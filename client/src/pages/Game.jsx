@@ -128,7 +128,7 @@ export default function Game() {
           setCheckMate={setCheckMate}
         />
         <ChessBoard />
-        <GameSideSection />
+        <GameSideSection players={players} />
       </div>
     </GameContext.Provider>
   );

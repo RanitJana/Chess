@@ -41,14 +41,15 @@ function Home() {
       {/* Header Section */}
       <div className="flex w-full lg-930:flex-row flex-col justify-center items-center gap-10 sm:p-0 p-2">
         <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
-          <img
+          {/* <img
             src="/images/standardboard.png"
             draggable={false}
             alt="Chess Board"
             className="w-[min(28rem,100%)] h-full"
-          />
+          /> */}
+          <video src="/videos/chess.mp4" autoPlay loop muted autoFocus className="w-full h-full object-cover"></video>
         </div>
-        <div className="max-w-[30rem] flex flex-col items-center text-center">
+        <div className="max-w-[30rem] flex flex-col items-center text-center pb-5">
           <h2 className="text-white font-extrabold md:text-[3.2rem] text-[2rem] leading-[3.5rem]">
             Play Chess Online on the #2 Site!
           </h2>
@@ -62,16 +63,28 @@ function Home() {
               <span className="pl-1 text-gray-400 font-bold">Playing Now</span>
             </div>
           </div>
-          <button
-            disabled={isCreatingGame}
-            className={`bg-buttonLight ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[5.5rem] p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }`}
-            onClick={handleClick}
-          >
-            <img src="/images/play.svg" alt="Play Icon" className="w-[4rem]" />
-            <div className="flex flex-col items-start">
-              <span className="text-3xl">New Game</span>
-            </div>
-          </button>
+          <div className="w-full flex flex-wrap gap-3 justify-center items-center">
+            <button
+              disabled={isCreatingGame}
+              className={`bg-blackDark ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
+              onClick={handleClick}
+            >
+              <img src="/images/play.svg" alt="Play Icon" className="w-[3rem]" />
+              <div className="flex flex-col items-start">
+                <span className="text-xl">New Game</span>
+              </div>
+            </button>
+            <button
+              disabled={isCreatingGame}
+              className={`bg-blackDark ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
+              
+            >
+              <img src="/images/handshake.svg" alt="Play Icon" className="w-[3rem]" />
+              <div className="flex flex-col items-start">
+                <span className="text-xl">Play a friend</span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 

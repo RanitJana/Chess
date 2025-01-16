@@ -70,7 +70,7 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
 
   const navigate = useNavigate();
   return (
-    <div className="w-full max-w-[970px] bg-blackDarkest rounded-md">
+    <div className="w-full max-w-[970px] bg-blackDark rounded-md">
       <div className="flex gap-2 p-4 border-b-[2px] border-blackLight">
         <img
           src="/images/sun.png"
