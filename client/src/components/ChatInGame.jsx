@@ -10,7 +10,7 @@ import { encryptMessage } from "../utils/encryptDecryptMessage.js";
 import { useGameContext } from "../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
 import { useAuthContext } from "../context/AuthContext.jsx";
-import { messageGet } from "../api/message.js";
+import { messageGet, messageReaction } from "../api/message.js";
 import { useParams } from "react-router";
 import { decryptMessage } from "../utils/encryptDecryptMessage.js";
 import SingleChat from "./SingleChat.jsx";
@@ -31,11 +31,43 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
   />
 );
 
+const EmojiPickerComponentForReaction = ({
+  onEmojiClick,
+  setIsOpenReactionMore,
+}) => (
+  <div className="w-full">
+    <div className="flex justify-center items-center w-full p-2">
+      <div
+        className="bg-gray-900 transition-colors rounded-full p-1 hover:bg-gray-800 hover:cursor-pointer"
+        onClick={() => setIsOpenReactionMore(false)}
+      >
+        <img src="/images/cross.png" alt="X" className="w-7" />
+      </div>
+    </div>
+    <EmojiPicker
+      theme="dark"
+      autoFocusSearch={false}
+      searchDisabled={true}
+      skinTonesDisabled={true}
+      style={{
+        position: "absolute",
+        height: "90%",
+        width: "100%",
+      }}
+      lazyLoadEmojis={true}
+      onEmojiClick={onEmojiClick}
+    />
+  </div>
+);
+
 const cleanUpSocketEvents = (events) => {
   events.forEach(([event, listener]) => socket.off(event, listener));
 };
 
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
+const MemoizedEmojiPickerForReaction = React.memo(
+  EmojiPickerComponentForReaction
+);
 
 function ChatInGame() {
   const { gameId } = useParams();
@@ -44,6 +76,8 @@ function ChatInGame() {
   const userId = playerInfo._id;
 
   const [allMessage, setAllMessage] = useState(null);
+  const [isOpenReactionMore, setIsOpenReactionMore] = useState(false);
+  const [reactionMessageId, setReactionMessageId] = useState(null);
 
   const [trueFalseStates, setTrueFalseStates] = useState({
     initialLoad: true,
@@ -366,6 +400,37 @@ function ChatInGame() {
     scrollChatElementBottom();
   }, [mentionText]);
 
+  const handleReaction = async (messageId, reaction, triggerStates) => {
+    try {
+      triggerStates.forEach((state) => state(false));
+      const response = await messageReaction(messageId, { reaction });
+      if (response.data) {
+        const { success, reaction } = response.data;
+        if (success) {
+          setAllMessage((prev) =>
+            prev.map((val) => {
+              if (val._id != messageId) return val;
+              return { ...val, reaction };
+            })
+          );
+          socket.emit("chat-reaction", {
+            senderId: userId,
+            messageId,
+            reaction,
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  async function passReactionReference(emojiObject) {
+    await handleReaction(reactionMessageId, emojiObject.emoji, [
+      setIsOpenReactionMore,
+    ]);
+  }
+
   return (
     <div className="relative h-full w-full flex flex-col bg-transparent">
       <img
@@ -374,6 +439,16 @@ function ChatInGame() {
         alt=""
         className="absolute w-full h-full top-0 brightness-[25%] object-cover"
       />
+      {isOpenReactionMore && (
+        <div className="absolute bottom-0 left-0 w-full flex z-[1000] h-[80%] transition-all overflow-hidden">
+          {
+            <MemoizedEmojiPickerForReaction
+              onEmojiClick={passReactionReference}
+              setIsOpenReactionMore={setIsOpenReactionMore}
+            />
+          }
+        </div>
+      )}
       {/* scroll to bottom */}
       <div
         onClick={() => {
@@ -432,10 +507,12 @@ function ChatInGame() {
               return (
                 <div key={idx}>
                   <SingleChat
+                    handleReaction={handleReaction}
+                    setReactionMessageId={setReactionMessageId}
+                    setIsOpenReactionMore={setIsOpenReactionMore}
                     setMentionText={setMentionText}
                     allRefs={allRefs}
                     allMessage={allMessage}
-                    setAllMessage={setAllMessage}
                     idx={idx}
                     info={info}
                     userId={userId}

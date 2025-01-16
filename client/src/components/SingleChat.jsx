@@ -1,7 +1,5 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { socket } from "../socket.js";
-import { messageReaction } from "../api/message.js";
 import Picker from "./Picker.jsx";
 import { useEffect, useRef, useState, memo } from "react";
 import axios from "axios";
@@ -45,9 +43,11 @@ function SingleChat({
   info,
   idx,
   userId,
-  setAllMessage,
+  handleReaction,
   allRefs,
   setMentionText,
+  setIsOpenReactionMore,
+  setReactionMessageId,
 }) {
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 });
@@ -63,36 +63,12 @@ function SingleChat({
 
   const pickerRef = useRef(null);
   const chatSecRef = useRef(null);
+  const mainSectionRef = useRef(null);
 
   const emojiRegex =
     /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
 
   const urlRegex = /\b((https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*\b/g;
-
-  const handleReaction = async (messageId, reaction) => {
-    try {
-      setOpenReactionBox(false);
-      const response = await messageReaction(messageId, { reaction });
-      if (response.data) {
-        const { success, reaction } = response.data;
-        if (success) {
-          setAllMessage((prev) =>
-            prev.map((val) => {
-              if (val._id != messageId) return val;
-              return { ...val, reaction };
-            })
-          );
-          socket.emit("chat-reaction", {
-            senderId: userId,
-            messageId,
-            reaction,
-          });
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const hanldleMentionText = function () {
     setMentionText(() => ({
@@ -214,7 +190,8 @@ function SingleChat({
 
   return (
     <div
-      className={`relative flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
+      ref={mainSectionRef}
+      className={`relative w-full flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -240,8 +217,11 @@ function SingleChat({
       {/* all emojis */}
       <Picker
         pickerRef={pickerRef}
+        mainSectionRef={mainSectionRef}
+        setIsOpenReactionMore={setIsOpenReactionMore}
         reactionLocation={reactionLocation}
         openReactionBox={openReactionBox}
+        setOpenReactionBox={setOpenReactionBox}
         handleReaction={handleReaction}
         messageId={info._id}
         translate={"translate-x-[-50%] translate-y-[-130%]"}
@@ -290,15 +270,21 @@ function SingleChat({
           transition: "transform 0.1s ease-out",
         }}
         onDoubleClick={(e) => {
+          setReactionMessageId(() => info._id);
           setOpenReactionBox((prev) => !prev);
-          const target = chatSecRef.current;
+          const target = mainSectionRef.current;
           const rect = target.getBoundingClientRect();
-          console.log((e.clientY || e.touches[0].clientY || 0) - rect.y);
 
-          setReactionLocation(() => ({
-            x: e.clientX || e.touches[0].clientX || 0,
-            y: Math.max(0, (e.clientY || e.touches[0].clientY || 0) - rect.y),
-          }));
+          const x =
+            (e.clientX || (e.touches && e.touches[0]?.clientX) || 0) -
+            rect.left;
+          const y =
+            (e.clientY || (e.touches && e.touches[0]?.clientY) || 0) - rect.top;
+
+          setReactionLocation({
+            x: Math.max(0, x),
+            y: Math.max(0, y),
+          });
         }}
         onClick={(e) => setOpenReactionBox(false)}
       >

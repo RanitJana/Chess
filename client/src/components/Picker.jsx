@@ -2,12 +2,15 @@ import { useEffect } from "react";
 
 /* eslint-disable react/prop-types */
 function Picker({
+  mainSectionRef,
   pickerRef,
   translate,
   handleReaction,
   messageId,
   openReactionBox,
+  setOpenReactionBox,
   reactionLocation,
+  setIsOpenReactionMore,
 }) {
   const reactionEmojis = [
     "👍",
@@ -15,51 +18,29 @@ function Picker({
     "😂",
     "😮",
     "😢",
-    "🙏",
-    "👎",
-    "😍",
-    "🥰",
-    "😄",
-    "🎉",
-    "😡",
-    "🤔",
-    "🚀",
-    "👏",
-    "🥳",
-    "🔥",
-    "😱",
-    "💯",
-    "✨",
-    "👀",
-    "🤩",
-    "😊",
-    "🙌",
-    "🌟",
-    "😞",
-    "💔",
-    "🤷",
-    "😐",
-    "🤨",
+    // "🙏",
   ];
 
   useEffect(() => {
     const picker = pickerRef.current;
-    if (picker) {
+    const mainSection = mainSectionRef.current;
+    const { top, height } = mainSection.getBoundingClientRect();
+    if (picker && mainSection) {
       // Get picker dimensions
       const pickerWidth = picker.offsetWidth;
       const pickerHeight = picker.offsetHeight;
 
       // Get viewport dimensions
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
+      const viewportWidth = mainSection.clientWidth;
+      const viewportHeight = top + height;
 
       // Calculate adjusted position
       let adjustedX = reactionLocation.x;
       let adjustedY = reactionLocation.y;
 
       // Prevent picker from overflowing on the right
-      if (adjustedX + pickerWidth / 2 + 20 >= viewportWidth) {
-        adjustedX = viewportWidth - pickerWidth / 2 - 20; // Add padding
+      if (adjustedX + pickerWidth / 2 >= viewportWidth) {
+        adjustedX = viewportWidth - pickerWidth / 2; // Add padding
       }
 
       if (adjustedX - pickerWidth / 2 < 0) {
@@ -77,15 +58,17 @@ function Picker({
       }
 
       // Apply adjusted position
+      console.log(adjustedX, adjustedY);
+
       picker.style.left = `${adjustedX}px`;
       picker.style.top = `${adjustedY}px`;
     }
-  }, [reactionLocation, pickerRef]);
+  }, [reactionLocation, pickerRef, mainSectionRef]);
 
   return (
     <div
       ref={pickerRef}
-      className={`bg-[rgb(35,46,52)] shadow-xl overflow-x-scroll absolute flex z-[100] w-[15.5rem] p-2 rounded-full ${
+      className={`bg-[rgb(35,46,52)] shadow-xl absolute flex z-[100] p-2 rounded-full ${
         translate
       } ${openReactionBox ? "opacity-100 scale-100" : "opacity-0 scale-0"} translate-y-[-10%]`}
       style={{
@@ -96,13 +79,22 @@ function Picker({
         <div
           key={idx}
           onClick={() => {
-            handleReaction(messageId, emoji);
+            handleReaction(messageId, emoji, [setOpenReactionBox]);
           }}
           className="flex items-center justify-center hover:cursor-pointer rounded-full mx-[0.1rem] h-9 w-9 p-2 text-[1.5rem]"
         >
           {emoji}
         </div>
       ))}
+      <div
+        className="bg-gray-700 flex items-center justify-center hover:cursor-pointer rounded-full mx-[0.1rem] h-9 aspect-square p-2 text-[1.5rem]"
+        onClick={() => {
+          setOpenReactionBox(false);
+          setIsOpenReactionMore(true);
+        }}
+      >
+        <img src="/images/cross.png" alt="" className="rotate-45 w-6" />
+      </div>
     </div>
   );
 }
