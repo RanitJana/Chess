@@ -13,6 +13,7 @@ import { messageGet, messageReaction, messagePost } from "../api/message.js";
 import { useParams } from "react-router";
 import { decryptMessage } from "../utils/encryptDecryptMessage.js";
 import SingleChat from "./SingleChat.jsx";
+import showNotification from "../utils/Notification.js";
 
 const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
@@ -179,6 +180,7 @@ function ChatInGame() {
 
     let info = {
       _id: tempId,
+      senderName: playerInfo.name,
       senderId: userId,
       message: text.trim(),
       updatedAt: Date.now(),
@@ -328,7 +330,9 @@ function ChatInGame() {
     loadMessages();
 
     const handleReceiveMessage = (info) => {
-      const { senderId, message, _id, mentionText } = info;
+      const { senderId, message, _id, mentionText, senderName } = info;
+      const decryptMessageText = decryptMessage(message);
+      showNotification(senderName + " : " + decryptMessageText);
       setAllMessage((prev) => [
         ...prev,
         {
@@ -336,7 +340,7 @@ function ChatInGame() {
           reaction: [],
           mentionText,
           senderId,
-          message: decryptMessage(message),
+          message: decryptMessageText,
           updatedAt: Date.now(),
           createdAt: Date.now(),
         },
