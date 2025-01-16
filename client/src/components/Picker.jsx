@@ -13,12 +13,12 @@ function Picker({
   setIsOpenReactionMore,
 }) {
   const reactionEmojis = [
-    "👍",
     "❤️",
     "😂",
     "😮",
     "😢",
-    // "🙏",
+    "😡",
+    "👍",
   ];
 
   useEffect(() => {

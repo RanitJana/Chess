@@ -17,6 +17,7 @@ import SingleChat from "./SingleChat.jsx";
 
 const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
+    previewConfig={{ showPreview: false, }}
     theme="dark"
     autoFocusSearch={false}
     emojiStyle="native"
@@ -47,6 +48,7 @@ const EmojiPickerComponentForReaction = ({
     </div>
     <EmojiPicker
       emojiStyle="native"
+      previewConfig={{ showPreview: false, }}
       theme="dark"
       autoFocusSearch={false}
       searchDisabled={true}
