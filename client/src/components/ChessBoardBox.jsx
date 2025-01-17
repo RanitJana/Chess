@@ -341,7 +341,7 @@ function ChessBoardBox({
   return (
     <span
       style={{ backgroundColor: color }}
-      className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
+      className="relative w-full aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
       onClick={handlePieceMove}
       onDragStart={handleDragStart}
       onDragOver={(e) => e.preventDefault()}

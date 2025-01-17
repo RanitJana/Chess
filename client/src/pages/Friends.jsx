@@ -259,7 +259,7 @@ function Friends() {
           <img src="/images/friends.png" alt="" />
           <span className="font-bold text-white text-2xl">Friends</span>
         </p>
-        <div className="rounded-md bg-blackDarkest sm:p-4 p-2 py-4 flex flex-col gap-6">
+        <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6">
           <div className="relative flex w-full">
             <img
               src="/images/search.png"
@@ -360,7 +360,7 @@ function Friends() {
           ) : (
             ""
           )}
-          <PendingRequestSkeleton isLoading={isLoading} />
+          {/* <PendingRequestSkeleton isLoading={isLoading} /> */}
           <div>
             <div>
               <span className="text-white mr-2 font-semibold">Friends</span>

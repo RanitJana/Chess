@@ -152,14 +152,18 @@ function SingleChat({
 
   //fetch info if only message is link
   useEffect(() => {
+    // https://api.microlink.io/?url=
+    // e17f055849c09f0356ddfa4853c600fd
     (async () => {
       try {
         const url = info.message;
         if (url.match(urlRegex)) {
           const response = await axios.get(
-            `https://api.microlink.io/?url=${url}`
+            `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`
           );
-          if (response.data) setLinkInfo(response.data.data);
+          console.log(response);
+
+          if (response.data) setLinkInfo(response.data);
           // console.log(response.data.data);
         }
       } catch (error) {
@@ -319,7 +323,7 @@ function SingleChat({
                     {linkInfo.image ? (
                       <img
                         className="max-w-[30rem] w-full pointer-events-none"
-                        src={linkInfo.image.url}
+                        src={linkInfo.image}
                         alt=""
                       />
                     ) : (

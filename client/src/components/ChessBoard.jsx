@@ -134,7 +134,7 @@ export default function ChessBoard() {
   const { onlineUsers } = useSocketContext();
 
   return (
-    <div className="flex flex-col h-fit">
+    <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
       <div className="flex justify-between items-center">
         <div className="flex py-2 gap-4">
           <div className=" relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
@@ -181,7 +181,7 @@ export default function ChessBoard() {
       </div>
       <div
         ref={boardRef}
-        className="relative w-[100dvw] max-w-[35rem] aspect-square h-fit"
+        className="relative w-full h-fit items-center justify-center flex flex-col"
       >
         {chessboard ? (
           chessboard.map((row, rowIdx) => (
@@ -208,7 +208,7 @@ export default function ChessBoard() {
             </div>
           ))
         ) : (
-          <div className="relative w-[100dvw] max-w-[35rem] h-[100dvh] max-h-[35rem]">
+          <div className="relative w-full h-fit">
             {<EmptyBoard />}
           </div>
         )}

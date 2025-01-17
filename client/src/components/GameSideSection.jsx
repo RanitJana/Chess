@@ -43,7 +43,7 @@ function GameSideSection({ players }) {
   };
 
   return (
-    <div className="relative lg-1008:h-[40rem] h-dvh w-[100dvw] lg-1008:w-[27rem] lg-1008:max-h-[92%] min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
+    <div className="relative md:h-full md:max-h-[37rem] h-dvh w-full min-h-[35rem] py-[4px] bg-[rgb(39,37,35)] rounded-md flex flex-col">
       <ul className="flex w-full border-b border-[rgba(255,255,255,0.16)]">
         <Tab
           isActive={activeTab === 0}

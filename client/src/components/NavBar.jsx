@@ -30,7 +30,7 @@ function NavBar() {
     }
   };
   return (
-    <div className="flex items-center max-w-[970px] w-full justify-between sm:p-0 sm:mb-0 mb-[-1rem] p-4">
+    <div className="flex items-center max-w-[970px] w-full justify-between sm:p-0 sm:mb-0 mb-[-1rem] p-4 z-[1000]">
       {isLoggingOut && <Loader />}
       <div
         className="flex gap-2 items-center hover:cursor-pointer"

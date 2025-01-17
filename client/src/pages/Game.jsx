@@ -7,6 +7,7 @@ import { gameSingle } from "../api/game.js";
 import { socket } from "../socket.js";
 import GameSideSection from "../components/GameSideSection.jsx";
 import WinnerBoard from "../components/WinnerBoard.jsx";
+import NavBar from "../components/NavBar.jsx";
 
 const GameContext = createContext();
 
@@ -121,14 +122,23 @@ export default function Game() {
         setCheckMate,
       }}
     >
-      <div className="relative w-full h-[100dvh] min-h-fit overflow-scroll flex items-center justify-center gap-4 flex-wrap">
+      <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">
         <WinnerBoard
           playerColor={playerColor}
           isCheckMate={isCheckMate}
           setCheckMate={setCheckMate}
         />
-        <ChessBoard />
-        <GameSideSection players={players} />
+        <div className="sm:p-4 p-0 w-full flex justify-center items-center">
+          {<NavBar />}
+        </div>
+        <div className=" flex w-full justify-center items-center">
+          <div className="grid grid-cols-1 w-full h-full gap-2 md:grid-cols-2 max-w-[970px]">
+            <div className=" w-full flex items-center justify-center h-fit">
+              <ChessBoard />
+            </div>
+            <GameSideSection players={players} />
+          </div>
+        </div>
       </div>
     </GameContext.Provider>
   );
