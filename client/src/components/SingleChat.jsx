@@ -153,7 +153,6 @@ function SingleChat({
   //fetch info if only message is link
   useEffect(() => {
     // https://api.microlink.io/?url=
-    // e17f055849c09f0356ddfa4853c600fd
     (async () => {
       try {
         const url = info.message;
