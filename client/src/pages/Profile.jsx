@@ -127,8 +127,8 @@ function Profile() {
         {<NavBar />}
         <div className="bg-blackDark p-4 rounded-md">
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
-            <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
-              <div className="relative">
+            <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full left-1/2 rounded-sm overflow-hidden aspect-square">
+              <div className="relative w-[12rem]">
                 <img
                   className=" bg-white rounded-xl"
                   src={
