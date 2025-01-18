@@ -2,13 +2,13 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import ChessBoardBox from "./ChessBoardBox.jsx";
-import { gameEnd, gameMove } from "../api/game.js";
-import { socket } from "../socket.js";
+import { gameEnd, gameMove } from "../../api/game.js";
+import { socket } from "../../socket.js";
 import EmptyBoard from "./EmptyBoard.jsx";
-import { useGameContext, convertTo2DArray } from "../pages/Game.jsx";
-import { kingCheckMate } from "../utils/KingCheck.js";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { useSocketContext } from "../context/SocketContext.jsx";
+import { useGameContext, convertTo2DArray } from "../../pages/Game.jsx";
+import { kingCheckMate } from "../../utils/KingCheck.js";
+import { useAuthContext } from "../../context/AuthContext.jsx";
+import { useSocketContext } from "../../context/SocketContext.jsx";
 
 export default function ChessBoard() {
   const {
@@ -208,9 +208,7 @@ export default function ChessBoard() {
             </div>
           ))
         ) : (
-          <div className="relative w-full h-fit">
-            {<EmptyBoard />}
-          </div>
+          <div className="relative w-full h-fit">{<EmptyBoard />}</div>
         )}
       </div>
       <div className="flex justify-between items-center">

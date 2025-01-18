@@ -43,12 +43,13 @@ export default function AuthContext({ children }) {
       value={{ isAuth, setAuth, playerInfo, setPlayerInfo }}
     >
       {/* <img src="/images/tile.png" alt="" className="fixed bottom-0 w-full" /> */}
-      <div className="bg-[hsl(40,7%,18%)] overflow-y-scroll h-[100dvh]"
-        style={{
-          background: "url(/images/tile.png) hsl(40,7%,18%) no-repeat",
-          backgroundSize: "100%",
-          backgroundPosition: "bottom"
-        }}
+      <div
+        className="bg-[hsl(40,7%,18%)] overflow-y-scroll h-[100dvh]"
+        // style={{
+        //   background: "url(/images/tile.png) hsl(40,7%,18%) no-repeat",
+        //   backgroundSize: "100%",
+        //   backgroundPosition: "bottom"
+        // }}
       >
         <div className="min-h-fit">
           {isLoading ? (

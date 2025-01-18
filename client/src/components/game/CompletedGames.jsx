@@ -4,7 +4,7 @@
 import "./GameDone.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { gameDone } from "../api/game.js";
+import { gameDone } from "../../api/game.js";
 import toast from "react-hot-toast";
 
 function NamePlate({ name, winner, rating }) {

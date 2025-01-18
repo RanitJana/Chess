@@ -7,13 +7,13 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import pieceMove, { getColor } from "../utils/PieceMove.js";
-import clearPieceMove from "../utils/ClearPieceMove.js";
+import pieceMove, { getColor } from "../../utils/PieceMove.js";
+import clearPieceMove from "../../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
-import { captureSound, moveSound } from "../utils/Sounds.js";
-import { useGameContext } from "../pages/Game.jsx";
-import { kingCheck, kingCheckMate } from "../utils/KingCheck.js";
-import getKingPos from "../utils/KingPos.js";
+import { captureSound, moveSound } from "../../utils/Sounds.js";
+import { useGameContext } from "../../pages/Game.jsx";
+import { kingCheck, kingCheckMate } from "../../utils/KingCheck.js";
+import getKingPos from "../../utils/KingPos.js";
 
 function ChessBoardBox({
   row,

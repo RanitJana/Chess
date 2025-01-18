@@ -2,9 +2,9 @@
 import { useNavigate } from "react-router-dom";
 import ChessBoardPreview from "./ChessBoardPreview.jsx";
 import { useEffect, useState } from "react";
-import { gameOngoing, gameSingle } from "../api/game.js";
+import { gameOngoing, gameSingle } from "../../api/game.js";
 import toast from "react-hot-toast";
-import { socket } from "../socket.js";
+import { socket } from "../../socket.js";
 
 function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   const [games, setGames] = useState([]);

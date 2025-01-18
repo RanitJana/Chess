@@ -5,8 +5,8 @@ import NavBar from "../components/NavBar.jsx";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
-import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
-import CompletedGames from "../components/CompletedGames.jsx";
+import CurrentGamePreview from "../components/game/CurrentGamePreview.jsx";
+import CompletedGames from "../components/game/CompletedGames.jsx";
 import { sendFriendRequest, rejectFriendRequest } from "../api/friend.js";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { socket } from "../socket.js";
@@ -180,7 +180,9 @@ function Profile() {
                     src="/images/followers.png"
                     alt=""
                   />
-                  <span className="text-[0.85rem]">{user?.friendsCount || 0}</span>
+                  <span className="text-[0.85rem]">
+                    {user?.friendsCount || 0}
+                  </span>
                 </li>
                 {/* <li className="flex flex-col justify-center items-center">
                   <img

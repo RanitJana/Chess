@@ -1,14 +1,15 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import ChatInGame from "./ChatInGame.jsx";
+import ChatInGame from "../chat/ChatInGame.jsx";
 import Moves from "./Moves.jsx";
-import { useAuthContext } from "../context/AuthContext.jsx";
+import { useAuthContext } from "../../context/AuthContext.jsx";
 
 function Tab({ isActive, label, onClick }) {
   return (
     <li
-      className={`relative px-8 py-2 text-white border-b-[3px] transition ${isActive ? "border-white" : "border-transparent"
-        } cursor-pointer`}
+      className={`relative px-8 py-2 text-white border-b-[3px] transition ${
+        isActive ? "border-white" : "border-transparent"
+      } cursor-pointer`}
       onClick={onClick}
     >
       {label}
@@ -17,21 +18,21 @@ function Tab({ isActive, label, onClick }) {
 }
 
 function GameSideSection({ players }) {
-
   const { playerInfo } = useAuthContext();
   const [activeTab, setActiveTab] = useState(1);
   const [isViewer, setIsViewer] = useState(true);
 
   useEffect(() => {
-    if (!(playerInfo._id != players.player1._id &&
-      playerInfo._id != players.player2._id)) setIsViewer(false);
-
-  }, [players, playerInfo])
-
-
+    if (
+      !(
+        playerInfo._id != players.player1._id &&
+        playerInfo._id != players.player2._id
+      )
+    )
+      setIsViewer(false);
+  }, [players, playerInfo]);
 
   const renderContent = () => {
-
     if (isViewer) return <Moves />;
 
     switch (activeTab) {
@@ -50,14 +51,13 @@ function GameSideSection({ players }) {
           label="Moves"
           onClick={() => setActiveTab(0)}
         />
-        {
-          !isViewer &&
+        {!isViewer && (
           <Tab
             isActive={activeTab === 1}
             label="Chat"
             onClick={() => setActiveTab(1)}
           />
-        }
+        )}
       </ul>
       <div className="overflow-y-scroll h-full">{renderContent()}</div>
       <div className="flex gap-2 justify-between min-h-fit p-2 bg-[rgb(33,32,29)]">

@@ -11,64 +11,7 @@ import {
 import toast from "react-hot-toast";
 import { useSocketContext } from "../context/SocketContext.jsx";
 
-function PendingRequestSkeleton({ isLoading }) {
-  return (
-    <>
-      {isLoading && (
-        <div className="flex relative">
-          <div className="flex items-center gap-4 w-full">
-            <div className="w-[6rem] min-w-[5rem] aspect-square bg-[rgba(0,0,0,0.5)]"></div>
-            <div className="grid grid-rows-2 w-full">
-              <div>
-                <span className="text-white font-semibold hover:cursor-pointer">
-                  Loading...{" "}
-                </span>
-                <span className="text-gray-400 hover:cursor-pointer">
-                  (200)
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 w-full max-w-[20rem]">
-                <button className=" bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors">
-                  <img src="/images/cross.png" alt="" className="w-6" />
-                </button>
-                <button className=" bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors">
-                  <img src="/images/tick.png" alt="" className="w-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-function AcceptedFriendsSkeleton({ isLoading }) {
-  return (
-    <>
-      {isLoading && (
-        <div className="flex relative">
-          <div className="flex items-center gap-4 w-full">
-            <div className="w-[6rem] min-w-[5rem] aspect-square bg-[rgba(0,0,0,0.5)]"></div>
-            <div className="grid grid-rows-1 w-full">
-              <div>
-                <span className="text-white font-semibold hover:cursor-pointer">
-                  Loading...{" "}
-                </span>
-                <span className="text-gray-400 hover:cursor-pointer">
-                  (200)
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
 function ListFriend({ user, navigate, setFriends, isOnline }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
 
   const handleRejectFriendRequest = async function (modelId) {
@@ -98,13 +41,16 @@ function ListFriend({ user, navigate, setFriends, isOnline }) {
   };
 
   return (
-    <li key={user._id} className="flex justify-between">
+    <li
+      key={user._id}
+      className="justify-between flex flex-wrap sm:flex-row flex-col gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
+    >
       <div className="flex items-center gap-5">
         <div className="w-20 relative">
           <img
             src={user.avatar || "/images/user-pawn.gif"}
             alt="Dp"
-            className="w-20"
+            className="w-20 rounded-3xl"
           />
           {isOnline && (
             <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
@@ -125,34 +71,37 @@ function ListFriend({ user, navigate, setFriends, isOnline }) {
           </span>
         </div>
       </div>
-      <div className="relative">
-        <button
-          className="text-white bg-blackLight active:bg-blackDark text-center rounded-full w-[2rem] aspect-square flex items-center justify-center"
-          onClick={() => setIsOpen((prev) => !prev)}
+      <div className="relative flex items-center gap-2">
+        <div
+          title="Challange"
+          className="w-10 h-10 p-2 rounded-md hover:cursor-pointer hover:brightness-75 transition-all bg-[rgba(16,16,16,0.43)]"
         >
-          <img src="/images/more.png" alt="" className="w-4 invert rotate-90" />
-        </button>
-        {isOpen ? (
-          <ul className="absolute top-[2rem] pt-1 right-0 rounded-md w-[min(15rem,90dvw)] text-white overflow-hidden shadow-[3px_3px_6px_1px_rgba(0,0,0,0.5)]">
-            <li
-              className="flex justify-start rounded-md items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
-              onClick={() => handleRejectFriendRequest(user.modelId)}
-              style={{
-                opacity: isSubmit ? "0.5" : "1",
-                cursor: isSubmit ? "not-allowed" : "pointer",
-              }}
-            >
-              <img
-                src="/images/unfriend.png"
-                alt=""
-                className="w-[1.5rem] invert"
-              />
-              <span>Remove Friend</span>
-            </li>
-          </ul>
-        ) : (
-          ""
-        )}
+          <img
+            src="/images/challange.png"
+            alt=""
+            className="w-full h-full object-contain invert"
+          />
+        </div>
+        <div
+          title="Message"
+          className="w-10 h-10 p-2 rounded-md hover:cursor-pointer hover:brightness-75 transition-all bg-[rgba(16,16,16,0.43)]"
+        >
+          <img
+            src="/images/message.png"
+            alt=""
+            className="w-full h-full object-contain invert brightness-0"
+          />
+        </div>
+        <div
+          title="Unfriend"
+          className="w-10 h-10 p-2 rounded-md hover:cursor-pointer hover:brightness-75 transition-all bg-[rgba(16,16,16,0.43)]"
+        >
+          <img
+            src="/images/unfriend.png"
+            alt=""
+            className="w-full h-full object-contain invert"
+          />
+        </div>
       </div>
     </li>
   );
@@ -162,6 +111,7 @@ function Friends() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
+  const [openTab, setOpenTab] = useState(0);
   const [isSubmit, setIsSubmit] = useState(false);
   const [friends, setFriends] = useState({
     already: [],
@@ -255,8 +205,8 @@ function Friends() {
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
         {<NavBar />}
-        <p className="flex items-center justify-start gap-5 sm:p-0 pl-4">
-          <img src="/images/friends.png" alt="" />
+        <p className="flex items-center justify-start gap-2 sm:p-0 pl-4">
+          <img src="/images/friends.png" alt="" className="w-8" />
           <span className="font-bold text-white text-2xl">Friends</span>
         </p>
         <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6">
@@ -274,17 +224,52 @@ function Friends() {
               placeholder="Search by name"
             />
           </div>
-          <div>
-            <div>
-              <span className="text-white mr-2 font-semibold">
-                Friend requests
+
+          <div className="flex items-center gap-2 mb-[-0.5rem]">
+            <div
+              onClick={() => setOpenTab(() => 0)}
+              className={` min-w-[7rem] border-b-4 pb-3 px-2 hover:cursor-pointer transition-all ${openTab == 0 ? "border-b-white" : "border-b-transparent"}`}
+            >
+              <span className="text-white mr-2 font-semibold">Friends</span>
+              <span className="bg-blackLight text-white px-2 py-1 rounded-md">
+                {friends.already.length}
               </span>
+            </div>
+            <div
+              onClick={() => setOpenTab(() => 1)}
+              className={`min-w-[7rem] border-b-4 pb-3 px-2 hover:cursor-pointer transition-all ${openTab == 1 ? "border-b-white" : "border-b-transparent"}`}
+            >
+              <span className="text-white mr-2 font-semibold">Requests</span>
               <span className="bg-blackLight text-white px-2 py-1 rounded-md">
                 {friends.pending.length}
               </span>
             </div>
           </div>
-          {friends.pending?.length ? (
+          {isLoading ? (
+            <div className="w-full flex items-center justify-center py-10">
+              <span className="loader"></span>
+            </div>
+          ) : openTab == 0 ? (
+            friends.already?.length ? (
+              <ul className="flex flex-col">
+                {friends.already.map((user) => {
+                  return (
+                    <ListFriend
+                      key={user._id}
+                      user={user}
+                      navigate={navigate}
+                      setFriends={setFriends}
+                      isOnline={onlineUsers?.[user._id]}
+                    />
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="w-full text-center text-white bg-[rgba(26,26,26,0.34)] h-[8rem] py-10">
+                No Friends
+              </div>
+            )
+          ) : friends.pending?.length ? (
             <ul className="flex flex-col gap-7">
               {friends.pending.map((user) => {
                 return (
@@ -358,35 +343,10 @@ function Friends() {
               })}
             </ul>
           ) : (
-            ""
-          )}
-          {/* <PendingRequestSkeleton isLoading={isLoading} /> */}
-          <div>
-            <div>
-              <span className="text-white mr-2 font-semibold">Friends</span>
-              <span className="bg-blackLight text-white px-2 py-1 rounded-md">
-                {friends.already.length}
-              </span>
+            <div className="w-full text-center text-white bg-[rgba(26,26,26,0.34)] h-[8rem] py-10">
+              No request
             </div>
-          </div>
-          {friends.already?.length ? (
-            <ul className="flex flex-col gap-7">
-              {friends.already.map((user) => {
-                return (
-                  <ListFriend
-                    key={user._id}
-                    user={user}
-                    navigate={navigate}
-                    setFriends={setFriends}
-                    isOnline={onlineUsers?.[user._id]}
-                  />
-                );
-              })}
-            </ul>
-          ) : (
-            ""
           )}
-          <AcceptedFriendsSkeleton isLoading={isLoading} />
         </div>
       </div>
     </div>

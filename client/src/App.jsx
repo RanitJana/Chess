@@ -16,7 +16,6 @@ export default function App() {
   useEffect(() => {
     // function toggleFullscreen() {
     //   const element = document.documentElement;
-
     //   try {
     //     if (!document.fullscreenElement &&    // Standard
     //       !document.webkitFullscreenElement &&  // Safari
@@ -46,12 +45,10 @@ export default function App() {
     //     }
     //   } catch (error) {
     //     console.log(error);
-
     //   }
     // }
-
     // toggleFullscreen();
-  }, [])
+  }, []);
 
   return (
     <>

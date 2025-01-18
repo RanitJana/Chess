@@ -1,12 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, createContext, useContext } from "react";
-import ChessBoard from "../components/ChessBoard.jsx";
+import ChessBoard from "../components/game/ChessBoard.jsx";
 import { useParams } from "react-router";
 import { gameSingle } from "../api/game.js";
 import { socket } from "../socket.js";
-import GameSideSection from "../components/GameSideSection.jsx";
-import WinnerBoard from "../components/WinnerBoard.jsx";
+import GameSideSection from "../components/game/GameSideSection.jsx";
+import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
 
 const GameContext = createContext();

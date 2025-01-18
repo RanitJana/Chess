@@ -2,8 +2,8 @@ import { useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { gameInit } from "../api/game.js";
 import { toast } from "react-hot-toast";
-import CurrentGamePreview from "../components/CurrentGamePreview.jsx";
-import CompletedGames from "../components/CompletedGames.jsx";
+import CurrentGamePreview from "../components/game/CurrentGamePreview.jsx";
+import CompletedGames from "../components/game/CompletedGames.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 
@@ -47,7 +47,14 @@ function Home() {
             alt="Chess Board"
             className="w-[min(28rem,100%)] h-full"
           /> */}
-          <video src="/videos/chess.mp4" autoPlay loop muted autoFocus className="w-full h-full object-cover"></video>
+          <video
+            src="/videos/chess.mp4"
+            autoPlay
+            loop
+            muted
+            autoFocus
+            className="w-full h-full object-cover"
+          ></video>
         </div>
         <div className="max-w-[30rem] flex flex-col items-center text-center pb-5">
           <h2 className="text-white font-extrabold md:text-[3.2rem] md:mt-0 mt-[-1rem] text-[2rem] md:leading-[3.5rem] leading-[2rem]">
@@ -69,7 +76,11 @@ function Home() {
               className={`bg-blackDark ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
               onClick={handleClick}
             >
-              <img src="/images/play.svg" alt="Play Icon" className="w-[3rem]" />
+              <img
+                src="/images/play.svg"
+                alt="Play Icon"
+                className="w-[3rem]"
+              />
               <div className="flex flex-col items-start">
                 <span className="text-xl">New Game</span>
               </div>
@@ -77,9 +88,12 @@ function Home() {
             <button
               disabled={isCreatingGame}
               className={`bg-blackDark ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
-
             >
-              <img src="/images/handshake.svg" alt="Play Icon" className="w-[3rem]" />
+              <img
+                src="/images/handshake.svg"
+                alt="Play Icon"
+                className="w-[3rem]"
+              />
               <div className="flex flex-col items-start">
                 <span className="text-xl">Play a friend</span>
               </div>

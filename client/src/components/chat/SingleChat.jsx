@@ -160,10 +160,7 @@ function SingleChat({
           const response = await axios.get(
             `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`
           );
-          console.log(response);
-
           if (response.data) setLinkInfo(response.data);
-          // console.log(response.data.data);
         }
       } catch (error) {
         // console.error("Error fetching the URL:", error.message);

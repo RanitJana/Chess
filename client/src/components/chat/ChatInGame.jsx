@@ -3,17 +3,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-hot-toast";
-import { socket } from "../socket.js";
+import { socket } from "../../socket.js";
 import "./Chat.css";
-import { encryptMessage } from "../utils/encryptDecryptMessage.js";
-import { useGameContext } from "../pages/Game.jsx";
+import { encryptMessage } from "../../utils/encryptDecryptMessage.js";
+import { useGameContext } from "../../pages/Game.jsx";
 import EmojiPicker from "emoji-picker-react";
-import { useAuthContext } from "../context/AuthContext.jsx";
-import { messageGet, messageReaction, messagePost } from "../api/message.js";
+import { useAuthContext } from "../../context/AuthContext.jsx";
+import { messageGet, messageReaction, messagePost } from "../../api/message.js";
 import { useParams } from "react-router";
-import { decryptMessage } from "../utils/encryptDecryptMessage.js";
+import { decryptMessage } from "../../utils/encryptDecryptMessage.js";
 import SingleChat from "./SingleChat.jsx";
-import showNotification from "../utils/Notification.js";
+import showNotification from "../../utils/Notification.js";
 
 const EmojiPickerComponent = ({ onEmojiClick }) => (
   <EmojiPicker
@@ -36,7 +36,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
 const EmojiPickerComponentForReaction = ({
   onEmojiClick,
   setIsOpenReactionMore,
-  isOpenReactionMore
+  isOpenReactionMore,
 }) => (
   <div className="w-full">
     <div className="flex justify-center items-center w-full p-2">
@@ -48,8 +48,7 @@ const EmojiPickerComponentForReaction = ({
       </div>
     </div>
     <div className="bg-gray-800 h-full">
-      {
-        isOpenReactionMore &&
+      {isOpenReactionMore && (
         <EmojiPicker
           emojiStyle="native"
           previewConfig={{ showPreview: false }}
@@ -65,7 +64,7 @@ const EmojiPickerComponentForReaction = ({
           lazyLoadEmojis={true}
           onEmojiClick={onEmojiClick}
         />
-      }
+      )}
     </div>
   </div>
 );
@@ -445,10 +444,11 @@ function ChatInGame() {
         className="absolute w-full h-full top-0 brightness-[25%] object-cover"
       />
 
-      <div className="absolute bottom-0 left-0 w-full flex z-[1000] h-[80%] overflow-hidden"
+      <div
+        className="absolute bottom-0 left-0 w-full flex z-[1000] h-[80%] overflow-hidden"
         style={{
           height: isOpenReactionMore ? "80%" : "0",
-          transition: "height 0.5s ease"
+          transition: "height 0.5s ease",
         }}
       >
         <MemoizedEmojiPickerForReaction
@@ -630,9 +630,9 @@ function ChatInGame() {
                     }))
                   }
                   onBlur={() =>
-                  (allRefs.current.typingRef = setTimeout(() => {
-                    socket.emit("not-typing", userId);
-                  }, 100))
+                    (allRefs.current.typingRef = setTimeout(() => {
+                      socket.emit("not-typing", userId);
+                    }, 100))
                   }
                 />
               </div>

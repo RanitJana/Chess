@@ -1,5 +1,5 @@
-import { useGameContext } from "../pages/Game.jsx";
-import convertToChessNotation from "../utils/ChessNotation.js";
+import { useGameContext } from "../../pages/Game.jsx";
+import convertToChessNotation from "../../utils/ChessNotation.js";
 
 function Moves() {
   const { allMoves } = useGameContext();
