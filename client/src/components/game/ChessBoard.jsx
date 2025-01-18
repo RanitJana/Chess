@@ -138,7 +138,25 @@ export default function ChessBoard() {
       <div className="flex justify-between items-center">
         <div className="flex py-2 gap-4">
           <div className=" relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
-            <img src="/images/user-pawn.gif" alt="" />
+            {playerInfo._id != players.player1._id ? (
+              <img
+                src={
+                  players.player1?.avatar ||
+                  `https://robohash.org/${players.player1?.name}` ||
+                  "/images/user-pawn.gif"
+                }
+                alt=""
+              />
+            ) : (
+              <img
+                src={
+                  players.player2?.avatar ||
+                  `https://robohash.org/${players.player2?.name}` ||
+                  "/images/user-pawn.gif"
+                }
+                alt=""
+              />
+            )}
             {playerColor == "white" && onlineUsers[players.player2._id] && (
               <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
             )}
@@ -214,11 +232,29 @@ export default function ChessBoard() {
       <div className="flex justify-between items-center">
         <div className="flex py-2 gap-4">
           <div className="relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
-            <img src="/images/user-pawn.gif" alt="" />
-            {playerColor == "white" && onlineUsers[players.player2._id] && (
+            {playerInfo._id != players.player1._id ? (
+              <img
+                src={
+                  players.player2?.avatar ||
+                  `https://robohash.org/${players.player2?.name}` ||
+                  "/images/user-pawn.gif"
+                }
+                alt=""
+              />
+            ) : (
+              <img
+                src={
+                  players.player1?.avatar ||
+                  `https://robohash.org/${players.player1?.name}` ||
+                  "/images/user-pawn.gif"
+                }
+                alt=""
+              />
+            )}
+            {playerColor == "white" && onlineUsers[players.player1._id] && (
               <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
             )}
-            {playerColor == "black" && onlineUsers[players.player1._id] && (
+            {playerColor == "black" && onlineUsers[players.player2._id] && (
               <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
             )}
           </div>

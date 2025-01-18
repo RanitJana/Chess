@@ -130,12 +130,16 @@ function Profile() {
             <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full rounded-sm overflow-hidden aspect-square">
               <div className="relative">
                 <img
-                  className=""
-                  src={user?.avatar || "/images/user-pawn.gif"}
+                  className=" bg-white rounded-xl"
+                  src={
+                    user
+                      ? user?.avatar || `https://robohash.org/${user?.name}`
+                      : "/images/user-pawn.gif"
+                  }
                   alt=""
                 />
                 {onlineUsers[userId] ? (
-                  <div className="absolute bg-green-600 w-7 aspect-square right-0 bottom-0"></div>
+                  <div className="absolute bg-green-600 w-7 aspect-square right-0 bottom-0 rounded-br-xl"></div>
                 ) : (
                   ""
                 )}

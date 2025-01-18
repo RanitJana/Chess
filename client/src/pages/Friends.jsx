@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar.jsx";
@@ -10,112 +9,7 @@ import {
 } from "../api/friend.js";
 import toast from "react-hot-toast";
 import { useSocketContext } from "../context/SocketContext.jsx";
-
-function ListFriend({ user, navigate, setFriends, isOnline }) {
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [isSubmit, setIsSubmit] = useState(false);
-
-  const handleRejectFriendRequest = async function (modelId) {
-    if (isSubmit) return;
-
-    try {
-      setIsSubmit(true);
-      let response = await rejectFriendRequest({ modelId });
-
-      if (response) {
-        if (response.data.success) {
-          toast.success("Friend Removed");
-          setFriends((prev) => {
-            return {
-              already: prev.already.filter((prev) => prev.modelId != modelId),
-              pending: prev.pending,
-            };
-          });
-        } else toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Please try again");
-    } finally {
-      setIsSubmit(false);
-    }
-  };
-
-  return (
-    <li
-      key={user._id}
-      className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
-    >
-      <div className="flex items-center gap-5">
-        <div className="w-20 relative">
-          <img
-            src={user.avatar || "/images/user-pawn.gif"}
-            alt="Dp"
-            className="w-20 rounded-xl"
-          />
-          {isOnline && (
-            <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
-          )}
-        </div>
-        <div>
-          <span
-            className="text-white font-semibold hover:cursor-pointer"
-            onClick={() => navigate(`/member/${user._id}`)}
-          >
-            {user.name}{" "}
-          </span>
-          <span
-            className="text-gray-400 hover:cursor-pointer"
-            onClick={() => navigate(`/member/${user._id}`)}
-          >
-            ({user.rating})
-          </span>
-        </div>
-      </div>
-      <div className="absolute right-3 z-20">
-        <img onClick={() => setIsMoreOpen(prev => !prev)} src="/images/more.png" alt="" className="invert rotate-90 w-8 p-2 bg-[rgba(255,255,255,0.26)] rounded-full hover:cursor-pointer" />
-        {
-          isMoreOpen && <div className="absolute right-10 top-0 bg-blackDarkest flex shadow-lg flex-col rounded-lg overflow-hidden items-start">
-            <div
-              title="Challange"
-              className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
-            >
-              <img
-                src="/images/challange.png"
-                alt=""
-                className="w-4 object-contain invert"
-              />
-              <span className="text-white">Challange</span>
-            </div>
-            <div
-              title="Message"
-              className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
-            >
-              <img
-                src="/images/message.png"
-                alt=""
-                className="w-4 object-contain invert brightness-0"
-              />
-              <span className="text-white">Message</span>
-            </div>
-            <div
-              title="Unfriend"
-              className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
-            >
-              <img
-                src="/images/unfriend.png"
-                alt=""
-                className="w-4 object-contain invert"
-              />
-              <span className="text-white">Unfriend</span>
-            </div>
-          </div>
-        }
-      </div>
-
-    </li>
-  );
-}
+import ListFriend from "../components/ListFriend.jsx";
 
 function Friends() {
   const { userId } = useParams();
@@ -238,7 +132,7 @@ function Friends() {
           <div className="flex items-center gap-2 mb-[-0.5rem]">
             <div
               onClick={() => setOpenTab(() => 0)}
-              className={` min-w-[7rem] border-b-4 pb-3 px-2 hover:cursor-pointer transition-all ${openTab == 0 ? "border-b-white" : "border-b-transparent"}`}
+              className={` min-w-[7rem] border-b-4 pb-3 px-2 hover:cursor-pointer transition-all  ${openTab == 0 ? "border-b-white" : "border-b-transparent"}`}
             >
               <span className="text-white mr-2 font-semibold">Friends</span>
               <span className="bg-blackLight text-white px-2 py-1 rounded-md">
@@ -283,17 +177,27 @@ function Friends() {
             <ul className="flex flex-col gap-7">
               {friends.pending.map((user) => {
                 return (
-                  <li key={user._id} className="flex relative">
+                  <li
+                    key={user._id}
+                    className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
+                  >
                     <div className="flex items-center gap-4 w-full">
                       <div className="relative w-[6rem] min-w-[5rem]">
-                        <img
-                          src={user.avatar || "/images/user-pawn.gif"}
-                          alt="Dp"
-                          className="w-full h-full"
-                        />
-                        {onlineUsers[user._id] && (
-                          <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
-                        )}
+                        <div className="w-20 relative">
+                          <img
+                            src={
+                              user
+                                ? user.avatar ||
+                                  `https://robohash.org/${user.name}`
+                                : "/images/user-pawn.gif"
+                            }
+                            alt="Dp"
+                            className="w-20 rounded-xl"
+                          />
+                          {onlineUsers[user._id] && (
+                            <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600 rounded-br-xl"></div>
+                          )}
+                        </div>
                       </div>
                       <div className="grid grid-rows-2 w-full">
                         <div>

@@ -122,7 +122,14 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
                 <div className="flex items-center p-2 bg-blackDark transition-all group-hover:bg-[rgb(58,56,54)]">
                   {/* <div className="h-10 w-10 bg-white rounded-full" /> */}
                   <div className="h-10 aspect-square rounded-sm bg-white overflow-hidden">
-                    <img src="/images/user-pawn.gif" alt="" />
+                    <img
+                      src={
+                        player?.avatar ||
+                        `https://robohash.org/${player?.name}` ||
+                        "/images/user-pawn.gif"
+                      }
+                      alt=""
+                    />
                   </div>
 
                   <div className="pl-2 text-white">
