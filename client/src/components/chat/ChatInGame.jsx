@@ -20,7 +20,7 @@ const EmojiPickerComponent = ({ onEmojiClick }) => (
     previewConfig={{ showPreview: false }}
     theme="dark"
     autoFocusSearch={false}
-    emojiStyle="native"
+    emojiStyle="apple"
     style={{
       position: "absolute",
       bottom: "3.5rem",
@@ -50,7 +50,7 @@ const EmojiPickerComponentForReaction = ({
     <div className="bg-gray-800 h-full">
       {isOpenReactionMore && (
         <EmojiPicker
-          emojiStyle="native"
+          emojiStyle="apple"
           previewConfig={{ showPreview: false }}
           theme="dark"
           autoFocusSearch={false}
