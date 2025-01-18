@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { useSocketContext } from "../context/SocketContext.jsx";
 
 function ListFriend({ user, navigate, setFriends, isOnline }) {
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
 
   const handleRejectFriendRequest = async function (modelId) {
@@ -43,14 +44,14 @@ function ListFriend({ user, navigate, setFriends, isOnline }) {
   return (
     <li
       key={user._id}
-      className="justify-between flex flex-wrap sm:flex-row flex-col gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
+      className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
     >
       <div className="flex items-center gap-5">
         <div className="w-20 relative">
           <img
             src={user.avatar || "/images/user-pawn.gif"}
             alt="Dp"
-            className="w-20 rounded-3xl"
+            className="w-20 rounded-xl"
           />
           {isOnline && (
             <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
@@ -71,38 +72,47 @@ function ListFriend({ user, navigate, setFriends, isOnline }) {
           </span>
         </div>
       </div>
-      <div className="relative flex items-center gap-2">
-        <div
-          title="Challange"
-          className="w-10 h-10 p-2 rounded-md hover:cursor-pointer hover:brightness-75 transition-all bg-[rgba(16,16,16,0.43)]"
-        >
-          <img
-            src="/images/challange.png"
-            alt=""
-            className="w-full h-full object-contain invert"
-          />
-        </div>
-        <div
-          title="Message"
-          className="w-10 h-10 p-2 rounded-md hover:cursor-pointer hover:brightness-75 transition-all bg-[rgba(16,16,16,0.43)]"
-        >
-          <img
-            src="/images/message.png"
-            alt=""
-            className="w-full h-full object-contain invert brightness-0"
-          />
-        </div>
-        <div
-          title="Unfriend"
-          className="w-10 h-10 p-2 rounded-md hover:cursor-pointer hover:brightness-75 transition-all bg-[rgba(16,16,16,0.43)]"
-        >
-          <img
-            src="/images/unfriend.png"
-            alt=""
-            className="w-full h-full object-contain invert"
-          />
-        </div>
+      <div className="absolute right-3 z-20">
+        <img onClick={() => setIsMoreOpen(prev => !prev)} src="/images/more.png" alt="" className="invert rotate-90 w-8 p-2 bg-[rgba(255,255,255,0.26)] rounded-full hover:cursor-pointer" />
+        {
+          isMoreOpen && <div className="absolute right-10 top-0 bg-blackDarkest flex shadow-lg flex-col rounded-lg overflow-hidden items-start">
+            <div
+              title="Challange"
+              className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
+            >
+              <img
+                src="/images/challange.png"
+                alt=""
+                className="w-4 object-contain invert"
+              />
+              <span className="text-white">Challange</span>
+            </div>
+            <div
+              title="Message"
+              className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
+            >
+              <img
+                src="/images/message.png"
+                alt=""
+                className="w-4 object-contain invert brightness-0"
+              />
+              <span className="text-white">Message</span>
+            </div>
+            <div
+              title="Unfriend"
+              className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
+            >
+              <img
+                src="/images/unfriend.png"
+                alt=""
+                className="w-4 object-contain invert"
+              />
+              <span className="text-white">Unfriend</span>
+            </div>
+          </div>
+        }
       </div>
+
     </li>
   );
 }
@@ -209,8 +219,8 @@ function Friends() {
           <img src="/images/friends.png" alt="" className="w-8" />
           <span className="font-bold text-white text-2xl">Friends</span>
         </p>
-        <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6">
-          <div className="relative flex w-full">
+        <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6 sm:pt-10 pt-10">
+          <div className="relative flex w-full rounded-3xl overflow-hidden">
             <img
               src="/images/search.png"
               alt=""
