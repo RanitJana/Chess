@@ -23,7 +23,7 @@ const EmojiPickerComponent = ({ onEmojiClick, isEmojiPickerTrue }) => (
       previewConfig={{ showPreview: false }}
       theme="dark"
       autoFocusSearch={false}
-      emojiStyle="apple"
+      emojiStyle="facebook"
       searchDisabled
       style={{
         height: "100%",
@@ -52,7 +52,7 @@ const EmojiPickerComponentForReaction = ({
     </div>
     <div className="bg-gray-800 h-full">
       <EmojiPicker
-        emojiStyle="apple"
+        emojiStyle="facebook"
         previewConfig={{ showPreview: false }}
         theme="dark"
         autoFocusSearch={false}
@@ -70,10 +70,6 @@ const EmojiPickerComponentForReaction = ({
     </div>
   </div>
 );
-
-const cleanUpSocketEvents = (events) => {
-  events.forEach(([event, listener]) => socket.off(event, listener));
-};
 
 const MemoizedEmojiPicker = React.memo(EmojiPickerComponent);
 const MemoizedEmojiPickerForReaction = React.memo(
@@ -99,6 +95,10 @@ function ChatInGame() {
 
   const [text, setText] = useState("");
 
+  const cleanUpSocketEvents = useCallback((events) => {
+    events.forEach(([event, listener]) => socket.off(event, listener));
+  }, []);
+
   // {
   //   text: "Hey ranit what's up. How are you?",
   //   _id: 123,
@@ -123,45 +123,24 @@ function ChatInGame() {
         const { success, info, hasMore } = response.data;
         setTrueFalseStates((prev) => ({ ...prev, hasMoreMessages: hasMore }));
         if (success) {
-          if (allMessage)
-            setAllMessage((prev) => {
-              return [
-                ...info.map((value) => ({
-                  _id: value._id,
-                  senderId: value.senderId,
-                  message: decryptMessage(value.content),
-                  createdAt: value.createdAt,
-                  updatedAt: value.updatedAt,
-                  reaction: value.reaction,
-                  mentionText: {
-                    text: value.mentionText
-                      ? decryptMessage(value.mentionText?.content)
-                      : null,
-                    _id: value.mentionText?._id,
-                    owner: value.mentionText?.senderId,
-                  },
-                })),
-                ...prev,
-              ];
-            });
-          else
-            setAllMessage(() => {
-              return info.map((value) => ({
-                _id: value._id,
-                senderId: value.senderId,
-                message: decryptMessage(value.content),
-                createdAt: value.createdAt,
-                updatedAt: value.updatedAt,
-                reaction: value.reaction,
-                mentionText: {
-                  text: value.mentionText
-                    ? decryptMessage(value.mentionText?.content)
-                    : null,
-                  _id: value.mentionText?._id,
-                  owner: value.mentionText?.senderId,
-                },
-              }));
-            });
+          const decryptedMessages = info.map((value) => ({
+            _id: value._id,
+            senderId: value.senderId,
+            message: decryptMessage(value.content),
+            createdAt: value.createdAt,
+            updatedAt: value.updatedAt,
+            reaction: value.reaction,
+            mentionText: {
+              text: value.mentionText
+                ? decryptMessage(value.mentionText.content)
+                : null,
+              _id: value.mentionText?._id,
+              owner: value.mentionText?.senderId,
+            },
+          }));
+          setAllMessage((prev) =>
+            prev?.length ? [...decryptedMessages, ...prev] : decryptedMessages
+          );
         } else setAllMessage([]);
       }
     } catch (error) {
@@ -189,12 +168,11 @@ function ChatInGame() {
       mentionText,
     };
 
-    setMentionText(() => null);
+    setMentionText(null);
+    setAllMessage((prev) => [...prev, info]);
+    setText("");
 
     try {
-      setAllMessage((prev) => [...prev, info]);
-      setText(() => "");
-
       socket.emit("new-message", {
         ...{ ...info, mentionText },
         message: encryptedText,
@@ -230,7 +208,7 @@ function ChatInGame() {
       console.error(error);
       toast.error("Unable to send the message");
     }
-  }, [gameId, opponent, text, userId]);
+  }, [gameId, text, userId, mentionText]);
 
   const handleEmojiClick = useCallback(
     (emojiObject) => {
@@ -248,29 +226,32 @@ function ChatInGame() {
     );
   }
 
-  const scrollChatElementBottom = function () {
-    const chatSectionRefCurrent = allRefs.current.chatSectionRef;
+  const scrollChatElementBottom = useCallback(
+    function () {
+      const chatSectionRefCurrent = allRefs.current.chatSectionRef;
 
-    if (chatSectionRefCurrent) {
-      if (isAtBottom(chatSectionRefCurrent, 200)) {
-        setTimeout(() => {
-          chatSectionRefCurrent.scrollTo({
-            top: chatSectionRefCurrent.scrollHeight,
-            behavior: "smooth",
-          });
-        }, 100);
+      if (chatSectionRefCurrent) {
+        if (isAtBottom(chatSectionRefCurrent, 100)) {
+          setTimeout(() => {
+            chatSectionRefCurrent.scrollTo({
+              top: chatSectionRefCurrent.scrollHeight,
+              behavior: "smooth",
+            });
+          }, 100);
+        }
       }
-    }
-  };
+    },
+    [isAtBottom]
+  );
 
-  const adjustHeight = () => {
+  const adjustHeight = useCallback(() => {
     const textarea = allRefs.current.textareaRef;
     if (textarea) {
       textarea.style.height = "auto"; // Reset height
       textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`; // Adjust to content
       scrollChatElementBottom();
     }
-  };
+  }, []);
 
   const handleScroll = () => {
     const container = allRefs.current.chatSectionRef;
@@ -406,30 +387,33 @@ function ChatInGame() {
     scrollChatElementBottom();
   }, [mentionText]);
 
-  const handleReaction = async (messageId, reaction, triggerStates) => {
-    try {
-      triggerStates.forEach((state) => state(false));
-      const response = await messageReaction(messageId, { reaction });
-      if (response.data) {
-        const { success, reaction } = response.data;
-        if (success) {
-          setAllMessage((prev) =>
-            prev.map((val) => {
-              if (val._id != messageId) return val;
-              return { ...val, reaction };
-            })
-          );
-          socket.emit("chat-reaction", {
-            senderId: userId,
-            messageId,
-            reaction,
-          });
+  const handleReaction = useCallback(
+    async (messageId, reaction, triggerStates) => {
+      try {
+        triggerStates.forEach((state) => state(false));
+        const response = await messageReaction(messageId, { reaction });
+        if (response.data) {
+          const { success, reaction } = response.data;
+          if (success) {
+            setAllMessage((prev) =>
+              prev.map((val) => {
+                if (val._id != messageId) return val;
+                return { ...val, reaction };
+              })
+            );
+            socket.emit("chat-reaction", {
+              senderId: userId,
+              messageId,
+              reaction,
+            });
+          }
         }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    },
+    [gameId]
+  );
 
   async function passReactionReference(emojiObject) {
     await handleReaction(reactionMessageId, emojiObject.emoji, [
@@ -566,7 +550,7 @@ function ChatInGame() {
                   </div>
                 </div>
                 <div className="w-full relative flex items-end text-white outline-none">
-                  <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
+                  <div className="active:bg-[rgba(255,255,255,0.14)] transition-colors rounded-full min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
                     <img
                       src="/images/smile.png"
                       alt="E"
