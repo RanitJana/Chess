@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
 import { useContext, createContext, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // Import useLocation
+import { useLocation, Navigate } from "react-router-dom"; // Import useLocation
 import { verify } from "../api/auth";
 import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
@@ -36,7 +36,7 @@ export default function AuthContext({ children }) {
     };
 
     handleVerify();
-  }, []);
+  }, [location.pathname]);
 
   return (
     <authContext.Provider
@@ -56,14 +56,14 @@ export default function AuthContext({ children }) {
             <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
               <span className="loader"></span>
             </div>
+          ) : location.pathname == "/login" ? (
+            <Login />
+          ) : Location.pathname == "/signup" ? (
+            <SignUp />
           ) : isAuth ? (
             children
-          ) : location.pathname === "/login" ? ( // Check the current route
-            <Login />
-          ) : location.pathname === "/signup" ? (
-            <SignUp />
           ) : (
-            <Login /> // Default to Login if the path doesn't match
+            <Navigate to={"/login"} />
           )}
         </div>
       </div>

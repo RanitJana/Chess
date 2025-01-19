@@ -15,22 +15,25 @@ import { decryptMessage } from "../../utils/encryptDecryptMessage.js";
 import SingleChat from "./SingleChat.jsx";
 import showNotification from "../../utils/Notification.js";
 
-const EmojiPickerComponent = ({ onEmojiClick }) => (
-  <EmojiPicker
-    previewConfig={{ showPreview: false }}
-    theme="dark"
-    autoFocusSearch={false}
-    emojiStyle="apple"
-    style={{
-      position: "absolute",
-      bottom: "3.5rem",
-      left: "0.5rem",
-      height: "25rem",
-      width: "18rem",
-    }}
-    lazyLoadEmojis={true}
-    onEmojiClick={onEmojiClick}
-  />
+const EmojiPickerComponent = ({ onEmojiClick, isEmojiPickerTrue }) => (
+  <div
+    className={`w-full ${isEmojiPickerTrue ? "h-[17rem]" : "h-0"} transition-all `}
+  >
+    <EmojiPicker
+      previewConfig={{ showPreview: false }}
+      theme="dark"
+      autoFocusSearch={false}
+      emojiStyle="apple"
+      searchDisabled
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+      lazyLoadEmojis={true}
+      open={isEmojiPickerTrue}
+      onEmojiClick={onEmojiClick}
+    />
+  </div>
 );
 
 const EmojiPickerComponentForReaction = ({
@@ -48,23 +51,22 @@ const EmojiPickerComponentForReaction = ({
       </div>
     </div>
     <div className="bg-gray-800 h-full">
-      {isOpenReactionMore && (
-        <EmojiPicker
-          emojiStyle="apple"
-          previewConfig={{ showPreview: false }}
-          theme="dark"
-          autoFocusSearch={false}
-          searchDisabled={true}
-          skinTonesDisabled={true}
-          style={{
-            position: "absolute",
-            height: "90%",
-            width: "100%",
-          }}
-          lazyLoadEmojis={true}
-          onEmojiClick={onEmojiClick}
-        />
-      )}
+      <EmojiPicker
+        emojiStyle="apple"
+        previewConfig={{ showPreview: false }}
+        theme="dark"
+        autoFocusSearch={false}
+        searchDisabled={true}
+        skinTonesDisabled={true}
+        open={isOpenReactionMore}
+        style={{
+          position: "absolute",
+          height: "90%",
+          width: "100%",
+        }}
+        lazyLoadEmojis={true}
+        onEmojiClick={onEmojiClick}
+      />
     </div>
   </div>
 );
@@ -457,23 +459,6 @@ function ChatInGame() {
           setIsOpenReactionMore={setIsOpenReactionMore}
         />
       </div>
-      {/* scroll to bottom */}
-      <div
-        onClick={() => {
-          const chatSectionRefCurrent = allRefs.current.chatSectionRef;
-          if (!chatSectionRefCurrent) return;
-          chatSectionRefCurrent.scrollTo({
-            top: chatSectionRefCurrent.scrollHeight,
-            behavior: "smooth",
-          });
-        }}
-        className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[1rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] bottom-[5rem]"
-        style={{
-          scale: chatSectionBottom ? "0" : "1",
-        }}
-      >
-        <img src="/images/double.png" alt="" className="w-5" />
-      </div>
       {/* Chat Messages */}
       {allMessage ? (
         <div className="absolute top-0 h-full flex flex-col w-full">
@@ -541,112 +526,134 @@ function ChatInGame() {
           </div>
 
           {/* Input Box */}
-          <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
-            <div
-              className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl"
-              style={{
-                borderTopLeftRadius: mentionText ? "1rem" : "1.5rem",
-                borderTopRightRadius: mentionText ? "1rem" : "1.5rem",
-              }}
-            >
-              {/* mention text */}
+          <div className="w-full relative">
+            <div className="w-full relative grid grid-cols-[auto_3rem] gap-2 items-end p-2 pt-1">
               <div
-                className={`bg-[rgb(17,26,33)] rounded-xl  ${mentionText ? "opacity-100 m-[0.15rem]" : "h-0 opacity-0"} transition-opacity overflow-hidden`}
+                className="w-full p-1 bg-[rgb(42,56,67)] rounded-3xl"
+                style={{
+                  borderTopLeftRadius: mentionText ? "1rem" : "1.5rem",
+                  borderTopRightRadius: mentionText ? "1rem" : "1.5rem",
+                }}
               >
-                <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
-                  <div className="flex items-center justify-between w-full px-2 py-1">
-                    <span className="text-[rgb(13,160,157)] font-bold transition-all">
-                      {mentionText?.owner}
-                    </span>
+                {/* mention text */}
+                <div
+                  className={`bg-[rgb(17,26,33)] rounded-xl  ${mentionText ? "opacity-100 m-[0.15rem]" : "h-0 opacity-0"} transition-opacity overflow-hidden`}
+                >
+                  <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
+                    <div className="flex items-center justify-between w-full px-2 py-1">
+                      <span className="text-[rgb(13,160,157)] font-bold transition-all">
+                        {mentionText?.owner}
+                      </span>
+                      <span
+                        className="text-white hover:cursor-pointer"
+                        onClick={() => {
+                          setMentionText(() => null);
+                        }}
+                      >
+                        <img
+                          src="/images/cross.png"
+                          alt="x"
+                          decoding="sync"
+                          className="w-4"
+                        />
+                      </span>
+                    </div>
                     <span
-                      className="text-white hover:cursor-pointer"
-                      onClick={() => {
-                        setMentionText(() => null);
-                      }}
+                      className={`px-2 pb-1 w-[99%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty mb-1`}
                     >
-                      <img
-                        src="/images/cross.png"
-                        alt="x"
-                        decoding="sync"
-                        className="w-4"
-                      />
+                      {mentionText?.text}
                     </span>
                   </div>
-                  <span
-                    className={`px-2 pb-1 w-[99%] text-[rgb(114,104,96)] line-clamp-3 break-all text-pretty mb-1`}
-                  >
-                    {mentionText?.text}
-                  </span>
                 </div>
-              </div>
-              <div className="w-full relative flex items-end text-white outline-none">
-                <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
-                  <img
-                    src="/images/smile.png"
-                    alt="E"
-                    onClick={() =>
+                <div className="w-full relative flex items-end text-white outline-none">
+                  <div className="min-w-[2.5rem] w-[2.5rem] h-full hover:cursor-pointer p-1">
+                    <img
+                      src="/images/smile.png"
+                      alt="E"
+                      onClick={() =>
+                        setTrueFalseStates((prev) => ({
+                          ...prev,
+                          isEmojiPickerTrue: !prev.isEmojiPickerTrue,
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
+                  <textarea
+                    ref={(el) => (allRefs.current.textareaRef = el)}
+                    type="text"
+                    value={text}
+                    onChange={(e) => {
+                      setText(e.target.value);
+                      adjustHeight();
+                    }}
+                    rows={1}
+                    className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
+                    placeholder="Message"
+                    onKeyDown={(e) => {
+                      if (allRefs.current.typingRef)
+                        clearTimeout(allRefs.current.typingRef);
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        socket.emit("not-typing", userId);
+                        handleSendMessage();
+                      } else {
+                        socket.emit("typing", { userId, gameId });
+                      }
+                    }}
+                    onKeyUp={() => {
+                      allRefs.current.typingRef = setTimeout(() => {
+                        socket.emit("not-typing", userId);
+                      }, 1500);
+                    }}
+                    onFocus={() =>
                       setTrueFalseStates((prev) => ({
                         ...prev,
-                        isEmojiPickerTrue: !prev.isEmojiPickerTrue,
+                        isEmojiPickerTrue: false,
                       }))
                     }
-                    className="w-full"
+                    onBlur={() =>
+                      (allRefs.current.typingRef = setTimeout(() => {
+                        socket.emit("not-typing", userId);
+                      }, 100))
+                    }
                   />
                 </div>
-                {trueFalseStates.isEmojiPickerTrue && (
-                  <MemoizedEmojiPicker onEmojiClick={handleEmojiClick} />
-                )}
-                <textarea
-                  ref={(el) => (allRefs.current.textareaRef = el)}
-                  type="text"
-                  value={text}
-                  onChange={(e) => {
-                    setText(e.target.value);
-                    adjustHeight();
-                  }}
-                  rows={1}
-                  className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
-                  placeholder="Message"
-                  onKeyDown={(e) => {
-                    if (allRefs.current.typingRef)
-                      clearTimeout(allRefs.current.typingRef);
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      socket.emit("not-typing", userId);
-                      handleSendMessage();
-                    } else {
-                      socket.emit("typing", { userId, gameId });
-                    }
-                  }}
-                  onKeyUp={() => {
-                    allRefs.current.typingRef = setTimeout(() => {
-                      socket.emit("not-typing", userId);
-                    }, 1500);
-                  }}
-                  onFocus={() =>
-                    setTrueFalseStates((prev) => ({
-                      ...prev,
-                      isEmojiPickerTrue: false,
-                    }))
-                  }
-                  onBlur={() =>
-                    (allRefs.current.typingRef = setTimeout(() => {
-                      socket.emit("not-typing", userId);
-                    }, 100))
-                  }
-                />
               </div>
+              <button
+                className="h-[3rem] relative flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] active:brightness-75 transition-colors"
+                onClick={handleSendMessage}
+              >
+                <img
+                  src="/images/send.png"
+                  alt=""
+                  className="w-6 max-h-6 rotate-45 brightness-0"
+                />
+
+                {/* scroll to bottom */}
+                <div
+                  onClick={() => {
+                    const chatSectionRefCurrent =
+                      allRefs.current.chatSectionRef;
+                    if (!chatSectionRefCurrent) return;
+                    chatSectionRefCurrent.scrollTo({
+                      top: chatSectionRefCurrent.scrollHeight,
+                      behavior: "instant",
+                    });
+                  }}
+                  className="absolute hover:cursor-pointer active:bg-blackDarkest transition-all right-[0.5rem] rotate-180 rounded-full p-2 z-50 bg-[rgb(32,45,50)] top-[-3.5rem]"
+                  style={{
+                    scale: chatSectionBottom ? "0" : "1",
+                  }}
+                >
+                  <img src="/images/double.png" alt="" className="w-5" />
+                </div>
+              </button>
             </div>
-            <button
-              className="h-[3rem] flex justify-center items-center text-white rounded-[50%] aspect-square bg-[rgb(37,211,102)] active:brightness-75 transition-colors"
-              onClick={handleSendMessage}
-            >
-              <img
-                src="/images/send.png"
-                alt=""
-                className="w-6 max-h-6 rotate-45 brightness-0"
-              />
-            </button>
+            <MemoizedEmojiPicker
+              onEmojiClick={handleEmojiClick}
+              isEmojiPickerTrue={trueFalseStates.isEmojiPickerTrue}
+            />
           </div>
           <div ref={(el) => (allRefs.current.textAreaFocus = el)}></div>
         </div>
