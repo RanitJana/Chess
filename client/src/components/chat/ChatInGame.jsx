@@ -34,7 +34,7 @@ const EmojiPickerComponent = ({ onEmojiClick, isEmojiPickerTrue }) => (
       onEmojiClick={onEmojiClick}
     />
   </div>
-);
+); 
 
 const EmojiPickerComponentForReaction = ({
   onEmojiClick,
