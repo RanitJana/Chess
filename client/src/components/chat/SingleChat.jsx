@@ -46,7 +46,7 @@ function SingleChat({
   handleReaction,
   allRefs,
   setMentionText,
-  setIsOpenReactionMore,
+  setTrueFalseStates,
   setReactionMessageId,
 }) {
   const [openReactionBox, setOpenReactionBox] = useState(false);
@@ -218,7 +218,7 @@ function SingleChat({
       <Picker
         pickerRef={pickerRef}
         mainSectionRef={mainSectionRef}
-        setIsOpenReactionMore={setIsOpenReactionMore}
+        setTrueFalseStates={setTrueFalseStates}
         reactionLocation={reactionLocation}
         openReactionBox={openReactionBox}
         setOpenReactionBox={setOpenReactionBox}

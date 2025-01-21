@@ -10,7 +10,7 @@ function Picker({
   openReactionBox,
   setOpenReactionBox,
   reactionLocation,
-  setIsOpenReactionMore,
+  setTrueFalseStates,
 }) {
   const reactionEmojis = ["❤️", "😂", "😮", "😢", "😡", "👍"];
 
@@ -70,7 +70,8 @@ function Picker({
         <div
           key={idx}
           onClick={() => {
-            handleReaction(messageId, emoji, [setOpenReactionBox]);
+            setOpenReactionBox(false);
+            handleReaction(messageId, emoji);
           }}
           className="flex items-center justify-center hover:cursor-pointer rounded-full mx-[0.1rem] h-9 w-9 p-2 text-[1.5rem]"
         >
@@ -78,13 +79,17 @@ function Picker({
         </div>
       ))}
       <div
-        className="bg-gray-700 flex items-center justify-center hover:cursor-pointer rounded-full mx-[0.1rem] h-9 aspect-square p-2 text-[1.5rem]"
+        className="bg-gray-600 active:bg-gray-700 transition-colors flex items-center justify-center hover:cursor-pointer rounded-full mx-[0.1rem] h-9 aspect-square p-2 text-[1.5rem]"
         onClick={() => {
           setOpenReactionBox(false);
-          setIsOpenReactionMore(true);
+          setTrueFalseStates((prev) => ({ ...prev, isOpenReactionMore: true }));
         }}
       >
-        <img src="/images/cross.png" alt="" className="rotate-45 w-6" />
+        <img
+          src="/images/cross.png"
+          alt=""
+          className="rotate-45 w-6 brightness-0 invert select-none"
+        />
       </div>
     </div>
   );

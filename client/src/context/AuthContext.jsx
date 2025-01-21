@@ -36,27 +36,22 @@ export default function AuthContext({ children }) {
     };
 
     handleVerify();
-  }, [location.pathname]);
+  }, []);
+
+  if (isLoading)
+    return (
+      <div className="bg-[hsl(40,7%,18%)] overflow-y-scroll w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
+        <span className="loader"></span>
+      </div>
+    );
 
   return (
     <authContext.Provider
       value={{ isAuth, setAuth, playerInfo, setPlayerInfo }}
     >
-      {/* <img src="/images/tile.png" alt="" className="fixed bottom-0 w-full" /> */}
-      <div
-        className="bg-[hsl(40,7%,18%)] overflow-y-scroll h-[100dvh]"
-        // style={{
-        //   background: "url(/images/tile.png) hsl(40,7%,18%) no-repeat",
-        //   backgroundSize: "100%",
-        //   backgroundPosition: "bottom"
-        // }}
-      >
+      <div className="bg-[hsl(40,7%,18%)] overflow-y-scroll h-[100dvh]">
         <div className="min-h-fit">
-          {isLoading ? (
-            <div className="w-[100dvw] h-[100dvh] min-h-[10rem] flex items-center justify-center">
-              <span className="loader"></span>
-            </div>
-          ) : location.pathname == "/login" ? (
+          {location.pathname == "/login" ? (
             <Login />
           ) : Location.pathname == "/signup" ? (
             <SignUp />
