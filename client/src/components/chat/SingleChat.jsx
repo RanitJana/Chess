@@ -87,9 +87,9 @@ function SingleChat({
     const currentX = e.clientX || e.touches[0].clientX || 0;
     const currentY = e.clientY || e.touches[0].clientY || 0;
     let distanceX = currentX - dragStart.x;
-    const distanceY = currentY - dragStart.y;
+    const distanceY = Math.abs(currentY - dragStart.y);
 
-    if (distanceY > distanceX) {
+    if (distanceY > 20) {
       setIsDragging(false);
       setDragDistance(0);
       return;
