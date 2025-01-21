@@ -176,6 +176,9 @@ function TypingArea() {
   };
 
   const handleOnBlur = () => {
+    setTimeout(() => {
+      isPrevFocusedTextArea.current = false;
+    }, 500)
     allRefs.current.typingRef = setTimeout(() => {
       socket.emit("not-typing", userId);
     }, 100);
