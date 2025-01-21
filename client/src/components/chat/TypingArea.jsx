@@ -214,7 +214,7 @@ function TypingArea() {
               type="text"
               value={text}
               rows={1}
-              className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none"
+              className="caret-[rgb(36,217,181)] w-full resize-none bg-transparent p-2 pl-1 px-4 text-white outline-none rounded-3xl rounded-bl-none rounded-tl-none overflow-y-scroll"
               placeholder="Message"
               onChange={handleOnChange}
               onKeyDown={handleOnkeyDown}
