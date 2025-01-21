@@ -1,62 +1,53 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import Picker from "./Picker.jsx";
 import { useEffect, useRef, useState, memo } from "react";
+import Picker from "./Picker.jsx";
 import axios from "axios";
+import DifferentDayChatSeparator from "./DifferentDayChatSeparator.jsx";
 // import { useChatContext } from "../../context/ChatContext.jsx";
 
-function areDatesSame(date1, date2) {
-  return (
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() && // Note: getMonth() returns 0 for January, 1 for February, etc.
-    date1.getFullYear() === date2.getFullYear()
-  );
-}
-
 function MentionSection({ mentionText, senderId, userId }) {
+  if (!mentionText?._id) return;
   return (
-    <>
-      {mentionText?._id && (
-        <div
-          className={`${senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} mb-1 rounded-md overflow-hidden transition-all`}
-        >
-          <div className="text-sm py-1 border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
-            <div className="flex items-center justify-between w-full px-2 transition-all">
-              <span className="text-[rgb(13,160,157)] font-bold">
-                {mentionText.owner == userId ? "You" : "Opponent"}
-              </span>
-            </div>
-
-            <span
-              className={`px-2 pb-1 w-[99%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
-            >
-              {mentionText.text}
-            </span>
-          </div>
+    <div
+      className={`${senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(17,26,33)]"} mb-1 rounded-md overflow-hidden transition-all`}
+    >
+      <div className="text-sm py-1 border-l-4 flex-col h-full border-[rgb(7,206,156)] break-words flex items-center justify-center transition-all">
+        <div className="flex items-center justify-between w-full px-2 transition-all">
+          <span className="text-[rgb(13,160,157)] font-bold">
+            {mentionText.owner == userId ? "You" : "Opponent"}
+          </span>
         </div>
-      )}
-    </>
+
+        <span
+          className={`px-2 pb-1 w-[99%] text-[rgb(174,174,174)] line-clamp-3 transition-all mb-[-1px]`}
+        >
+          {mentionText.text}
+        </span>
+      </div>
+    </div>
   );
 }
 
 function SingleChat({
-  allMessage = [],
+  prevBubble,
   info,
   idx,
-  userId,
-  handleReaction,
+  hasMoreMessages,
+  scrollChatElementBottom,
+  playerInfo,
   allRefs,
   setMentionText,
   setTrueFalseStates,
   setReactionMessageId,
+  handleReaction,
 }) {
-  // const { scrollChatElementBottom } = useChatContext();
+  const userId = playerInfo._id;
 
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 });
-
   const [linkInfo, setLinkInfo] = useState(null);
-
   const [dragStart, setDragStart] = useState({
     x: 0,
     y: 0,
@@ -81,7 +72,7 @@ function SingleChat({
     }));
 
     allRefs.current.textareaRef?.focus();
-    // scrollChatElementBottom();
+    scrollChatElementBottom();
   };
 
   const handleMouseDown = (e) => {
@@ -118,19 +109,46 @@ function SingleChat({
 
   const handleMouseUp = () => {
     setIsDragging(false);
-
-    // Trigger reply if dragged beyond 45px
+    // Trigger reply if dragged beyond 50px
     if (dragDistance > 50) {
       if (navigator.vibrate) navigator.vibrate(50);
       hanldleMentionText();
     }
-
-    // Reset drag distance
     setDragDistance(0);
   };
 
-  //remove reaction list
+  const handleDoubleClick = (e) => {
+    setReactionMessageId(() => info._id);
+    setOpenReactionBox((prev) => !prev);
+    const target = mainSectionRef.current;
+    const rect = target.getBoundingClientRect();
+
+    const x =
+      (e.clientX || (e.touches && e.touches[0]?.clientX) || 0) - rect.left;
+    const y =
+      (e.clientY || (e.touches && e.touches[0]?.clientY) || 0) - rect.top;
+
+    setReactionLocation({
+      x: Math.max(0, x),
+      y: Math.max(0, y),
+    });
+  };
+
   useEffect(() => {
+    const fetchLinkInfo = async () => {
+      try {
+        const url = info.message;
+        if (url.match(urlRegex)) {
+          const response = await axios.get(
+            `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`
+          );
+          if (response.data) setLinkInfo(response.data);
+        }
+      } catch (error) {
+        // console.error("Error fetching the URL:", error.message);
+      }
+    };
+
     const handleUnsetReactionMenu = (e) => {
       if (
         chatSecRef.current &&
@@ -141,6 +159,8 @@ function SingleChat({
         setOpenReactionBox(false);
       }
     };
+
+    fetchLinkInfo();
 
     const listeners = ["click", "mousedown"];
     listeners.forEach((event) =>
@@ -154,27 +174,6 @@ function SingleChat({
     };
   }, []);
 
-  //fetch info if only message is link
-  useEffect(() => {
-    // https://api.microlink.io/?url=
-    (async () => {
-      try {
-        const url = info.message;
-        if (url.match(urlRegex)) {
-          const response = await axios.get(
-            `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`
-          );
-          if (response.data) setLinkInfo(response.data);
-        }
-      } catch (error) {
-        // console.error("Error fetching the URL:", error.message);
-      }
-    })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [info]);
-
-  // Add and remove global event listeners
   useEffect(() => {
     if (isDragging) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -189,7 +188,6 @@ function SingleChat({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging]); // Only re-run when isDragging changes
 
   return (
@@ -211,12 +209,7 @@ function SingleChat({
           transition: "transform 0.1s linear",
         }}
       >
-        <img
-          src="/images/reply.png"
-          alt=""
-          decoding="sync"
-          className="invert w-4"
-        />
+        <img src="/images/reply.png" alt="" className="invert w-4" />
       </div>
       {/* all emojis */}
       <Picker
@@ -233,32 +226,11 @@ function SingleChat({
       />
 
       {/* different day's message */}
-      {!areDatesSame(
-        new Date(allMessage[idx - 1 >= 0 ? idx - 1 : 0].createdAt),
-        new Date(info.createdAt)
-      ) || idx === 0 ? (
-        <div className="w-full flex items-center justify-center mb-1">
-          <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
-            {(() => {
-              const prevDate = new Intl.DateTimeFormat("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(new Date(info.createdAt));
-
-              const today = new Intl.DateTimeFormat("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(new Date(Date.now()));
-
-              return today == prevDate ? "Today" : prevDate;
-            })()}
-          </div>
-        </div>
-      ) : (
-        ""
-      )}
+      <DifferentDayChatSeparator
+        previousDate={prevBubble?.createdAt || info.createdAt}
+        currentDate={info.createdAt}
+        hasMoreMessages={hasMoreMessages}
+      />
 
       {/* main chat bubble */}
       <div
@@ -266,31 +238,15 @@ function SingleChat({
         className={`
           relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
           ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
-          ${idx === 0 || allMessage[idx - 1 >= 0 ? idx - 1 : 0].senderId != info.senderId ? (info.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none") : ""}
-          ${idx > 0 && info.senderId !== allMessage[idx - 1].senderId ? "mt-[0.8rem]" : ""}
+          ${idx === 0 || prevBubble?.senderId != info.senderId ? (info.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none") : ""}
+          ${idx > 0 && info.senderId !== prevBubble?.senderId ? "mt-[0.8rem]" : ""}
           `}
         style={{
           transform: `translateX(${dragDistance}px)`,
           transition: "transform 0.1s ease-out",
         }}
-        onDoubleClick={(e) => {
-          setReactionMessageId(() => info._id);
-          setOpenReactionBox((prev) => !prev);
-          const target = mainSectionRef.current;
-          const rect = target.getBoundingClientRect();
-
-          const x =
-            (e.clientX || (e.touches && e.touches[0]?.clientX) || 0) -
-            rect.left;
-          const y =
-            (e.clientY || (e.touches && e.touches[0]?.clientY) || 0) - rect.top;
-
-          setReactionLocation({
-            x: Math.max(0, x),
-            y: Math.max(0, y),
-          });
-        }}
-        onClick={(e) => setOpenReactionBox(false)}
+        onDoubleClick={handleDoubleClick}
+        onClick={() => setOpenReactionBox(false)}
       >
         {/* text reactions */}
         {info.reaction?.length > 0 && (
@@ -319,21 +275,11 @@ function SingleChat({
                 <div
                   className={`${info.senderId == userId ? "bg-[rgb(2,81,68)]" : "bg-[rgb(28,41,47)]"} overflow-hidden rounded-lg mb-2 w-full max-w-[30rem]`}
                 >
-                  <div>
-                    {linkInfo.image ? (
-                      <img
-                        className="max-w-[30rem] w-full pointer-events-none"
-                        src={linkInfo.image}
-                        alt=""
-                      />
-                    ) : (
-                      <img
-                        className="max-w-[15rem] p-2"
-                        src={linkInfo.logo.url}
-                        alt=""
-                      />
-                    )}
-                  </div>
+                  <img
+                    src={linkInfo.image || linkInfo.logo?.url}
+                    alt=""
+                    className={`${linkInfo.image ? "max-w-[30rem] w-full pointer-events-none" : "max-w-[15rem] p-2"}`}
+                  />
                   <div className="p-2">
                     <div>{linkInfo.title || "Unknown"}</div>
                     <div className="truncate line-clamp-2 text-wrap text-xs text-gray-400">

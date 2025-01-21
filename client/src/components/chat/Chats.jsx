@@ -18,14 +18,13 @@ function Chats() {
     allMessage,
     trueFalseStates,
     gameId,
+    setAllMessage,
+    scrollChatElementBottom,
     playerInfo,
     setMentionText,
-    setAllMessage,
     setReactionMessageId,
     handleReaction,
   } = useChatContext();
-
-  const userId = playerInfo._id;
 
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
 
@@ -103,17 +102,19 @@ function Chats() {
 
         {allMessage.map((info, idx) => {
           return (
-            <div key={idx}>
+            <div key={info._id}>
               <SingleChat
-                handleReaction={handleReaction}
-                setReactionMessageId={setReactionMessageId}
-                setTrueFalseStates={setTrueFalseStates}
-                setMentionText={setMentionText}
-                allRefs={allRefs}
-                allMessage={allMessage}
-                idx={idx}
+                prevBubble={idx == 0 ? null : allMessage[idx - 1]}
                 info={info}
-                userId={userId}
+                idx={idx}
+                scrollChatElementBottom={scrollChatElementBottom}
+                playerInfo={playerInfo}
+                allRefs={allRefs}
+                setMentionText={setMentionText}
+                setTrueFalseStates={setTrueFalseStates}
+                setReactionMessageId={setReactionMessageId}
+                handleReaction={handleReaction}
+                hasMoreMessages={hasMoreMessages}
               />
             </div>
           );
