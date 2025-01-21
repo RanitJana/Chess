@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { socket } from "../../socket.js";
 import MemoizedEmojiMore from "./EmojiMore.jsx";
 import { useGameContext } from "../../pages/Game.jsx";
@@ -59,7 +59,6 @@ function TypingArea() {
   const userId = playerInfo._id;
 
   const [text, setText] = useState("");
-  const isPrevFocusedTextArea = useRef(false);
 
   const handleEmojiClick = useCallback((emojiObject) => {
     setText((prev) => prev + emojiObject.emoji);
@@ -75,10 +74,10 @@ function TypingArea() {
   }, [allRefs, scrollChatElementBottom]);
 
   const handleSendMessage = useCallback(async () => {
-    if (isPrevFocusedTextArea.current) {
-      isPrevFocusedTextArea.current = false;
-      allRefs.current.textareaRef.focus();
-    }
+
+    //focus again to prevent go back the keyboard
+    allRefs.current.textareaRef.focus();
+
     if (!text.trim() || !opponent || !userId) return;
 
     setTrueFalseStates((prev) => ({ ...prev, isEmojiPickerTrue: false }));
@@ -172,7 +171,6 @@ function TypingArea() {
   };
 
   const handleOnFocus = () => {
-    isPrevFocusedTextArea.current = true;
     setTrueFalseStates((prev) => ({ ...prev, isEmojiPickerTrue: false }));
   };
 
