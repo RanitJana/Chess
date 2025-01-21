@@ -221,6 +221,7 @@ function TypingArea() {
               onKeyUp={handleOnKeyUp}
               onFocus={handleOnFocus}
               onBlur={handleOnBlur}
+              onScroll={(e) => e.preventDefault()}
             />
           </div>
         </div>
