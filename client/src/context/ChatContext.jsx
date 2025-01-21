@@ -35,7 +35,6 @@ function ChatContext() {
   const [trueFalseStates, setTrueFalseStates] = useState({
     initialLoad: true,
     isTyping: false,
-    hasMoreMessages: true,
     isEmojiPickerTrue: false,
     isOpenReactionMore: false,
     isChatSectionBottom: true,

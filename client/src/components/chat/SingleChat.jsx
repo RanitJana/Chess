@@ -3,6 +3,7 @@
 import Picker from "./Picker.jsx";
 import { useEffect, useRef, useState, memo } from "react";
 import axios from "axios";
+// import { useChatContext } from "../../context/ChatContext.jsx";
 
 function areDatesSame(date1, date2) {
   return (
@@ -49,6 +50,8 @@ function SingleChat({
   setTrueFalseStates,
   setReactionMessageId,
 }) {
+  // const { scrollChatElementBottom } = useChatContext();
+
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 });
 
@@ -78,6 +81,7 @@ function SingleChat({
     }));
 
     allRefs.current.textareaRef?.focus();
+    // scrollChatElementBottom();
   };
 
   const handleMouseDown = (e) => {
