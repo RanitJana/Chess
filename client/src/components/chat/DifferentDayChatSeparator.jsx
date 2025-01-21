@@ -27,8 +27,6 @@ function DifferentDayChatSeparator({
             month: "short",
             year: "numeric",
           }).format(new Date(Date.now()));
-          console.log(today, prevDate);
-
           return today == prevDate ? "Today" : prevDate;
         })()}
       </div>

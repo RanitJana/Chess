@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState, memo } from "react";
 import Picker from "./Picker.jsx";
 import axios from "axios";
 import DifferentDayChatSeparator from "./DifferentDayChatSeparator.jsx";
-// import { useChatContext } from "../../context/ChatContext.jsx";
 
 function MentionSection({ mentionText, senderId, userId }) {
   if (!mentionText?._id) return;
@@ -144,7 +142,7 @@ function SingleChat({
           );
           if (response.data) setLinkInfo(response.data);
         }
-      } catch (error) {
+      } catch {
         // console.error("Error fetching the URL:", error.message);
       }
     };
@@ -193,7 +191,7 @@ function SingleChat({
   return (
     <div
       ref={mainSectionRef}
-      className={`relative w-full flex flex-col transition-all ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
+      className={`relative w-full flex flex-col ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -243,7 +241,7 @@ function SingleChat({
           `}
         style={{
           transform: `translateX(${dragDistance}px)`,
-          transition: "transform 0.1s ease-out",
+          transition: "transform 0.1s ease",
         }}
         onDoubleClick={handleDoubleClick}
         onClick={() => setOpenReactionBox(false)}

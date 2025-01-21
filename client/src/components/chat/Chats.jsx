@@ -90,7 +90,7 @@ function Chats() {
   return (
     <div className="absolute top-0 h-full flex flex-col w-full">
       <div
-        className="w-full h-full text-white overflow-y-auto px-4 space-y-1"
+        className="w-full h-full text-white overflow-y-auto px-4 space-y-1 overflow-x-hidden"
         ref={(el) => (allRefs.current.chatSectionRef = el)}
         onScroll={handleScroll}
       >
