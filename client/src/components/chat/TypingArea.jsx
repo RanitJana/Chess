@@ -76,6 +76,7 @@ function TypingArea() {
 
   const handleSendMessage = useCallback(async () => {
     if (isPrevFocusedTextArea.current) {
+      isPrevFocusedTextArea.current = false;
       allRefs.current.textareaRef.focus();
     }
     if (!text.trim() || !opponent || !userId) return;
@@ -176,9 +177,6 @@ function TypingArea() {
   };
 
   const handleOnBlur = () => {
-    setTimeout(() => {
-      isPrevFocusedTextArea.current = false;
-    }, 500)
     allRefs.current.typingRef = setTimeout(() => {
       socket.emit("not-typing", userId);
     }, 100);
