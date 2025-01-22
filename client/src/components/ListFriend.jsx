@@ -51,7 +51,7 @@ export default function ListFriend({
         </div>
       )}
       <div className="flex items-center gap-5">
-        <div className="w-20 relative">
+        <div className="w-20 relative rounded-xl overflow-hidden">
           <div
             dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
             className="w-20 rounded-xl bg-white"

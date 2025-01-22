@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
 import { _env } from "./constants.js";
-import jwt from "jsonwebtoken";
 import playerSchema from "./models/player.model.js";
 
 const realTimeInit = function (server) {
@@ -20,19 +19,18 @@ const realTimeInit = function (server) {
 
   io.on("connection", (socket) => {
     let userIdsave = null; // Assume user ID is sent when connecting
+
     socket.on("add-online-user", (userId) => {
       onlineUsers[userId] = true;
+      totalOnline = totalOnline + 1;
       userIdsave = userId;
-      io.emit("online-user", onlineUsers);
+
+      setTimeout(() => {
+        io.emit("online-user", { onlineUsers, totalOnline });
+      }, 100);
     });
 
-    // Mark user as online
-
     let roomId; // To track which room this socket belongs to
-
-    // Increment total online when a user connects
-    totalOnline++;
-    io.emit("total-online", totalOnline); // Broadcast the updated total
 
     // Handle room joining
     socket.on("join-game", (gameId) => {
@@ -79,8 +77,7 @@ const realTimeInit = function (server) {
       totalOnline--;
       if (userIdsave) delete onlineUsers[userIdsave];
 
-      io.emit("online-user", onlineUsers);
-      io.emit("total-online", totalOnline); // Broadcast the updated total
+      io.emit("online-user", { onlineUsers, totalOnline });
 
       try {
         if (userIdsave) {
