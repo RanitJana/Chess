@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { rejectFriendRequest } from "../api/friend.js";
 import toast from "react-hot-toast";
+import GetAvatar from "../utils/GetAvatar.js";
 
 export default function ListFriend({
   user = {},
@@ -51,13 +52,8 @@ export default function ListFriend({
       )}
       <div className="flex items-center gap-5">
         <div className="w-20 relative">
-          <img
-            src={
-              user
-                ? user.avatar || `https://robohash.org/${user?.name}`
-                : "/images/user-pawn.gif"
-            }
-            alt="Dp"
+          <div
+            dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
             className="w-20 rounded-xl bg-white"
           />
           {isOnline && (

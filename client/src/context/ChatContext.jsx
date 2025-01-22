@@ -66,7 +66,7 @@ function ChatContext() {
       const chatSectionRefCurrent = allRefs.current.chatSectionRef;
 
       if (chatSectionRefCurrent) {
-        if (isAtBottom(chatSectionRefCurrent, 10)) {
+        if (isAtBottom(chatSectionRefCurrent, 50)) {
           setTimeout(() => {
             chatSectionRefCurrent.scrollTo({
               top: chatSectionRefCurrent.scrollHeight,

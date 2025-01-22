@@ -41,7 +41,7 @@ function SingleChat({
   setReactionMessageId,
   handleReaction,
 }) {
-  const userId = playerInfo._id;
+  const userId = playerInfo?._id;
 
   const [openReactionBox, setOpenReactionBox] = useState(false);
   const [reactionLocation, setReactionLocation] = useState({ x: 0, y: 0 });
@@ -235,9 +235,9 @@ function SingleChat({
         ref={chatSecRef}
         className={`
           relative max-w-[80%] px-1 pt-1 pb-5 rounded-xl break-words text-white min-w-[6.5rem] select-none hover:cursor-pointer 
-          ${info.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
-          ${idx === 0 || prevBubble?.senderId != info.senderId ? (info.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none") : ""}
-          ${idx > 0 && info.senderId !== prevBubble?.senderId ? "mt-[0.8rem]" : ""}
+          ${info?.senderId === userId ? "bg-[rgb(0,93,74)]" : "bg-[rgb(32,45,50)]"}
+          ${idx === 0 || prevBubble?.senderId != info?.senderId ? (info?.senderId == userId ? "parentBubbleYou rounded-tr-none" : "parentBubbleOther rounded-tl-none") : ""}
+          ${idx > 0 && info?.senderId !== prevBubble?.senderId ? "mt-[0.8rem]" : ""}
           `}
         style={{
           transform: `translateX(${dragDistance}px)`,
@@ -247,21 +247,21 @@ function SingleChat({
         onClick={() => setOpenReactionBox(false)}
       >
         {/* text reactions */}
-        {info.reaction?.length > 0 && (
+        {info?.reaction?.length > 0 && (
           <div
             className={`absolute text-sm bottom-0 translate-y-[80%] bg-[rgb(32,45,50)] rounded-full border border-[rgb(17,27,33)] w-7 min-w-fit min-h-fit flex items-center justify-center text-[1rem] p-[0.2rem] ${info.senderId == userId ? "right-3" : "left-3"}`}
           >
-            {info.reaction?.map((val) => val?.symbol)}
-            {info.reaction?.length > 1 && (
+            {info?.reaction?.map((val) => val?.symbol)}
+            {info?.reaction?.length > 1 && (
               <span className="text-gray-400 px-1">
-                {info.reaction?.length}
+                {info?.reaction?.length}
               </span>
             )}
           </div>
         )}
 
         {/* link detection */}
-        {info.message.match(urlRegex) ? (
+        {info?.message.match(urlRegex) ? (
           <span className="block">
             {linkInfo ? (
               <a href={info.message} target="_blank">
@@ -319,22 +319,22 @@ function SingleChat({
         ) : (
           <>
             <MentionSection
-              mentionText={info.mentionText}
-              senderId={info.senderId}
+              mentionText={info?.mentionText}
+              senderId={info?.senderId}
               userId={userId}
             />
             {/* main text */}
             <span
-              className={`block px-1 pt-1 ${emojiRegex.test(info.message) ? "text-[3rem]" : ""}`}
+              className={`block px-1 pt-1 ${emojiRegex.test(info?.message) ? "text-[3rem]" : ""}`}
             >
-              {info.message}
+              {info?.message}
             </span>
           </>
         )}
 
         {/* message sent time */}
         <span className="absolute bottom-1 right-2 text-xs text-gray-300">
-          {new Date(info.createdAt).toLocaleTimeString("en-US", {
+          {new Date(info?.createdAt).toLocaleTimeString("en-US", {
             hour: "numeric",
             minute: "numeric",
             hour12: true,

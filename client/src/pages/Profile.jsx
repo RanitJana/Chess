@@ -10,6 +10,7 @@ import CompletedGames from "../components/game/CompletedGames.jsx";
 import { sendFriendRequest, rejectFriendRequest } from "../api/friend.js";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { socket } from "../socket.js";
+import GetAvatar from "../utils/GetAvatar.js";
 
 function timeAgo(lastSeen) {
   const diffInSeconds = Math.floor(
@@ -128,18 +129,12 @@ function Profile() {
         <div className="bg-blackDark p-4 rounded-md">
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
             <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full left-1/2 rounded-sm overflow-hidden aspect-square">
-              <div className="relative w-[12rem]">
-                <img
-                  className=" bg-white rounded-xl"
-                  src={
-                    user
-                      ? user?.avatar || `https://robohash.org/${user?.name}`
-                      : "/images/user-pawn.gif"
-                  }
-                  alt=""
+              <div className="relative w-[12rem] rounded-xl overflow-hidden">
+                <div
+                  dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
                 />
                 {onlineUsers[userId] ? (
-                  <div className="absolute bg-green-600 w-7 aspect-square right-0 bottom-0 rounded-br-xl"></div>
+                  <div className="absolute bg-green-600 w-7 aspect-square right-0 bottom-0"></div>
                 ) : (
                   ""
                 )}

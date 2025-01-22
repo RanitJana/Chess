@@ -10,6 +10,7 @@ import {
 import toast from "react-hot-toast";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import ListFriend from "../components/ListFriend.jsx";
+import GetAvatar from "../utils/GetAvatar.js";
 
 function Friends() {
   const { userId } = useParams();
@@ -184,15 +185,11 @@ function Friends() {
                     <div className="flex items-center gap-4 w-full">
                       <div className="relative w-[6rem] min-w-[5rem]">
                         <div className="w-20 relative">
-                          <img
-                            src={
-                              user
-                                ? user.avatar ||
-                                  `https://robohash.org/${user.name}`
-                                : "/images/user-pawn.gif"
-                            }
-                            alt="Dp"
-                            className="w-20 rounded-xl"
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: GetAvatar(user?.name),
+                            }}
+                            className="bg-white rounded-xl"
                           />
                           {onlineUsers[user._id] && (
                             <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600 rounded-br-xl"></div>

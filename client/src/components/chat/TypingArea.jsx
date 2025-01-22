@@ -74,10 +74,6 @@ function TypingArea() {
   }, [allRefs, scrollChatElementBottom]);
 
   const handleSendMessage = useCallback(async () => {
-
-    //focus again to prevent go back the keyboard
-    allRefs.current.textareaRef.focus();
-
     if (!text.trim() || !opponent || !userId) return;
 
     setTrueFalseStates((prev) => ({ ...prev, isEmojiPickerTrue: false }));
@@ -98,8 +94,12 @@ function TypingArea() {
 
     setMentionText(null);
     setAllMessage((prev) => [...prev, info]);
-    setText("");
-    adjustHeight();
+    setText(() => "");
+    setTimeout(() => {
+      adjustHeight();
+      //focus again to prevent go back the keyboard
+      allRefs.current.textareaRef.focus();
+    }, 50);
 
     try {
       socket.emit("new-message", {

@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
+import { useEffect, useRef, useState } from "react";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import { gameEnd, gameMove } from "../../api/game.js";
 import { socket } from "../../socket.js";
@@ -9,6 +8,7 @@ import { useGameContext, convertTo2DArray } from "../../pages/Game.jsx";
 import { kingCheckMate } from "../../utils/KingCheck.js";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
+import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 
 export default function ChessBoard() {
   const {
@@ -26,16 +26,23 @@ export default function ChessBoard() {
   } = useGameContext();
 
   const { playerInfo } = useAuthContext();
+  const { onlineUsers } = useSocketContext();
+  const boardRef = useRef(null);
+  const userId = playerInfo._id;
+
+  const [opponent, setOpponent] = useState(null);
+
+  useEffect(() => {
+    if (players)
+      setOpponent(() =>
+        userId == players.player1._id ? players.player2 : players.player1
+      );
+  }, [players]);
 
   const isViewer = () => {
-    if (
-      playerInfo._id != players.player1._id &&
-      playerInfo._id != players.player2._id
-    )
+    if (userId != players.player1._id && userId != players.player2._id)
       return true;
   };
-
-  const navigate = useNavigate();
 
   // Handle move updates
   async function updateMoves(clearedBoard, info) {
@@ -89,9 +96,8 @@ export default function ChessBoard() {
   }
 
   useEffect(() => {
-    socket.on("opponent-move", (val) => {
+    function handleOpponentMove(val) {
       if (isViewer()) return;
-      console.log("Your Turn");
       let updatedBoard = val[0];
       let move = val[1];
 
@@ -122,81 +128,22 @@ export default function ChessBoard() {
         setMovingPiece(null);
         setChessboard(updatedBoard);
       }, 100);
-    });
+    }
 
-    return () => {
-      socket.off("opponent-move");
-    };
+    socket.on("opponent-move", handleOpponentMove);
+
+    return () => socket.off("opponent-move", handleOpponentMove);
   }, []);
 
-  const boardRef = useRef(null);
-
-  const { onlineUsers } = useSocketContext();
+  if (!players || !opponent) return;
 
   return (
     <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
-      <div className="flex justify-between items-center">
-        <div className="flex py-2 gap-4">
-          <div className=" relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
-            {playerInfo._id != players.player1._id ? (
-              <img
-                src={
-                  players.player1?.avatar ||
-                  `https://robohash.org/${players.player1?.name}` ||
-                  "/images/user-pawn.gif"
-                }
-                alt=""
-              />
-            ) : (
-              <img
-                src={
-                  players.player2?.avatar ||
-                  `https://robohash.org/${players.player2?.name}` ||
-                  "/images/user-pawn.gif"
-                }
-                alt=""
-              />
-            )}
-            {playerColor == "white" && onlineUsers[players.player2._id] && (
-              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
-            )}
-            {playerColor == "black" && onlineUsers[players.player1._id] && (
-              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
-            )}
-          </div>
-          <p>
-            {playerColor == "white" ? (
-              <>
-                <span
-                  onClick={() => navigate(`/member/${players.player2._id}`)}
-                  className="text-white font-semibold mr-1 hover:cursor-pointer"
-                >
-                  {players.player2?.name}
-                </span>
-                <span className="text-gray-400">
-                  ({players.player2?.rating})
-                </span>
-              </>
-            ) : (
-              <>
-                <span
-                  onClick={() => navigate(`/member/${players.player1._id}`)}
-                  className="text-white font-semibold mr-1 hover:cursor-pointer"
-                >
-                  {players.player1?.name}
-                </span>
-                <span className="text-gray-400">
-                  ({players.player1?.rating})
-                </span>
-              </>
-            )}
-          </p>
-        </div>
-        <div className="flex items-center justify-evenly gap-1 w-full max-w-[7rem] bg-white p-2 rounded-md">
-          <img src="/images/time.gif" alt="" />
-          <span>3 days</span>
-        </div>
-      </div>
+      {/* opponent info */}
+      <PlayerInfoInGame
+        player={opponent}
+        isOnline={onlineUsers[opponent._id]}
+      />
       <div
         ref={boardRef}
         className="relative w-full h-fit items-center justify-center flex flex-col"
@@ -229,68 +176,11 @@ export default function ChessBoard() {
           <div className="relative w-full h-fit">{<EmptyBoard />}</div>
         )}
       </div>
-      <div className="flex justify-between items-center">
-        <div className="flex py-2 gap-4">
-          <div className="relative h-10 aspect-square rounded-sm bg-white overflow-hidden">
-            {playerInfo._id != players.player1._id ? (
-              <img
-                src={
-                  players.player2?.avatar ||
-                  `https://robohash.org/${players.player2?.name}` ||
-                  "/images/user-pawn.gif"
-                }
-                alt=""
-              />
-            ) : (
-              <img
-                src={
-                  players.player1?.avatar ||
-                  `https://robohash.org/${players.player1?.name}` ||
-                  "/images/user-pawn.gif"
-                }
-                alt=""
-              />
-            )}
-            {playerColor == "white" && onlineUsers[players.player1._id] && (
-              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
-            )}
-            {playerColor == "black" && onlineUsers[players.player2._id] && (
-              <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
-            )}
-          </div>
-          <p>
-            {playerColor == "black" ? (
-              <>
-                <span
-                  onClick={() => navigate(`/member/${players.player2._id}`)}
-                  className="text-white font-semibold mr-1 hover:cursor-pointer"
-                >
-                  {players.player2?.name}
-                </span>
-                <span className="text-gray-400">
-                  ({players.player2?.rating})
-                </span>
-              </>
-            ) : (
-              <>
-                <span
-                  onClick={() => navigate(`/member/${players.player1._id}`)}
-                  className="text-white font-semibold mr-1 hover:cursor-pointer"
-                >
-                  {players.player1?.name}
-                </span>
-                <span className="text-gray-400">
-                  ({players.player1?.rating})
-                </span>
-              </>
-            )}
-          </p>
-        </div>
-        <div className="flex items-center justify-evenly gap-1 w-full max-w-[7rem] bg-white p-2 rounded-md">
-          <img src="/images/time.gif" alt="" />
-          <span>3 days</span>
-        </div>
-      </div>
+      {/* user info */}
+      <PlayerInfoInGame
+        player={playerInfo}
+        isOnline={onlineUsers[playerInfo._id]}
+      />
     </div>
   );
 }
