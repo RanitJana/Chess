@@ -124,7 +124,7 @@ function ChatContext() {
       const decryptMessageText = decryptMessage(message);
       showNotification(senderName + " : " + decryptMessageText);
       setAllMessage((prev) => [
-        ...prev,
+        ...(prev || []),
         {
           _id,
           reaction: [],
@@ -140,7 +140,7 @@ function ChatContext() {
 
     function handleNewReaction(info) {
       setAllMessage((prev) =>
-        prev.map((val) => {
+        (prev || []).map((val) => {
           if (val._id != info.messageId) return val;
           return { ...val, reaction: info.reaction };
         })
