@@ -74,7 +74,7 @@ const realTimeInit = function (server) {
 
     // Handle disconnection
     socket.on("disconnect", async () => {
-      totalOnline--;
+      totalOnline = Math.max(0, totalOnline - 1);
       if (userIdsave) delete onlineUsers[userIdsave];
 
       io.emit("online-user", { onlineUsers, totalOnline });
