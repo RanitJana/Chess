@@ -60,7 +60,7 @@ function GameSideSection({ players }) {
         )}
       </ul>
       <div className="overflow-y-scroll h-full">{renderContent()}</div>
-      <div className="flex gap-2 justify-between min-h-fit p-2 bg-[rgb(33,32,29)]">
+      {/* <div className="flex gap-2 justify-between min-h-fit p-2 bg-[rgb(33,32,29)]">
         <button className="group relative flex items-center justify-center gap-1 bg-[rgb(57,54,52)] shadow-sm px-4 text-white rounded-md text-[0.8rem] w-[5rem] h-[2.1rem]">
           <img
             src="/images/arrow.png"
@@ -73,7 +73,7 @@ function GameSideSection({ players }) {
           <span>Next</span>
           <img src="/images/arrow.png" className="w-[0.8rem]" alt="Back" />
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
