@@ -76,10 +76,10 @@ function TypingArea() {
   const handleSendMessage = useCallback(async () => {
     if (!text.trim() || !opponent || !userId) return;
 
+    //focus again to prevent go back the keyboard
+    allRefs.current.textareaRef.focus();
     setTimeout(() => {
       adjustHeight();
-      //focus again to prevent go back the keyboard
-      allRefs.current.textareaRef.focus();
     }, 50);
 
     setTrueFalseStates((prev) => ({ ...prev, isEmojiPickerTrue: false }));
