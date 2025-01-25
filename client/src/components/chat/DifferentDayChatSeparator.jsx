@@ -13,7 +13,7 @@ function DifferentDayChatSeparator({
     return;
 
   return (
-    <div className="w-full flex items-center justify-center mb-1">
+    <div className="w-full flex items-center justify-center py-4">
       <div className="flex text-[0.7rem] w-fit bg-[rgb(32,44,51)] h-fit px-4 py-1 rounded-lg">
         {(() => {
           const prevDate = new Intl.DateTimeFormat("en-GB", {

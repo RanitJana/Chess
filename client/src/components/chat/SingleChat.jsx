@@ -28,6 +28,12 @@ function MentionSection({ mentionText, senderId, userId }) {
   );
 }
 
+function isOnlyEmojis(text) {
+  // Regex to match emojis
+  const emojiRegex = /^(?:\p{Emoji}|\p{Extended_Pictographic})+$/u;
+  return emojiRegex.test(text.trim());
+}
+
 function SingleChat({
   prevBubble,
   info,
@@ -56,9 +62,6 @@ function SingleChat({
   const pickerRef = useRef(null);
   const chatSecRef = useRef(null);
   const mainSectionRef = useRef(null);
-
-  const emojiRegex =
-    /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji}\u200D\p{Emoji})$/gu;
 
   const urlRegex = /\b((https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*\b/g;
 
@@ -325,7 +328,7 @@ function SingleChat({
             />
             {/* main text */}
             <span
-              className={`block px-1 pt-1 ${emojiRegex.test(info?.message) ? "text-[3rem]" : ""}`}
+              className={`block px-1 pt-1 ${isOnlyEmojis(info?.message) ? "text-[1.5rem]" : ""}`}
             >
               {info?.message}
             </span>
