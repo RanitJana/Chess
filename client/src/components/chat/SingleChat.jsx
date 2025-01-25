@@ -29,8 +29,8 @@ function MentionSection({ mentionText, senderId, userId }) {
 }
 
 function isOnlyEmojis(text) {
-  // Regex to match emojis
-  const emojiRegex = /^(?:\p{Emoji}|\p{Extended_Pictographic})+$/u;
+  // Regex to match only emojis and exclude other characters like numbers
+  const emojiRegex = /^[\p{Extended_Pictographic}]+$/u;
   return emojiRegex.test(text.trim());
 }
 
@@ -194,7 +194,7 @@ function SingleChat({
   return (
     <div
       ref={mainSectionRef}
-      className={`relative w-full flex flex-col ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
+      className={`relative w-full flex flex-col px-4 ${info.senderId === userId ? "items-end" : "items-start"} ${info.reaction?.length ? "mb-7" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -350,6 +350,8 @@ function SingleChat({
 
 export default memo(SingleChat, (prevProps, nextProps) => {
   return (
-    prevProps.info === nextProps.info && prevProps.userId === nextProps.userId
+    prevProps.info === nextProps.info &&
+    prevProps.userId === nextProps.userId &&
+    prevProps.prevBubble == nextProps.prevBubble
   );
 });

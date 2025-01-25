@@ -3,7 +3,7 @@
 function Typing({ isTyping = false }) {
   return (
     <div
-      className={`bg-[rgb(32,44,51)] ${isTyping ? "p-2 h-[35px]" : "h-0"} flex items-center justify-center w-fit px-[15px] rounded-xl rounded-tl-none overflow-hidden transition-[height_0.3s_linear]`}
+      className={`bg-[rgb(32,44,51)] ${isTyping ? "p-2 h-[35px]" : "h-0"} ml-4 mt-1 flex items-center justify-center w-fit px-[15px] rounded-xl rounded-tl-none overflow-hidden transition-[height_0.3s_linear]`}
     >
       {isTyping && (
         <div className="typing">

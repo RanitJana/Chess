@@ -29,8 +29,9 @@ function MentionInText({ mentionText, setMentionText }) {
 
   return (
     <div
-      className={`bg-[rgb(17,26,33)] rounded-xl ${mentionText ? "m-[0.15rem] max-h-[5rem]" : "max-h-0"
-        } overflow-hidden`}
+      className={`bg-[rgb(17,26,33)] rounded-xl ${
+        mentionText ? "m-[0.15rem] max-h-[5rem]" : "max-h-0"
+      } overflow-hidden`}
       style={{
         transition: "all 0.1s ease",
       }}
@@ -52,9 +53,7 @@ function MentionInText({ mentionText, setMentionText }) {
             />
           </span>
         </div>
-        <span
-          className="px-2 pb-1 w-[99%] text-[rgb(174,174,174)] line-clamp-3 break-all text-pretty mb-1"
-        >
+        <span className="px-2 pb-1 w-[99%] text-[rgb(174,174,174)] line-clamp-3 break-all text-pretty mb-1">
           {savedMention?.text}
         </span>
       </div>
@@ -118,7 +117,7 @@ function TypingArea() {
     };
 
     setMentionText(null);
-    setAllMessage((prev) => [...prev, info]);
+    setAllMessage((prev) => [info, ...prev]);
     setText(() => "");
 
     try {

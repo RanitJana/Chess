@@ -91,12 +91,10 @@ const handleGetMessage = AsyncHandler(async (req, res, _) => {
     },
   });
 
-  const messages = totalMessages.messages.sort(
-    (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-  );
+  const messages = totalMessages.messages;
 
   const totalLength = messages.length;
-  const startIndex = Math.max(0, totalLength - lengthNow - 50); // Start index for the next 30 messages
+  const startIndex = Math.max(0, totalLength - lengthNow - 30); // Start index for the next 30 messages
   const endIndex = Math.max(0, totalLength - lengthNow); // End index
 
   const paginatedMessages = messages.slice(startIndex, endIndex);

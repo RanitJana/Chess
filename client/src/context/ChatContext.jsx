@@ -33,7 +33,6 @@ function ChatContext() {
   const [mentionText, setMentionText] = useState(null);
 
   const [trueFalseStates, setTrueFalseStates] = useState({
-    initialLoad: true,
     isTyping: false,
     isEmojiPickerTrue: false,
     isOpenReactionMore: false,
@@ -41,7 +40,6 @@ function ChatContext() {
   });
 
   const allRefs = useRef({
-    previousScrollHeight: null,
     typingRef: null,
     textareaRef: null,
     chatSectionRef: null,
@@ -54,11 +52,7 @@ function ChatContext() {
 
   function isAtBottom(element, offset) {
     if (!element) return false;
-    return (
-      Math.abs(
-        element.scrollHeight - element.scrollTop - element.clientHeight
-      ) <= offset
-    );
+    return Math.abs(element.scrollTop) <= offset;
   }
 
   const scrollChatElementBottom = useCallback(
@@ -78,32 +72,6 @@ function ChatContext() {
     },
     [isAtBottom]
   );
-  useEffect(() => {
-    if (!allMessage) return;
-
-    const container = allRefs.current.chatSectionRef;
-    if (!container) return;
-
-    const newScrollHeight = container.scrollHeight;
-
-    if (trueFalseStates.initialLoad) {
-      container.scrollTo(0, newScrollHeight); // Scroll to the bottom initially
-      setTrueFalseStates((prev) => ({ ...prev, initialLoad: false }));
-      allRefs.current.previousScrollHeight = newScrollHeight; // Save initial scroll height
-      return;
-    }
-
-    const previousScrollHeight = allRefs.current.previousScrollHeight;
-
-    if (container.scrollTop + container.clientHeight === previousScrollHeight) {
-      container.scrollTop = newScrollHeight;
-    } else {
-      container.scrollTop =
-        container.scrollHeight - previousScrollHeight + container.scrollTop;
-    }
-
-    allRefs.current.previousScrollHeight = newScrollHeight;
-  }, [allMessage]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -123,8 +91,8 @@ function ChatContext() {
       const { senderId, message, _id, mentionText, senderName } = info;
       const decryptMessageText = decryptMessage(message);
       showNotification(senderName + " : " + decryptMessageText);
+      //added in reverse order as parent is row-col-reverse
       setAllMessage((prev) => [
-        ...(prev || []),
         {
           _id,
           reaction: [],
@@ -134,6 +102,7 @@ function ChatContext() {
           updatedAt: Date.now(),
           createdAt: Date.now(),
         },
+        ...(prev || []),
       ]);
       scrollChatElementBottom();
     }
@@ -228,20 +197,20 @@ function ChatContext() {
   return (
     <chatContext.Provider
       value={{
-        allRefs, //.
-        gameId, //.
-        playerInfo, //.
-        allMessage, //.
-        setAllMessage, //.
+        allRefs,
+        gameId,
+        playerInfo,
+        allMessage,
+        setAllMessage,
         reactionMessageId,
-        setReactionMessageId, //.
-        trueFalseStates, //.
-        setTrueFalseStates, //.
-        mentionText, //.
-        setMentionText, //.
-        isAtBottom, //.
-        scrollChatElementBottom, //.
-        handleReaction, //.
+        setReactionMessageId,
+        trueFalseStates,
+        setTrueFalseStates,
+        mentionText,
+        setMentionText,
+        isAtBottom,
+        scrollChatElementBottom,
+        handleReaction,
       }}
     >
       {

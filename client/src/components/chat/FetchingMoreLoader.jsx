@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-function FetchingMoreLoader({ hasMoreMessages }) {
-  if (!hasMoreMessages) return;
+function FetchingMoreLoader({ hasMoreMessages = true }) {
+  // if (!hasMoreMessages) return;
   return (
-    <div className="flex items-center justify-center pb-3">
+    <div className="flex items-center justify-center p-3">
       <span
         className="loader"
         style={{
