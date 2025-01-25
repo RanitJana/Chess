@@ -9,6 +9,7 @@ import { kingCheckMate } from "../../utils/KingCheck.js";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
+import toast from "react-hot-toast";
 
 export default function ChessBoard() {
   const {
@@ -55,12 +56,16 @@ export default function ChessBoard() {
       boardString = boardString.split("").reverse().join("");
 
     try {
+      socket.emit("game-move", gameId);
+      socket.emit("move-done", [boardString, info]);
+
+      setAllMoves((prevMoves) => [...prevMoves, info]);
+
       const response = await gameMove({
         moves: [...allMoves, info],
         gameId,
         board: boardString,
       });
-      socket.emit("game-move", gameId);
 
       if (
         kingCheckMate(
@@ -87,10 +92,8 @@ export default function ChessBoard() {
           setUserMove(true);
         else setUserMove(false);
       }
-      setAllMoves((prevMoves) => [...prevMoves, info]);
-
-      socket.emit("move-done", [boardString, info]);
     } catch (error) {
+      toast.error("Error updating moves.. Please try to refresh the page");
       console.error("Error updating moves:", error);
     }
   }
@@ -98,6 +101,7 @@ export default function ChessBoard() {
   useEffect(() => {
     function handleOpponentMove(val) {
       if (isViewer()) return;
+
       let updatedBoard = val[0];
       let move = val[1];
 
@@ -122,9 +126,10 @@ export default function ChessBoard() {
 
       // Update the allMoves array directly
       setAllMoves((prevMoves) => [...prevMoves, move]);
+      setCurrPiece({ row: null, col: null, moves: null });
+
       // Delay to show animation
       setTimeout(() => {
-        setCurrPiece({ row: null, col: null, moves: null });
         setMovingPiece(null);
         setChessboard(updatedBoard);
       }, 100);
@@ -133,7 +138,7 @@ export default function ChessBoard() {
     socket.on("opponent-move", handleOpponentMove);
 
     return () => socket.off("opponent-move", handleOpponentMove);
-  }, []);
+  }, [allMoves]);
 
   if (!players || !opponent) return;
 

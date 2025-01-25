@@ -101,7 +101,7 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
                 {player &&
                   ((!game.player1 && parseInt(game.moves[0]) % 2 != 0) ||
                     (!game.player2 && parseInt(game.moves[0]) % 2 == 0)) && (
-                    <div className="absolute inset-0 bg-black opacity-40 flex justify-center items-center"></div>
+                    <div className="absolute inset-0 bg-black opacity-40 flex justify-center items-center z-10"></div>
                   )}
                 <ChessBoardPreview
                   boardString={game.board}

@@ -369,6 +369,7 @@ function ChessBoardBox({
         className="max-w-full absolute z-20 opacity-0"
         onDrag={handleDragging}
         onDragEnd={handleDragEnd}
+        decoding="async"
       />
 
       <MemoizedChessBoardBoxNumbering
