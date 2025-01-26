@@ -10,10 +10,16 @@ import React, {
 import pieceMove, { getColor } from "../../utils/PieceMove.js";
 import clearPieceMove from "../../utils/ClearPieceMove.js";
 import ChessBoardBoxNumbering from "./ChessBoardBoxNumbering.jsx";
-import { captureSound, moveSound } from "../../utils/Sounds.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import { kingCheck, kingCheckMate } from "../../utils/KingCheck.js";
 import getKingPos from "../../utils/KingPos.js";
+import {
+  colors,
+  makeSound,
+  getPieceImagePath,
+  movingPieceTime,
+} from "../../constants.js";
+import pawnUpdatePieces from "../../utils/PawanUpdatePieces.js";
 
 function ChessBoardBox({
   row,
@@ -36,52 +42,27 @@ function ChessBoardBox({
     movingPiece,
     setMovingPiece,
     isUserMove,
-    setUserMove,
+    setIsUserMove,
   } = useGameContext();
 
-  const [imgPath, setImgPath] = useState("");
-  const pawnUpdatePieces = useMemo(() => {
-    if (playerColor === "black") {
-      return ["queen-b", "rook-b", "bishop-b", "knight-b"];
-    }
-    return ["queen-w", "rook-w", "bishop-w", "knight-w"];
-  }, [playerColor]);
-
+  const imgPath = getPieceImagePath(piece);
   const [moveInfo, setMoveInfo] = useState(null);
   const [isDragging, setDragging] = useState(false);
-
   const [offsets, setOffsets] = useState({ offsetX: 0, offsetY: 0 });
+  const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
 
   const transparentImage = useRef(new Image());
+  const dragImg = useRef(null);
+  const boxRef = useRef(null);
+
+  const MemoizedChessBoardBoxNumbering = React.memo(ChessBoardBoxNumbering);
+
   useEffect(() => {
     transparentImage.current.src =
       "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
   }, []);
 
-  const dragImg = useRef(null);
-  const boxRef = useRef(null);
-
-  useEffect(() => {
-    const assignValue = () => {
-      const pieceMapping = {
-        r: "/images/rook-b.png",
-        p: "/images/pawn-b.png",
-        n: "/images/knight-b.png",
-        b: "/images/bishop-b.png",
-        q: "/images/queen-b.png",
-        k: "/images/nrking-b.png",
-        R: "/images/rook-w.png",
-        P: "/images/pawn-w.png",
-        N: "/images/knight-w.png",
-        B: "/images/bishop-w.png",
-        Q: "/images/queen-w.png",
-        K: "/images/nrking-w.png",
-      };
-      setImgPath(pieceMapping[piece] || "");
-    };
-    assignValue();
-  }, [piece]);
-
+  //set moving piece location
   useEffect(() => {
     if (
       !movingPiece ||
@@ -96,68 +77,75 @@ function ChessBoardBox({
     setTimeout(() => setMoveInfo(null), 300);
   }, [movingPiece, row, col]);
 
-  const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
+  //prepare pawn promotion .. like display all possible pieces to be updated
+  const shouldPreparePawnPromotion = (clearedBoard) => {
+    const isSelectedPawn =
+      clearedBoard[currPiece.row][currPiece.col] === "p" ||
+      clearedBoard[currPiece.row][currPiece.col] === "P";
 
-  const handlePlacePiece = useCallback(() => {
-    if (isViewer()) return;
-    setMovingPiece({
-      from: { row: currPiece.row, col: currPiece.col },
-      to: { row, col },
-    });
-
-    const color = getColor(chessboard, row, col);
-    const sound = color && color !== playerColor ? "capture" : "move";
-
-    const clearedBoard = clearPieceMove(chessboard);
-
-    if (
-      row === 0 &&
-      (clearedBoard[currPiece.row][currPiece.col] === "p" ||
-        clearedBoard[currPiece.row][currPiece.col] === "P")
-    ) {
+    if (row === 0 && isSelectedPawn) {
       clearedBoard[currPiece.row][currPiece.col] = " ";
       setChessboard(clearedBoard);
       setPawnPieceDisplay(true);
       setMovePossible(false);
-    } else {
-      clearedBoard[currPiece.row][currPiece.col] = " ";
-      setTimeout(() => {
+      return true;
+    }
+    return false;
+  };
+
+  //final updation of placing a piece
+  const mustMovePiece = (clearedBoard, isPawnPromotion = false) => {
+    clearedBoard[currPiece.row][currPiece.col] = " ";
+
+    //delay a litle to show moving animation
+    setTimeout(() => {
+      //if it is for pawn promotion then skip placing the pawn to the new location
+      if (!isPawnPromotion)
         clearedBoard[row][col] = chessboard[currPiece.row][currPiece.col];
+      setCurrPiece({ row: null, col: null, moves: null });
+      setChessboard(clearedBoard);
 
-        setCurrPiece({ row: null, col: null, moves: null });
-        setChessboard(clearedBoard);
+      const pieceColor = getColor(chessboard, row, col);
+      makeSound(playerColor, pieceColor);
 
-        switch (sound) {
-          case "move":
-            moveSound();
-            break;
-          case "capture":
-            captureSound();
-            break;
-        }
+      setMovingPiece(null);
+      setIsUserMove(false);
 
-        setMovingPiece(null);
-        setUserMove(false);
-        const opponentColor = playerColor == "white" ? "black" : "white";
-        const kingPosition = getKingPos(clearedBoard, opponentColor);
-        const isCheck = kingCheck(
+      const opponentColor =
+        playerColor == colors.white ? colors.black : colors.white;
+      const kingPosition = getKingPos(clearedBoard, opponentColor);
+
+      const isCheck =
+        kingCheck(
           clearedBoard,
           kingPosition.row,
           kingPosition.col,
           opponentColor
-        );
-        const isCheckMate = kingCheckMate(clearedBoard, opponentColor);
-        updateMoves(clearedBoard, {
-          from: { row: currPiece.row, col: currPiece.col },
-          to: { row, col },
-          color: playerColor,
-          piece: chessboard[currPiece.row][currPiece.col],
-          takes: chessboard[row][col],
-          check: isCheck.length > 0,
-          checkMate: isCheckMate,
-        });
-      }, 100);
-    }
+        ).length > 0;
+
+      const isCheckMate = kingCheckMate(clearedBoard, opponentColor);
+
+      updateMoves(clearedBoard, {
+        from: currPiece,
+        to: { row, col },
+        color: playerColor,
+        piece: chessboard[currPiece.row][currPiece.col],
+        takes: chessboard[row][col],
+        check: isCheck,
+        checkMate: isCheckMate,
+      });
+    }, movingPieceTime);
+  };
+
+  //move a piece logic
+  const handlePlacePiece = useCallback(() => {
+    if (isViewer()) return;
+
+    setMovingPiece({ from: currPiece, to: { row, col } });
+    const clearedBoard = clearPieceMove(chessboard);
+
+    //move a piece
+    if (!shouldPreparePawnPromotion(clearedBoard)) mustMovePiece(clearedBoard);
   }, [
     currPiece,
     chessboard,
@@ -173,18 +161,17 @@ function ChessBoardBox({
 
   const handleDisplayPossibleMoves = useCallback(() => {
     if (isViewer()) return;
-    const color = getColor(chessboard, row, col);
-    if (color && playerColor !== color) return;
+
+    const pieceColor = getColor(chessboard, row, col);
+    if (pieceColor && playerColor !== pieceColor) return;
 
     const clearedBoard = clearPieceMove(chessboard);
     const moves = pieceMove(clearedBoard, row, col, true);
-    if (moves.length === 0) return;
-
-    setCurrPiece({ row, col, moves });
-  }, [chessboard, row, col, playerColor, piece]);
+    if (moves.length != 0) setCurrPiece({ row, col, moves });
+  }, [chessboard, row, col, playerColor]);
 
   const handlePieceMove = useCallback(() => {
-    if (movePossible === false || !isUserMove || isViewer()) return;
+    if (!movePossible || !isUserMove || isViewer()) return;
     if (currPiece.moves?.some(([r, c]) => r === row && c === col)) {
       return handlePlacePiece();
     } else {
@@ -200,45 +187,21 @@ function ChessBoardBox({
     handleDisplayPossibleMoves,
   ]);
 
-  const handlePawnPromotion = (_, idx) => {
+  //promote the pawn
+  const handlePawnPromotion = (idx) => {
     if (!isUserMove || isViewer()) return;
+
     const clearedBoard = clearPieceMove(chessboard.map((row) => [...row]));
 
     const promotionPieces = ["Q", "R", "B", "N"];
     const piece = promotionPieces[idx];
     clearedBoard[row][col] =
-      playerColor === "white" ? piece : piece.toLowerCase();
-
-    clearedBoard[currPiece.row][currPiece.col] = " ";
+      playerColor === colors.white ? piece : piece.toLowerCase();
 
     setMovePossible(true);
     setPawnPieceDisplay(false);
 
-    const sound = color && color !== playerColor ? "capture" : "move";
-
-    setTimeout(() => {
-      setCurrPiece({ row: null, col: null, moves: null });
-      setChessboard(clearedBoard);
-
-      switch (sound) {
-        case "move":
-          moveSound();
-          break;
-        case "capture":
-          captureSound();
-          break;
-      }
-
-      setMovingPiece(null);
-      setUserMove(false);
-      updateMoves(clearedBoard, {
-        from: { row: currPiece.row, col: currPiece.col },
-        to: { row, col },
-        color: playerColor,
-        piece: chessboard[currPiece.row][currPiece.col],
-        takes: chessboard[row][col],
-      });
-    }, 100);
+    mustMovePiece(clearedBoard, true);
   };
 
   const handleDragStart = useCallback(
@@ -319,24 +282,17 @@ function ChessBoardBox({
     }, 105);
   }, []);
 
-  const MemoizedChessBoardBoxNumbering = React.memo(ChessBoardBoxNumbering);
-
-  const promotionItems = useMemo(
-    () =>
-      pawnUpdatePieces.map((val, idx) => (
-        <li
-          onClick={(e) => handlePawnPromotion(e, idx)}
-          key={idx}
-          style={{
-            backgroundColor: idx & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)",
-          }}
-          className="relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
-        >
-          <img src={`/images/${val}.png`} alt="" />
-        </li>
-      )),
-    [pawnUpdatePieces, currPiece]
-  );
+  const promotionItems = useMemo(() => {
+    return pawnUpdatePieces(playerColor).map((val, idx) => (
+      <li
+        onClick={() => handlePawnPromotion(idx)}
+        key={idx}
+        className={`relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px] ${idx & 1 ? "bg-[rgb(115,149,82)]" : "bg-[rgb(234,237,208)]"}`}
+      >
+        <img src={`/images/${val}.png`} alt="" decoding="async" />
+      </li>
+    ));
+  }, [pawnUpdatePieces, currPiece]);
 
   return (
     <span
@@ -354,13 +310,11 @@ function ChessBoardBox({
         ref={dragImg}
         className="max-w-full absolute z-10"
         style={{
-          ...(moveInfo && !isDragging
-            ? {
-                transform: `translate(${moveInfo.x}% ,${moveInfo.y}%)`,
-                transition: "transform 0.1s linear",
-              }
-            : {}),
-          transition: "transform 0.1s linear",
+          transform:
+            moveInfo && !isDragging
+              ? `translate(${moveInfo.x}% ,${moveInfo.y}%)`
+              : "",
+          transition: `transform ${movingPieceTime}ms linear`,
         }}
       />
       <img

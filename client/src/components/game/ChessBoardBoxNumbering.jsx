@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { useCallback } from "react";
+import { colors } from "../../constants.js";
 
 function ChessBoardBoxNumbering({
   allMoves = [],
@@ -24,8 +25,8 @@ function ChessBoardBoxNumbering({
 
     // If the move count is odd and the player is white, reverse the coordinates
     if (
-      (allMoves.length % 2 == 0 && playerColor === "white") ||
-      (allMoves.length % 2 != 0 && playerColor === "black")
+      (allMoves.length % 2 == 0 && playerColor === colors.white) ||
+      (allMoves.length % 2 != 0 && playerColor === colors.black)
     ) {
       givenRow1 = 7 - givenRow1;
       givenCol1 = 7 - givenCol1;
@@ -43,15 +44,12 @@ function ChessBoardBoxNumbering({
   return (
     <>
       {/* recent piece move mark */}
-      {allMoves.length ? (
-        isValidPositionToColor() ? (
-          <div className="absolute h-full w-full bg-[#f2ff007e]"></div>
-        ) : (
-          ""
-        )
+      {allMoves.length && isValidPositionToColor() ? (
+        <div className="absolute h-full w-full bg-[#f2ff007e]"></div>
       ) : (
         ""
       )}
+
       {currPiece.moves?.some(([row1, col1]) => row === row1 && col === col1) ? (
         chessboard[row][col] != " " ? (
           <div
@@ -79,12 +77,12 @@ function ChessBoardBoxNumbering({
                 : "rgb(115,149,82)",
           }}
         >
-          {playerColor == "white" ? 8 - row : row + 1}
+          {playerColor == colors.white ? 8 - row : row + 1}
         </span>
       )}
       {row == 7 && (
         <span
-          className="absolute right-[1px] bottom-[-4px] font-semibold text-[11px]"
+          className="absolute right-[1px] bottom-[-2px] font-semibold text-[11px]"
           style={{
             color:
               color == "rgb(115,149,82)"
@@ -92,7 +90,7 @@ function ChessBoardBoxNumbering({
                 : "rgb(115,149,82)",
           }}
         >
-          {playerColor == "white"
+          {playerColor == colors.white
             ? String.fromCharCode(97 + col)
             : String.fromCharCode(104 - col)}
         </span>

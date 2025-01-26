@@ -10,6 +10,7 @@ import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import toast from "react-hot-toast";
+import { colors } from "../../constants.js";
 
 export default function ChessBoard() {
   const {
@@ -17,7 +18,7 @@ export default function ChessBoard() {
     allMoves,
     gameId,
     setChessboard,
-    setUserMove,
+    setIsUserMove,
     setAllMoves,
     setMovingPiece,
     setCurrPiece,
@@ -25,12 +26,12 @@ export default function ChessBoard() {
     players,
     setCheckMate,
   } = useGameContext();
-
   const { playerInfo } = useAuthContext();
   const { onlineUsers } = useSocketContext();
-  const boardRef = useRef(null);
+
   const userId = playerInfo._id;
 
+  const boardRef = useRef(null);
   const [opponent, setOpponent] = useState(null);
 
   useEffect(() => {
@@ -48,11 +49,10 @@ export default function ChessBoard() {
   // Handle move updates
   async function updateMoves(clearedBoard, info) {
     if (isViewer()) return;
-    let boardString = clearedBoard
-      .map((row) => row.join("")) // Use join to avoid commas
-      .join("");
 
-    if (playerColor == "black")
+    let boardString = clearedBoard.map((row) => row.join("")).join("");
+
+    if (playerColor == colors.black)
       boardString = boardString.split("").reverse().join("");
 
     try {
@@ -70,27 +70,21 @@ export default function ChessBoard() {
       if (
         kingCheckMate(
           convertTo2DArray(boardString),
-          playerColor == "white" ? "black" : "white"
+          playerColor == colors.white ? colors.black : colors.white
         )
       ) {
-        const winner = playerColor == "white" ? 1 : 2;
+        const winner = playerColor == colors.white ? 1 : 2;
         setCheckMate(winner);
         await gameEnd({ winner, gameId });
       }
 
-      if (response?.data.board) {
-        setChessboard(convertTo2DArray(response.data.board));
-      }
-
       if (response) {
-        if (playerColor == "white" && response.data.info.game.userMove == 0)
-          setUserMove(true);
-        else if (
-          playerColor == "black" &&
-          response.data.info.game.userMove == 1
-        )
-          setUserMove(true);
-        else setUserMove(false);
+        const { userMove } = response.data.info.game;
+
+        if (playerColor == colors.white && userMove == 0) setIsUserMove(true);
+        else if (playerColor == colors.black && userMove == 1)
+          setIsUserMove(true);
+        else setIsUserMove(false);
       }
     } catch (error) {
       toast.error("Error updating moves.. Please try to refresh the page");
@@ -98,45 +92,45 @@ export default function ChessBoard() {
     }
   }
 
-  useEffect(() => {
-    function handleOpponentMove(val) {
-      if (isViewer()) return;
+  //hanldle my move after opponent's move
+  function handleOpponentMove(val) {
+    if (isViewer()) return;
 
-      let updatedBoard = val[0];
-      let move = val[1];
+    let updatedBoard = val[0];
+    let move = val[1];
 
-      if (playerColor === "black") {
-        updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
-      }
-
-      updatedBoard = convertTo2DArray(updatedBoard);
-
-      if (kingCheckMate(updatedBoard, playerColor))
-        setCheckMate(playerColor == "white" ? 2 : 1);
-
-      setUserMove(true);
-
-      const opponentMove = {
-        from: { row: 7 - move.from.row, col: 7 - move.from.col },
-        to: { row: 7 - move.to.row, col: 7 - move.to.col },
-      };
-
-      // Update the moving piece for animations
-      setMovingPiece(opponentMove);
-
-      // Update the allMoves array directly
-      setAllMoves((prevMoves) => [...prevMoves, move]);
-      setCurrPiece({ row: null, col: null, moves: null });
-
-      // Delay to show animation
-      setTimeout(() => {
-        setMovingPiece(null);
-        setChessboard(updatedBoard);
-      }, 100);
+    if (playerColor === colors.black) {
+      updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
     }
 
-    socket.on("opponent-move", handleOpponentMove);
+    updatedBoard = convertTo2DArray(updatedBoard);
 
+    if (kingCheckMate(updatedBoard, playerColor))
+      setCheckMate(playerColor == colors.white ? 2 : 1);
+
+    setIsUserMove(true);
+
+    const opponentMove = {
+      from: { row: 7 - move.from.row, col: 7 - move.from.col },
+      to: { row: 7 - move.to.row, col: 7 - move.to.col },
+    };
+
+    // Update the moving piece for animations
+    setMovingPiece(opponentMove);
+
+    // Update the allMoves array directly
+    setAllMoves((prevMoves) => [...prevMoves, move]);
+    setCurrPiece({ row: null, col: null, moves: null });
+
+    // Delay to show animation
+    setTimeout(() => {
+      setMovingPiece(null);
+      setChessboard(updatedBoard);
+    }, 100);
+  }
+
+  useEffect(() => {
+    socket.on("opponent-move", handleOpponentMove);
     return () => socket.off("opponent-move", handleOpponentMove);
   }, [allMoves]);
 
@@ -149,6 +143,7 @@ export default function ChessBoard() {
         player={opponent}
         isOnline={onlineUsers[opponent._id]}
       />
+      {/* chessboard */}
       <div
         ref={boardRef}
         className="relative w-full h-fit items-center justify-center flex flex-col"
@@ -157,21 +152,19 @@ export default function ChessBoard() {
           chessboard.map((row, rowIdx) => (
             <div className="grid grid-cols-8 w-full" key={rowIdx}>
               {row.map((piece, pieceIdx) => {
-                const color =
-                  (pieceIdx + rowIdx) % 2 === 0
-                    ? "rgb(234,237,208)"
-                    : "rgb(115,149,82)";
+                const key = pieceIdx + rowIdx;
+                const color = key & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)";
 
                 return (
                   <ChessBoardBox
-                    isViewer={isViewer}
-                    key={pieceIdx}
+                    key={key}
                     row={rowIdx}
                     col={pieceIdx}
                     color={color}
                     piece={piece}
                     updateMoves={updateMoves}
                     boardDetails={boardRef.current?.getBoundingClientRect()}
+                    isViewer={isViewer}
                   />
                 );
               })}
