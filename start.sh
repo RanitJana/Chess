@@ -1,29 +1,74 @@
 #!/bin/bash
 
 clear
-# Start Node.js server
-echo "Starting Node.js server..."
-cd ./server || exit
-npm install
-npm run write
-npm start & # Run in the background
-server_pid=$! # Capture the process ID of the Node.js server
 
-cd ..
+# Define variables for PIDs
+server_pid=0
+client_pid=0
+
+# Function to handle cleanup on script exit
+cleanup() {
+    echo -e "\n🥲 Stopping servers..."
+    [[ $server_pid -ne 0 ]] && kill $server_pid 2>/dev/null && echo "Node.js server stopped."
+    [[ $client_pid -ne 0 ]] && kill $client_pid 2>/dev/null && echo "React server stopped."
+    exit 0
+}
+
+# Trap signals for cleanup
+trap cleanup SIGINT SIGTERM
+
+# Start Node.js server
+startBackend() {
+    echo ""
+    echo "💀 Starting Node.js server..."
+    cd ./server || {
+        echo "Error: Cannot find 'server' directory."
+        exit 1
+    }
+    npm install &>/dev/null || {
+        echo "Error: Failed to install Node.js dependencies."
+        exit 1
+    }
+    npm run write &>/dev/null || {
+        echo "Error: Failed to run 'write' script."
+        exit 1
+    }
+    npm start &>/dev/null &
+    server_pid=$! # Capture the process ID of the Node.js server
+    echo "👉 Node.js server started with PID: $server_pid"
+    cd - &>/dev/null || exit
+}
 
 # Start React server
-echo "Starting React server..."
-cd ./client || exit
-npm install
-npm run write
-npm run dev & # Run in the background
-client_pid=$! # Capture the process ID of the React server
+startFrontend() {
+    echo ""
+    echo "🥶 Starting React server..."
+    cd ./client || {
+        echo "Error: Cannot find 'client' directory."
+        exit 1
+    }
+    npm install &>/dev/null || {
+        echo "Error: Failed to install React dependencies."
+        exit 1
+    }
+    npm run write &>/dev/null || {
+        echo "Error: Failed to run 'write' script."
+        exit 1
+    }
+    npm run dev &>/dev/null &
+    client_pid=$! # Capture the process ID of the React server
+    echo "👉 React server started with PID: $client_pid"
+    cd - &>/dev/null || exit
+}
 
-# Return to the root directory
-cd ..
+# Start both servers
+startBackend
+startFrontend
+
+# Inform the user that the servers are running
+echo ""
+echo "Both servers are running in the background."
+echo "🚫Press Ctrl+C to stop both servers."
 
 # Wait for both servers to terminate
-echo "Both servers are running in the background."
-echo "Node.js Server PID: $server_pid"
-echo "React Server PID: $client_pid"
 wait $server_pid $client_pid
