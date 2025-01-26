@@ -46,7 +46,14 @@ const rejectFriendRequest = AsyncHandler(async (req, res, _) => {
 });
 
 const getFriends = AsyncHandler(async (req, res, _) => {
-  const { _id } = req.player;
+  const _id = req.params.userId;
+
+  if (!_id) {
+    return res.status(400).json({
+      success: false,
+      message: "Please try again",
+    });
+  }
   const friends = await friendSchema
     .find({
       $or: [{ sender: _id }, { receiver: _id }],

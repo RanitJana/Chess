@@ -10,7 +10,7 @@ import express from "express";
 const router = express.Router();
 
 router.post("/send", verifyPlayer, sendFriendRequest);
-router.get("/all", verifyPlayer, getFriends);
+router.get("/all/:userId", verifyPlayer, getFriends);
 router.put("/accept", verifyPlayer, acceptFriendRequest);
 router.put("/reject", verifyPlayer, rejectFriendRequest);
 

@@ -11,6 +11,7 @@ import { sendFriendRequest, rejectFriendRequest } from "../api/friend.js";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { socket } from "../socket.js";
 import GetAvatar from "../utils/GetAvatar.js";
+import AllFriends from "../components/profile/AllFriends.jsx";
 
 function timeAgo(lastSeen) {
   const diffInSeconds = Math.floor(
@@ -125,20 +126,20 @@ function Profile() {
   return (
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
-        {<NavBar />}
+        <NavBar />
         <div className="bg-blackDark p-4 rounded-md">
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
-            <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full left-1/2 rounded-sm overflow-hidden aspect-square">
-              <div className="relative w-[12rem] rounded-xl overflow-hidden">
-                <div
-                  dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
-                />
-                {onlineUsers[userId] ? (
-                  <div className="absolute bg-green-600 w-7 aspect-square right-0 bottom-0"></div>
-                ) : (
-                  ""
-                )}
+            <div className="relative">
+              <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full left-1/2 rounded-sm overflow-hidden aspect-square">
+                <div className="relative w-[10rem] rounded-3xl overflow-hidden">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
+                  />
+                </div>
               </div>
+              {onlineUsers[userId] && (
+                <div className="absolute right-0 translate-x-[50%] bottom-0 w-7 aspect-square rounded-full bg-green-600"></div>
+              )}
             </div>
             <div className="flex flex-col justify-between w-full text-[rgb(146,147,145)] gap-5">
               <div>
@@ -183,14 +184,6 @@ function Profile() {
                     {user?.friendsCount || 0}
                   </span>
                 </li>
-                {/* <li className="flex flex-col justify-center items-center">
-                  <img
-                    className="w-8 invert-[70%]"
-                    src="/images/views.png"
-                    alt=""
-                  />
-                  <span className="text-[0.85rem]">{user?.views || 0}</span>
-                </li> */}
               </ul>
             </div>
           </div>
@@ -244,6 +237,7 @@ function Profile() {
             </div>
           )}
         </div>
+        <AllFriends userId={userId} />
         <CurrentGamePreview userId={userId} />
         <CompletedGames userId={userId} />
       </div>

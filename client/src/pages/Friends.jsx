@@ -2,22 +2,17 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar.jsx";
 import { useNavigate, useParams } from "react-router";
-import {
-  acceptFriendRequest,
-  getFriends,
-  rejectFriendRequest,
-} from "../api/friend.js";
+import { getFriends } from "../api/friend.js";
 import toast from "react-hot-toast";
 import { useSocketContext } from "../context/SocketContext.jsx";
-import ListFriend from "../components/ListFriend.jsx";
-import GetAvatar from "../utils/GetAvatar.js";
+import ListFriend from "../components/friends/ListFriend.jsx";
+import Pending from "../components/friends/Pending.jsx";
 
 function Friends() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
   const [openTab, setOpenTab] = useState(0);
-  const [isSubmit, setIsSubmit] = useState(false);
   const [friends, setFriends] = useState({
     already: [],
     pending: [],
@@ -29,7 +24,7 @@ function Friends() {
     const handleGetAllFriends = async () => {
       try {
         setLoading(true);
-        let response = await getFriends();
+        let response = await getFriends(userId);
         if (response) {
           let tempFrndReq = [],
             tempFrnds = [];
@@ -55,57 +50,6 @@ function Friends() {
     handleGetAllFriends();
   }, [userId]);
 
-  const handleRejectFriendRequest = async function (modelId) {
-    if (isSubmit) return;
-    try {
-      setIsSubmit(true);
-      let response = await rejectFriendRequest({ modelId });
-      if (response) {
-        if (response.data.success) {
-          toast.success(response.data.message);
-          setFriends((prev) => {
-            return {
-              already: prev.already,
-              pending: prev.pending.filter((val) => val.modelId != modelId),
-            };
-          });
-        } else toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Please try again");
-    } finally {
-      setIsSubmit(false);
-    }
-  };
-
-  const handleAcceptFriendRequest = async function (modelId) {
-    if (isSubmit) return;
-    try {
-      setIsSubmit(true);
-      let response = await acceptFriendRequest({ modelId });
-      if (response) {
-        if (response.data.success) {
-          toast.success(response.data.message);
-          setFriends((prev) => {
-            return {
-              already: [
-                ...prev.pending.filter((val) => val.modelId == modelId),
-                ...prev.already,
-              ],
-              pending: prev.pending.filter((val) => val.modelId != modelId),
-            };
-          });
-        } else toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Please try again");
-    } finally {
-      setIsSubmit(false);
-    }
-  };
-
   return (
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
@@ -115,6 +59,7 @@ function Friends() {
           <span className="font-bold text-white text-2xl">Friends</span>
         </p>
         <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6 sm:pt-10 pt-10">
+          {/* search bar */}
           <div className="relative flex w-full rounded-3xl overflow-hidden">
             <img
               src="/images/search.png"
@@ -176,80 +121,14 @@ function Friends() {
             )
           ) : friends.pending?.length ? (
             <ul className="flex flex-col gap-7">
-              {friends.pending.map((user) => {
+              {friends.pending.map((user, idx) => {
                 return (
-                  <li
-                    key={user._id}
-                    className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
-                  >
-                    <div className="flex items-center gap-4 w-full">
-                      <div className="relative w-[6rem] min-w-[5rem]">
-                        <div className="w-20 relative">
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: GetAvatar(user?.name),
-                            }}
-                            className="bg-white rounded-xl"
-                          />
-                          {onlineUsers[user._id] && (
-                            <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600 rounded-br-xl"></div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="grid grid-rows-2 w-full">
-                        <div>
-                          <span
-                            className="text-white font-semibold hover:cursor-pointer"
-                            onClick={() => navigate(`/member/${user._id}`)}
-                          >
-                            {user.name}{" "}
-                          </span>
-                          <span
-                            className="text-gray-400 hover:cursor-pointer"
-                            onClick={() => navigate(`/member/${user._id}`)}
-                          >
-                            ({user.rating})
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 w-full max-w-[20rem]">
-                          <button
-                            className=" bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors"
-                            disabled={isSubmit}
-                            style={{
-                              opacity: isSubmit ? "0.5" : "1",
-                              cursor: isSubmit ? "not-allowed" : "pointer",
-                            }}
-                            onClick={() =>
-                              handleRejectFriendRequest(user.modelId)
-                            }
-                          >
-                            <img
-                              src="/images/cross.png"
-                              alt=""
-                              className="w-6"
-                            />
-                          </button>
-                          <button
-                            className=" bg-[rgb(61,58,57)] rounded-md h-10 flex items-center justify-center w-full active:bg-blackLight transition-colors"
-                            disabled={isSubmit}
-                            style={{
-                              opacity: isSubmit ? "0.5" : "1",
-                              cursor: isSubmit ? "not-allowed" : "pointer",
-                            }}
-                            onClick={() =>
-                              handleAcceptFriendRequest(user.modelId)
-                            }
-                          >
-                            <img
-                              src="/images/tick.png"
-                              alt=""
-                              className="w-5"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
+                  <Pending
+                    key={idx}
+                    user={user}
+                    setFriends={setFriends}
+                    isOnline={onlineUsers?.[user._id]}
+                  />
                 );
               })}
             </ul>

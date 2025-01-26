@@ -16,10 +16,10 @@ const sendFriendRequest = async function (body = {}) {
   }
 };
 
-const getFriends = async function () {
+const getFriends = async function (userId) {
   try {
     let response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URI}/api/v1/friend/all`,
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/friend/all/${userId}`,
       {
         withCredentials: true,
       }

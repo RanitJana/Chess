@@ -10,6 +10,7 @@ import MemoEmptyDailyGames from "./EmptyDailyGames.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import MemoDailyGamesLoading from "./DailyGamesLoading.jsx";
 import WaitingForOpponent from "./WaitingForOpponent.jsx";
+import { colors } from "../../constants.js";
 
 function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   const navigate = useNavigate();
@@ -105,23 +106,27 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
                   )}
                 <ChessBoardPreview
                   boardString={game.board}
-                  playerColor={game.player1 ? "black" : "white"}
+                  playerColor={game.player1 ? colors.black : colors.white}
                 />
-                <div className="flex items-center p-2 bg-blackDark transition-all group-hover:bg-[rgb(58,56,54)]">
-                  <div className="h-10 aspect-square rounded-xl bg-white overflow-hidden relative">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: GetAvatar(player?.name),
-                      }}
-                    />
+                <div className="flex items-center gap-1 p-2 bg-blackDark transition-all group-hover:bg-[rgb(58,56,54)]">
+                  <div className="relative">
+                    <div className="h-10 aspect-square rounded-xl bg-white overflow-hidden relative">
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: GetAvatar(player?.name),
+                        }}
+                      />
+                    </div>
                     {onlineUsers[player?._id] && (
-                      <div className="absolute right-0 bottom-0 w-3 aspect-square bg-green-600"></div>
+                      <div className="absolute right-0 translate-x-[50%] bottom-0 w-3 aspect-square rounded-full bg-green-600"></div>
                     )}
                   </div>
 
-                  <div className="pl-2 text-white">
-                    <p className="font-bold">{player?.name || " waiting..."}</p>
-                    <p className="text-sm text-gray-400">
+                  <div className="pl-2 text-white text-sm">
+                    <p className="font-bold line-clamp-1">
+                      {player?.name || " waiting..."}
+                    </p>
+                    <p className="text-gray-400 line-clamp-1">
                       {player ? "3 days" : "...."}
                     </p>
                   </div>

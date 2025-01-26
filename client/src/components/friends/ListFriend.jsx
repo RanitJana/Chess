@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 
 import { useState } from "react";
-import { rejectFriendRequest } from "../api/friend.js";
+import { rejectFriendRequest } from "../../api/friend.js";
 import toast from "react-hot-toast";
-import GetAvatar from "../utils/GetAvatar.js";
+import GetAvatar from "../../utils/GetAvatar.js";
 
 export default function ListFriend({
   user = {},
@@ -51,13 +51,15 @@ export default function ListFriend({
         </div>
       )}
       <div className="flex items-center gap-5">
-        <div className="w-20 relative rounded-xl overflow-hidden">
-          <div
-            dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
-            className="w-20 rounded-xl bg-white"
-          />
+        <div className="relative">
+          <div className="w-20 relative rounded-xl overflow-hidden">
+            <div
+              dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
+              className="w-20 rounded-xl bg-white"
+            />
+          </div>
           {isOnline && (
-            <div className="absolute right-0 bottom-0 w-5 aspect-square bg-green-600"></div>
+            <div className="absolute right-0 translate-x-[50%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
           )}
         </div>
         <div>
