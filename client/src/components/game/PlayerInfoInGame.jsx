@@ -77,7 +77,7 @@ function PlayerInfoInGame({
           )}
         </div>
         <div className="w-full">
-          <p className="text-sm">
+          <p className="text-sm line-clamp-1 text-white">
             <span
               onClick={() => navigate(`/member/${player._id}`)}
               className="text-white font-semibold mr-1 hover:cursor-pointer"

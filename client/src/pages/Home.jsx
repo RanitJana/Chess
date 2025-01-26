@@ -87,7 +87,7 @@ function Home() {
             </button>
             <button
               disabled={isCreatingGame}
-              className={`bg-blackDark ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
+              className={`bg-blackDark w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
             >
               <img
                 src="/images/handshake.svg"

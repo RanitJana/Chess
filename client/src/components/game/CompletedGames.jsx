@@ -54,10 +54,17 @@ function CompletedGames({ userId }) {
 
   return (
     <div className="w-full max-w-[970px] bg-blackDark rounded-md">
-      <p className="text-white p-4 border-b-[2px] border-blackLight flex items-center justify-between">
-        <span className="font-bold py-1">
-          Completed Games ({totalDoneGames || 0})
-        </span>
+      <div className="text-white p-4 border-b-[2px] border-blackLight flex items-center justify-between">
+        <div className="flex gap-2">
+          <img
+            src="/images/completed.png"
+            alt=""
+            className="invert w-6 aspect-square"
+          />
+          <p className="text-white font-bold">
+            Completed Games ({totalDoneGames || 0})
+          </p>
+        </div>
         <span>
           {games.length < totalDoneGames ? (
             <button
@@ -70,7 +77,7 @@ function CompletedGames({ userId }) {
             ""
           )}
         </span>
-      </p>
+      </div>
       {games?.length ? (
         <div className="overflow-x-scroll">
           <table className="w-full min-w-[30rem] text-gray-300 h-fit bg-gray-700">
