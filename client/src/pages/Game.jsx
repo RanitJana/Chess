@@ -96,7 +96,7 @@ export default function Game() {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchGameInfo();
-  }, [gameId]);
+  }, [gameId, fetchGameInfo]);
 
   return (
     <GameContext.Provider

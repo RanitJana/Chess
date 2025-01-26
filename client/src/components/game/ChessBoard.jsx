@@ -10,7 +10,7 @@ import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import toast from "react-hot-toast";
-import { colors, makeSound } from "../../constants.js";
+import { colors, makeSound, movingPieceTime } from "../../constants.js";
 import { getColor } from "../../utils/PieceMove.js";
 
 export default function ChessBoard() {
@@ -58,7 +58,7 @@ export default function ChessBoard() {
 
     try {
       socket.emit("game-move", gameId);
-      socket.emit("move-done", [boardString, info]);
+      socket.emit("move-done", { boardString, info });
 
       setAllMoves((prevMoves) => [...prevMoves, info]);
 
@@ -97,8 +97,8 @@ export default function ChessBoard() {
   function handleOpponentMove(val) {
     if (isViewer()) return;
 
-    let updatedBoard = val[0];
-    let move = val[1];
+    let updatedBoard = val.boardString;
+    let move = val.info;
 
     if (playerColor === colors.black) {
       updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
@@ -132,7 +132,7 @@ export default function ChessBoard() {
     setTimeout(() => {
       setMovingPiece(null);
       setChessboard(updatedBoard);
-    }, 100);
+    }, movingPieceTime);
   }
 
   useEffect(() => {
@@ -148,42 +148,48 @@ export default function ChessBoard() {
       <PlayerInfoInGame
         player={opponent}
         isOnline={onlineUsers[opponent._id]}
+        opponentColor={playerColor}
+        chessboard={chessboard}
       />
       {/* chessboard */}
       <div
         ref={boardRef}
         className="relative w-full h-fit items-center justify-center flex flex-col"
       >
-        {chessboard ? (
-          chessboard.map((row, rowIdx) => (
-            <div className="grid grid-cols-8 w-full" key={rowIdx}>
-              {row.map((piece, pieceIdx) => {
-                const key = pieceIdx + rowIdx;
-                const color = key & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)";
-
-                return (
-                  <ChessBoardBox
-                    key={key}
-                    row={rowIdx}
-                    col={pieceIdx}
-                    color={color}
-                    piece={piece}
-                    updateMoves={updateMoves}
-                    boardDetails={boardRef.current?.getBoundingClientRect()}
-                    isViewer={isViewer}
-                  />
-                );
-              })}
-            </div>
-          ))
-        ) : (
+        {/* empty chessboard */}
+        {!chessboard && (
           <div className="relative w-full h-fit">{<EmptyBoard />}</div>
         )}
+        {chessboard?.map((row, rowIdx) => (
+          <div className="grid grid-cols-8 w-full" key={rowIdx}>
+            {row.map((piece, pieceIdx) => {
+              const key = pieceIdx + rowIdx;
+              const color = key & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)";
+
+              return (
+                <ChessBoardBox
+                  key={key}
+                  row={rowIdx}
+                  col={pieceIdx}
+                  color={color}
+                  piece={piece}
+                  updateMoves={updateMoves}
+                  boardDetails={boardRef.current?.getBoundingClientRect()}
+                  isViewer={isViewer}
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
       {/* user info */}
       <PlayerInfoInGame
         player={playerInfo}
         isOnline={onlineUsers[playerInfo._id]}
+        opponentColor={
+          playerColor == colors.white ? colors.black : colors.white
+        }
+        chessboard={chessboard}
       />
     </div>
   );

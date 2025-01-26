@@ -1,16 +1,15 @@
-/* eslint-disable no-unused-vars */
 //a function to get a piece's color where capitals are white and small are black otherwise null
 import isKingCheck from "./IsKingCheck.js";
-import { kingCheck, kingCheckMate } from "./KingCheck.js";
+import { kingCheck } from "./KingCheck.js";
 import filterPieceMovesToPreventCheck from "./KingCheckPrevent.js";
-import getKingPos from "./KingPos.js";
+import { colors } from "../constants.js";
 
 const getColor = function (chessboard, row, col) {
   if (row < 0 || row > 7 || col < 0 || col > 7) return null;
   let piece = chessboard[row][col];
 
-  if (piece >= "A" && piece <= "Z") return "white";
-  if (piece >= "a" && piece <= "z") return "black";
+  if (piece >= "A" && piece <= "Z") return colors.white;
+  if (piece >= "a" && piece <= "z") return colors.black;
 
   return null;
 };
