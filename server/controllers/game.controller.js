@@ -175,22 +175,27 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
       success: false,
       message: "Game not found",
     });
+
   let board = game.board.split("").join("");
 
   //if the player is 1 then he is white otherwiese black
-  if (game.player1._id.toString() == req.player._id.toString())
+  if (game.player1._id.toString() == req.player._id.toString()) {
+    game.board = board;
     return res.status(200).json({
       success: true,
       message: "Game found",
       info: {
         color: "white",
         game,
-        board,
       },
     });
+  }
 
   //reverse the board for black
   board = board.split("").reverse().join("");
+
+  //
+  game.board = board;
 
   //return info as black
   return res.status(200).json({
@@ -199,7 +204,6 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
     info: {
       color: "black",
       game,
-      board,
     },
   });
 });

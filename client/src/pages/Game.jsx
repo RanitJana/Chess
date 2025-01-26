@@ -67,8 +67,8 @@ export default function Game() {
         const response = await gameSingle(gameId);
 
         if (response?.data.info) {
-          let { color, game, board } = response.data.info;
-          board = convertTo2DArray(board);
+          let { color, game } = response.data.info;
+          const board = convertTo2DArray(game.board);
 
           let moves = game.moves.map((val) => JSON.parse(val));
 
