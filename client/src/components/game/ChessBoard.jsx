@@ -10,7 +10,8 @@ import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import toast from "react-hot-toast";
-import { colors } from "../../constants.js";
+import { colors, makeSound } from "../../constants.js";
+import { getColor } from "../../utils/PieceMove.js";
 
 export default function ChessBoard() {
   const {
@@ -114,6 +115,11 @@ export default function ChessBoard() {
       from: { row: 7 - move.from.row, col: 7 - move.from.col },
       to: { row: 7 - move.to.row, col: 7 - move.to.col },
     };
+
+    makeSound(
+      playerColor,
+      getColor(updatedBoard, opponentMove.to.row, opponentMove.to.col)
+    );
 
     // Update the moving piece for animations
     setMovingPiece(opponentMove);
