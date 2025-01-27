@@ -11,7 +11,6 @@ createRoot(document.getElementById("root")).render(
   <>
     <Toaster
       toastOptions={{ style: { zIndex: 9999 } }}
-      position="top-right"
       reverseOrder={false}
     />
     <BrowserRouter>

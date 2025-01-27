@@ -67,6 +67,7 @@ function AllFriends() {
           <>
             <SingleFriendSkeleton />
             <SingleFriendSkeleton />
+            <SingleFriendSkeleton />
           </>
         )}
       </div>

@@ -24,10 +24,7 @@ const realTimeInit = function (server) {
       onlineUsers[userId] = true;
       totalOnline = totalOnline + 1;
       userIdsave = userId;
-
-      setTimeout(() => {
-        io.emit("online-user", { onlineUsers, totalOnline });
-      }, 100);
+      io.emit("online-user", { onlineUsers, totalOnline });
     });
 
     let roomId; // To track which room this socket belongs to

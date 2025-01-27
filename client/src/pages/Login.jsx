@@ -42,11 +42,11 @@ export default function Login() {
         setPlayerInfo(player);
         navigate("/");
       } else {
-        console.log(message);
         Toast.error(message);
       }
     } catch (error) {
       console.log(error);
+      Toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmit(false);
     }
