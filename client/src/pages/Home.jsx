@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { gameInit } from "../api/game.js";
-import { toast } from "react-hot-toast";
 import CurrentGamePreview from "../components/game/CurrentGamePreview.jsx";
 import CompletedGames from "../components/game/CompletedGames.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
+import Toast from "../utils/Toast.js";
 
 function Home() {
   const { totalOnline } = useSocketContext();
@@ -23,13 +23,13 @@ function Home() {
       if (success) {
         setAddNewGame(info);
         // setGames((prev) => [info, ...prev]);
-        toast.success(message);
+        Toast.success(message);
       } else {
-        toast.error(message || "Failed to create a game.");
+        Toast.error(message || "Failed to create a game.");
       }
     } catch (error) {
       console.error("Error creating a game:", error);
-      toast.error("Something went wrong while creating a game.");
+      Toast.error("Something went wrong while creating a game.");
     } finally {
       setIsCreatingGame(false);
     }

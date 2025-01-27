@@ -8,8 +8,8 @@ import { useChatContext } from "../../context/ChatContext.jsx";
 import { v4 as uuidv4 } from "uuid";
 import { messagePost } from "../../api/message.js";
 import { encryptMessage } from "../../utils/encryptDecryptMessage.js";
-import toast from "react-hot-toast";
 import ScrollToBottom from "./ScrollToBottom.jsx";
+import Toast from "../../utils/Toast.js";
 
 function MentionInText({ mentionText, setMentionText }) {
   const [savedMention, setSavedMention] = useState(mentionText);
@@ -151,7 +151,7 @@ function TypingArea() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Unable to send the message");
+      Toast.error("Unable to send the message");
     }
   }, [
     text,

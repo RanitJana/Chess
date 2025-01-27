@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { rejectFriendRequest } from "../../api/friend.js";
-import toast from "react-hot-toast";
 import GetAvatar from "../../utils/GetAvatar.js";
+import Toast from "../../utils/Toast.js";
 
 export default function ListFriend({
   user = {},
@@ -23,18 +23,18 @@ export default function ListFriend({
 
       if (response) {
         if (response.data.success) {
-          toast.success("Friend Removed");
+          Toast.success("Friend Removed");
           setFriends((prev) => {
             return {
               already: prev.already.filter((prev) => prev.modelId != modelId),
               pending: prev.pending,
             };
           });
-        } else toast.error(response.data.message);
+        } else Toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again");
+      Toast.error("Please try again");
     } finally {
       setIsSubmit(false);
     }

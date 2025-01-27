@@ -4,12 +4,12 @@ import SingleChat from "./SingleChat.jsx";
 import { useChatContext } from "../../context/ChatContext.jsx";
 import { decryptMessage } from "../../utils/encryptDecryptMessage.js";
 import { messageGet } from "../../api/message.js";
-import toast from "react-hot-toast";
 import Typing from "./Typing.jsx";
 import FetchingMoreLoader from "./FetchingMoreLoader.jsx";
 import TypingArea from "./TypingArea.jsx";
 import InfiniteScroll from "react-infinite-scroll-component";
 import EmptyChat from "./EmptyChat.jsx";
+import Toast from "../../utils/Toast.js";
 
 function Chats() {
   const {
@@ -63,7 +63,7 @@ function Chats() {
       }
     } catch (error) {
       console.error("Failed to load messages:", error);
-      toast.error("An error occurred. Please try refreshing the page.");
+      Toast.error("An error occurred. Please try refreshing the page.");
     }
   }, [allMessage, gameId]);
 

@@ -5,7 +5,7 @@ import "./GameDone.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { gameDone } from "../../api/game.js";
-import toast from "react-hot-toast";
+import Toast from "../../utils/Toast.js";
 
 function NamePlate({ name, winner, rating }) {
   return (
@@ -39,10 +39,10 @@ function CompletedGames({ userId }) {
       if (success) {
         setGames(info);
         setTotalDoneGames(totalDocuments);
-      } else toast.error("Failed to fetch games.");
+      } else Toast.error("Failed to fetch games.");
     } catch (error) {
       console.error("Error fetching games:", error);
-      toast.error("Something went wrong while fetching games.");
+      Toast.error("Something went wrong while fetching games.");
     } finally {
       setFetchingDoneGamesAll(false);
     }

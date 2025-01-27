@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { login } from "../api/auth.js";
-import toast from "react-hot-toast";
 import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
+import Toast from "../utils/Toast.js";
 
 export default function Login() {
   const [info, setInfo] = useState({
@@ -22,10 +22,10 @@ export default function Login() {
   const handleFormSumbit = async function (e) {
     e.preventDefault();
 
-    if (isSubmit) return toast.loading("Please wait..");
+    if (isSubmit) return Toast.loading("Please wait..");
 
     if (!info.email || !info.password)
-      return toast.error("Please fill all the fields..");
+      return Toast.error("Please fill all the fields..");
 
     try {
       setSubmit(true);
@@ -37,11 +37,14 @@ export default function Login() {
       const { success, message, player } = response?.data;
 
       if (success) {
-        toast.success(message);
+        Toast.success(message);
         setAuth(true);
         setPlayerInfo(player);
         navigate("/");
-      } else toast.error(message);
+      } else {
+        console.log(message);
+        Toast.error(message);
+      }
     } catch (error) {
       console.log(error);
     } finally {

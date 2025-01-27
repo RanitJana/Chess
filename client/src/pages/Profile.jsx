@@ -1,8 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import NavBar from "../components/NavBar.jsx";
-import toast from "react-hot-toast";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
 import CurrentGamePreview from "../components/game/CurrentGamePreview.jsx";
@@ -12,6 +12,7 @@ import { useSocketContext } from "../context/SocketContext.jsx";
 import { socket } from "../socket.js";
 import GetAvatar from "../utils/GetAvatar.js";
 import AllFriends from "../components/profile/AllFriends.jsx";
+import Toast from "../utils/Toast.js";
 
 function timeAgo(lastSeen) {
   const diffInSeconds = Math.floor(
@@ -42,43 +43,47 @@ function Profile() {
 
   const { onlineUsers } = useSocketContext();
 
-  useEffect(() => {
-    const handleUser = async () => {
-      if (userId != playerInfo?._id) {
-        try {
-          setLoading(true);
-          let response = await getUserInfo(userId);
-          if (response?.data.success) {
-            setUser(response.data.player);
-          }
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
+  const handleUser = async () => {
+    if (userId != playerInfo?._id) {
+      try {
+        setLoading(true);
+        let response = await getUserInfo(userId);
+        if (response?.data.success) {
+          setUser(response.data.player);
         }
-      } else {
-        setUser(playerInfo);
+      } catch (error) {
+        console.log(error);
+      } finally {
         setLoading(false);
       }
-    };
+    } else {
+      setUser(playerInfo);
+      setLoading(false);
+    }
+  };
+
+  const handleLastSeen = (userIdSave) => {
+    if (userId == userIdSave) {
+      if (onlineUsers[userId]) delete onlineUsers[userId];
+      user.lastSeen = Date.now();
+    }
+  };
+
+  useEffect(() => {
     handleUser();
   }, [userId, playerInfo]);
 
   useEffect(() => {
-    socket.on("fix-time", (userIdSave) => {
-      if (userId == userIdSave) {
-        if (onlineUsers[userId]) delete onlineUsers[userId];
-        user.lastSeen = Date.now();
-      }
-    });
+    socket.on("fix-time", handleLastSeen);
 
     const displayLastSeenRef = setInterval(() => {
       if (onlineUsers[userId]) setLastSeen("Online Now");
       else setLastSeen(timeAgo(user?.lastSeen));
-    }, 1000);
+    }, 10);
+
     return () => {
       clearInterval(displayLastSeenRef);
-      socket.off("fix-time");
+      socket.off("fix-time", handleLastSeen);
     };
   }, [onlineUsers, user, userId]);
 
@@ -92,13 +97,13 @@ function Profile() {
       });
       if (response) {
         if (response.data.success) {
-          toast.success(response.data.message);
+          Toast.success(response.data.message);
           setUser((prev) => ({ ...prev, friend: { accept: false } }));
-        } else toast.error(response.data.message);
+        } else Toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again..");
+      Toast.error("Please try again..");
     } finally {
       setIsSendFriendRequest(false);
     }
@@ -111,13 +116,13 @@ function Profile() {
       let response = await rejectFriendRequest({ modelId });
       if (response) {
         if (response.data.success) {
-          toast.success("Unfriend successful");
+          Toast.success("Unfriend successful");
           setUser((prev) => ({ ...prev, friend: null }));
-        } else toast.error(response.data.message);
+        } else Toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again");
+      Toast.error("Please try again");
     } finally {
       setIsSendFriendRequest(false);
     }

@@ -9,9 +9,9 @@ import { kingCheckMate } from "../../utils/KingCheck.js";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
-import toast from "react-hot-toast";
 import { colors, makeSound, movingPieceTime } from "../../constants.js";
 import { getColor } from "../../utils/PieceMove.js";
+import Toast from "../../utils/Toast.js";
 
 export default function ChessBoard() {
   const {
@@ -88,7 +88,7 @@ export default function ChessBoard() {
         else setIsUserMove(false);
       }
     } catch (error) {
-      toast.error("Error updating moves.. Please try to refresh the page");
+      Toast.error("Error updating moves.. Please try to refresh the page");
       console.error("Error updating moves:", error);
     }
   }

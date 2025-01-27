@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react";
 import { getFriends } from "../../api/friend.js";
-import toast from "react-hot-toast";
 import { useParams } from "react-router";
 import SingleFriend from "./SingleFriend";
 import SingleFriendSkeleton from "./SingleFriendSkeletion.jsx";
+import Toast from "../../utils/Toast.js";
 
 function AllFriends() {
   const [friends, setFriends] = useState([]);
@@ -18,11 +18,11 @@ function AllFriends() {
       if (response) {
         setFriends(response.data.friends.filter((value) => value.accept));
       } else {
-        toast.error("Please try to refresh the page again.");
+        Toast.error("Please try to refresh the page again.");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try to refresh the page again.");
+      Toast.error("Please try to refresh the page again.");
     } finally {
       setLoading(false);
     }

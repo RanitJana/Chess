@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import { logout } from "../api/auth.js";
-import toast from "react-hot-toast";
 import Loader from "../components/Loader.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
+import Toast from "../utils/Toast.js";
 
 function NavBar() {
   const { playerInfo } = useAuthContext();
@@ -19,11 +19,11 @@ function NavBar() {
       if (response?.data.success) {
         document.cookie = `${"authToken"}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
         localStorage.removeItem("user");
-        toast.success(response.data.message);
+        Toast.success(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again");
+      Toast.error("Please try again");
     } finally {
       navigate("/login");
       setLoggingOut(false);

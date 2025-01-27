@@ -8,7 +8,7 @@ client_pid=0
 
 # Function to handle cleanup on script exit
 cleanup() {
-    echo -e "\n🥲 Stopping servers..."
+    echo -e "🥲 Stopping servers..."
     [[ $server_pid -ne 0 ]] && kill $server_pid 2>/dev/null && echo "Node.js server stopped."
     [[ $client_pid -ne 0 ]] && kill $client_pid 2>/dev/null && echo "React server stopped."
     exit 0
@@ -19,7 +19,6 @@ trap cleanup SIGINT SIGTERM
 
 # Start Node.js server
 startBackend() {
-    echo ""
     echo "💀 Starting Node.js server..."
     cd ./server || {
         echo "Error: Cannot find 'server' directory."
@@ -36,12 +35,12 @@ startBackend() {
     npm start &>/dev/null &
     server_pid=$! # Capture the process ID of the Node.js server
     echo "👉 Node.js server started with PID: $server_pid"
+    echo ""
     cd - &>/dev/null || exit
 }
 
 # Start React server
 startFrontend() {
-    echo ""
     echo "🥶 Starting React server..."
     cd ./client || {
         echo "Error: Cannot find 'client' directory."
@@ -58,6 +57,7 @@ startFrontend() {
     npm run dev &>/dev/null &
     client_pid=$! # Capture the process ID of the React server
     echo "👉 React server started with PID: $client_pid"
+    echo ""
     cd - &>/dev/null || exit
 }
 
@@ -66,9 +66,9 @@ startBackend
 startFrontend
 
 # Inform the user that the servers are running
-echo ""
 echo "Both servers are running in the background."
-echo "🚫Press Ctrl+C to stop both servers."
+echo "🚫 Press Ctrl+C to stop both servers."
+echo ""
 
 # Wait for both servers to terminate
 wait $server_pid $client_pid

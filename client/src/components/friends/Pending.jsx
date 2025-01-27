@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import GetAvatar from "../../utils/GetAvatar.js";
 import { rejectFriendRequest, acceptFriendRequest } from "../../api/friend.js";
-import toast from "react-hot-toast";
+import Toast from "../../utils/Toast.js";
 
 function Pending({ user = {}, isOnline = false, setFriends }) {
   const navigate = useNavigate();
@@ -17,18 +17,18 @@ function Pending({ user = {}, isOnline = false, setFriends }) {
       let response = await rejectFriendRequest({ modelId });
       if (response) {
         if (response.data.success) {
-          toast.success(response.data.message);
+          Toast.success(response.data.message);
           setFriends((prev) => {
             return {
               already: prev.already,
               pending: prev.pending.filter((val) => val.modelId != modelId),
             };
           });
-        } else toast.error(response.data.message);
+        } else Toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again");
+      Toast.error("Please try again");
     } finally {
       setIsSubmit(false);
     }
@@ -41,7 +41,7 @@ function Pending({ user = {}, isOnline = false, setFriends }) {
       let response = await acceptFriendRequest({ modelId });
       if (response) {
         if (response.data.success) {
-          toast.success(response.data.message);
+          Toast.success(response.data.message);
           setFriends((prev) => {
             return {
               already: [
@@ -51,11 +51,11 @@ function Pending({ user = {}, isOnline = false, setFriends }) {
               pending: prev.pending.filter((val) => val.modelId != modelId),
             };
           });
-        } else toast.error(response.data.message);
+        } else Toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error("Please try again");
+      Toast.error("Please try again");
     } finally {
       setIsSubmit(false);
     }

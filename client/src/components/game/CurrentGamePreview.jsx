@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import ChessBoardPreview from "./ChessBoardPreview.jsx";
 import { useCallback, useEffect, useState } from "react";
 import { gameOngoing, gameSingle } from "../../api/game.js";
-import toast from "react-hot-toast";
 import { socket } from "../../socket.js";
 import GetAvatar from "../../utils/GetAvatar.js";
 import MemoEmptyDailyGames from "./EmptyDailyGames.jsx";
@@ -11,6 +10,7 @@ import { useSocketContext } from "../../context/SocketContext.jsx";
 import MemoDailyGamesLoading from "./DailyGamesLoading.jsx";
 import WaitingForOpponent from "./WaitingForOpponent.jsx";
 import { colors } from "../../constants.js";
+import Toast from "../../utils/Toast.js";
 
 function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   const navigate = useNavigate();
@@ -35,10 +35,10 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
       if (success) {
         setGames(info);
       } else {
-        toast.error("Please try to login again");
+        Toast.error("Please try to login again");
       }
     } catch {
-      toast.error("Something went wrong while fetching games.");
+      Toast.error("Something went wrong while fetching games.");
     } finally {
       setLoading(false);
     }
@@ -62,10 +62,10 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
             )
           );
         } else {
-          toast.error("Failed to fetch game updates.");
+          Toast.error("Failed to fetch game updates.");
         }
       } catch {
-        toast.error("Something went wrong while updating game preview.");
+        Toast.error("Something went wrong while updating game preview.");
       }
     };
     socket.on("update-game-preview", handleUpdateGamePreview);

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar.jsx";
 import { useNavigate, useParams } from "react-router";
 import { getFriends } from "../api/friend.js";
-import toast from "react-hot-toast";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import ListFriend from "../components/friends/ListFriend.jsx";
 import Pending from "../components/friends/Pending.jsx";
+import Toast from "../utils/Toast.js";
 
 function Friends() {
   const { userId } = useParams();
@@ -38,11 +38,11 @@ function Friends() {
           });
           setFriends(() => ({ already: tempFrnds, pending: tempFrndReq }));
         } else {
-          toast.error("Please try to refresh the page again.");
+          Toast.error("Please try to refresh the page again.");
         }
       } catch (error) {
         console.log(error);
-        toast.error("Please try to refresh the page again.");
+        Toast.error("Please try to refresh the page again.");
       } finally {
         setLoading(false);
       }
