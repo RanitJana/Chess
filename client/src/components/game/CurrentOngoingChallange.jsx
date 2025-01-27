@@ -2,7 +2,7 @@
 import ChessBoardPreview from "./ChessBoardPreview.jsx";
 import { colors } from "../../constants";
 import GetAvatar from "../../utils/GetAvatar.js";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { gameChallangeAccept, gameChallangeReject } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
 import Loader from "../Loader.jsx";
@@ -16,33 +16,39 @@ function CurrentOngoingChallange({
 }) {
   const [loading, setLoading] = useState(false);
 
+  const updateGanes = useCallback(
+    (gameId) => {
+      setGames((prev) => prev.filter((value) => value._id != gameId));
+    },
+    [setGames]
+  );
+
   const handleReject = async () => {
     try {
       setLoading(true);
-      const response = await gameChallangeReject(game._id);
-      const { success, message } = response.data;
-      if (success) {
-        setGames((prev) => prev.filter((value) => value._id != game._id));
-        Toast.success(message);
-      } else Toast.error(message);
+      const { data } = await gameChallangeReject(game._id);
+      if (data?.success) {
+        updateGanes(game._id);
+        Toast.success(data.message);
+      } else Toast.error(data?.message || "Try again");
     } catch {
       Toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
   };
+
   const handleAccept = async () => {
     try {
       setLoading(true);
-      const response = await gameChallangeAccept(game._id);
-      const { success, message } = response.data;
-      if (success) {
+      const { data } = await gameChallangeAccept(game._id);
+      if (data?.success) {
         if (challanger) game.player1 = null;
         else game.player2 = null;
         setAddNewGame(game);
-        setGames((prev) => prev.filter((value) => value._id != game._id));
-        Toast.success(message);
-      } else Toast.error(message);
+        updateGanes(game._id);
+        Toast.success(data.message);
+      } else Toast.error(data?.message || "Try again");
     } catch {
       Toast.error("An error occurred");
     } finally {
@@ -63,11 +69,12 @@ function CurrentOngoingChallange({
           playerColor={challanger ? colors.white : colors.black}
         />
         <div className="absolute w-full top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center gap-1">
-          <div className="h-10 aspect-square rounded-xl bg-white overflow-hidden relative">
+          <div className="h-14 p-1 aspect-square rounded-xl bg-white overflow-hidden relative">
             <div
               dangerouslySetInnerHTML={{
                 __html: GetAvatar(player?.name),
               }}
+              className=" rounded-xl overflow-hidden"
             />
           </div>
           <span className="text-white font-semibold text-xs max-w-[80%] overflow-hidden line-clamp-1 break-words">
@@ -80,22 +87,22 @@ function CurrentOngoingChallange({
           className={`grid ${challanger ? "" : "grid-cols-2"} gap-2 w-full h-full items-center `}
         >
           <button
-            className="bg-red-600 h-full flex justify-center items-center rounded-md "
+            className="bg-red-600 hover:bg-red-700 transition-all h-full flex justify-center items-center rounded-md "
             onClick={handleReject}
           >
             <img
-              src="/images/cross.png"
+              src="/images/reject.png"
               alt=""
               className="w-6 invert brightness-0"
             />
           </button>
           {!challanger && (
             <button
-              className="bg-green-600 h-full flex justify-center items-center rounded-md "
+              className="bg-green-600 hover:bg-green-700 transition-all h-full flex justify-center items-center rounded-md "
               onClick={handleAccept}
             >
               <img
-                src="/images/tick.png"
+                src="/images/accept.png"
                 alt=""
                 className="w-6 invert brightness-0"
               />

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { gameOngoing, gameSingle } from "../../api/game.js";
 import { socket } from "../../socket.js";
 import MemoEmptyDailyGames from "./EmptyDailyGames.jsx";
@@ -26,9 +26,8 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   const fetchOngoingGames = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await gameOngoing(userId);
-      const { success, info } = response?.data || {};
-      if (success) setGames(info);
+      const { data } = await gameOngoing(userId);
+      if (data?.success) setGames(data.info);
       else Toast.error("Please try to login again");
     } catch {
       Toast.error("Something went wrong while fetching games.");
@@ -37,25 +36,31 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
     }
   }, [userId]);
 
-  const handleUpdateGamePreview = async (gameId) => {
-    try {
-      const response = await gameSingle(gameId);
-      const { success, info } = response?.data || {};
-      if (success) {
-        setGames((prev) =>
-          prev.map((game) =>
-            game._id === gameId
-              ? { ...game, moves: info.game.moves, board: info.game.board }
-              : game
-          )
-        );
-      } else {
-        Toast.error("Failed to fetch game updates.");
+  const handleUpdateGamePreview = useCallback(
+    async (gameId) => {
+      try {
+        const { data } = await gameSingle(gameId);
+        if (data?.success) {
+          setGames((prev) =>
+            prev.map((game) =>
+              game._id === gameId
+                ? {
+                    ...game,
+                    moves: data.info.game.moves,
+                    board: data.info.game.board,
+                  }
+                : game
+            )
+          );
+        } else {
+          Toast.error("Failed to fetch game updates.");
+        }
+      } catch {
+        Toast.error("Something went wrong while updating game preview.");
       }
-    } catch {
-      Toast.error("Something went wrong while updating game preview.");
-    }
-  };
+    },
+    [setGames]
+  );
 
   useEffect(() => {
     fetchOngoingGames();
@@ -71,31 +76,33 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   useEffect(() => {
     socket.on("update-game-preview", handleUpdateGamePreview);
     return () => socket.off("update-game-preview", handleUpdateGamePreview);
-  }, [userId]);
+  }, [handleUpdateGamePreview]);
+
+  const content = useMemo(() => {
+    if (isLoading) return <MemoDailyGamesLoading />;
+    if (games.length === 0) return <MemoEmptyDailyGames />;
+
+    return (
+      <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
+        {games?.map((game) => {
+          const player = game.player1 || game.player2;
+          return (
+            <CurrentOngingAccepted
+              key={game._id}
+              game={game}
+              player={player}
+              isOnline={onlineUsers[player?._id]}
+            />
+          );
+        })}
+      </div>
+    );
+  }, [isLoading, games, onlineUsers]);
 
   return (
     <div className="w-full max-w-[970px] bg-blackDark rounded-md">
-      {/* headline */}
       <OngoingHeadline length={games?.length} />
-      {isLoading ? (
-        <MemoDailyGamesLoading />
-      ) : games?.length ? (
-        <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
-          {games?.map((game) => {
-            const player = game.player1 || game.player2;
-            return (
-              <CurrentOngingAccepted
-                key={game._id}
-                game={game}
-                player={player}
-                isOnline={onlineUsers[player?._id]}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        <MemoEmptyDailyGames />
-      )}
+      {content}
     </div>
   );
 }

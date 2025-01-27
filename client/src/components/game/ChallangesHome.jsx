@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { gameChallanges } from "../../api/game.js";
 import MemoEmptyDailyGames from "./EmptyDailyGames.jsx";
 import MemoDailyGamesLoading from "./DailyGamesLoading.jsx";
@@ -30,9 +30,8 @@ function ChallangesHome({ setAddNewGame }) {
   const fetchOngoingChallanges = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await gameChallanges(userId);
-      const { success, info } = response?.data || {};
-      if (success) setGames(info);
+      const { data } = await gameChallanges(userId);
+      if (data?.success) setGames(data.info);
       else Toast.error("Please try to login again");
     } catch {
       Toast.error("Something went wrong while fetching games.");
@@ -45,33 +44,35 @@ function ChallangesHome({ setAddNewGame }) {
     fetchOngoingChallanges();
   }, [fetchOngoingChallanges]);
 
+  const content = useMemo(() => {
+    if (isLoading) return <MemoDailyGamesLoading />;
+    if (games.length === 0) return <MemoEmptyDailyGames />;
+
+    return (
+      <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
+        {games?.map((game) => {
+          const challanger = game.player1._id.toString() == userId;
+          const player = challanger ? game.player2 : game.player1;
+
+          return (
+            <CurrentOngoingChallange
+              key={game._id}
+              setGames={setGames}
+              game={game}
+              player={player}
+              challanger={challanger}
+              setAddNewGame={setAddNewGame}
+            />
+          );
+        })}
+      </div>
+    );
+  }, [isLoading, games, setGames, setAddNewGame, userId]);
+
   return (
     <div className="w-full max-w-[970px] bg-blackDark rounded-md">
-      {/* headline */}
       <ChallangesHeadline length={games?.length} />
-      {isLoading ? (
-        <MemoDailyGamesLoading />
-      ) : games?.length ? (
-        <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
-          {games?.map((game) => {
-            const challanger = game.player1._id.toString() == userId;
-            const player = challanger ? game.player2 : game.player1;
-
-            return (
-              <CurrentOngoingChallange
-                key={game._id}
-                setGames={setGames}
-                game={game}
-                player={player}
-                challanger={challanger}
-                setAddNewGame={setAddNewGame}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        <MemoEmptyDailyGames />
-      )}
+      {content}
     </div>
   );
 }

@@ -21,7 +21,7 @@ function SingleFriend({ info, userId }) {
           </div>
         </div>
         {onlineUsers[info._id] && (
-          <div className="absolute right-0 translate-x-[-50%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
+          <div className="absolute right-0 translate-x-[0%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
         )}
       </div>
       <div className="text-white font-semibold text-xs text-wrap line-clamp-1 overflow-hidden w-full">
