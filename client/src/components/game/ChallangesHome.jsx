@@ -1,0 +1,79 @@
+/* eslint-disable react/prop-types */
+import { useCallback, useEffect, useState } from "react";
+import { gameChallanges } from "../../api/game.js";
+import MemoEmptyDailyGames from "./EmptyDailyGames.jsx";
+import MemoDailyGamesLoading from "./DailyGamesLoading.jsx";
+import Toast from "../../utils/Toast.js";
+import CurrentOngoingChallange from "./CurrentOngoingChallange.jsx";
+import { useAuthContext } from "../../context/AuthContext.jsx";
+
+function ChallangesHeadline({ length = 0 }) {
+  return (
+    <div className="flex gap-2 p-4 border-b-[2px] border-blackLight">
+      <img
+        src="/images/versus.png"
+        alt=""
+        className="invert w-6 aspect-square"
+      />
+      <p className="text-white font-bold">Challanges ({length})</p>
+    </div>
+  );
+}
+
+function ChallangesHome({ setAddNewGame }) {
+  const { playerInfo } = useAuthContext();
+  const userId = playerInfo?._id;
+
+  const [games, setGames] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+
+  const fetchOngoingChallanges = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await gameChallanges(userId);
+      const { success, info } = response?.data || {};
+      if (success) setGames(info);
+      else Toast.error("Please try to login again");
+    } catch {
+      Toast.error("Something went wrong while fetching games.");
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    fetchOngoingChallanges();
+  }, [fetchOngoingChallanges]);
+
+  return (
+    <div className="w-full max-w-[970px] bg-blackDark rounded-md">
+      {/* headline */}
+      <ChallangesHeadline length={games?.length} />
+      {isLoading ? (
+        <MemoDailyGamesLoading />
+      ) : games?.length ? (
+        <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
+          {games?.map((game) => {
+            const challanger = game.player1._id.toString() == userId;
+            const player = challanger ? game.player2 : game.player1;
+
+            return (
+              <CurrentOngoingChallange
+                key={game._id}
+                setGames={setGames}
+                game={game}
+                player={player}
+                challanger={challanger}
+                setAddNewGame={setAddNewGame}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <MemoEmptyDailyGames />
+      )}
+    </div>
+  );
+}
+
+export default ChallangesHome;

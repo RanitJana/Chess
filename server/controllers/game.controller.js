@@ -1,14 +1,43 @@
 import gameSchema from "../models/game.model.js";
 import AsyncHandler from "../utils/AsyncHandler.js";
+import playerSchema from "../models/player.model.js";
 
 const gameInit = AsyncHandler(async (req, res, _) => {
   const player = req.player;
 
+  const { player2 } = req.body;
+
+  //intentionally challanged
+  if (player2) {
+    if (!(await playerSchema.findById(player2)))
+      return res.status(400).json({
+        success: false,
+        message: "User does not exist",
+      });
+
+    let game = await gameSchema.create({
+      player1: player._id,
+      player2,
+      withRandom: false,
+    });
+
+    game = await gameSchema
+      .findById(game._id)
+      .populate("player1", "name _id")
+      .populate("player2", "name _id");
+
+    return res.status(200).json({
+      success: true,
+      message: "Challange created!",
+      info: game,
+    });
+  }
+
   //search for a game which needs another player
-  const games = await gameSchema.findOne({ player2: { $exists: false } });
+  let game = await gameSchema.findOne({ player2: { $exists: false } });
 
   //create a new game
-  if (!games) {
+  if (!game) {
     let newGame = await gameSchema.create({ player1: player._id });
     newGame.player1 = null;
 
@@ -19,23 +48,33 @@ const gameInit = AsyncHandler(async (req, res, _) => {
     });
   }
 
-  if (games.player1._id.toString() == player._id.toString())
+  if (game.player1._id.toString() == player._id.toString())
     return res.status(300).json({
       success: false,
       message: "Searching for an opponent",
     });
 
   //found a game
-  games.player2 = player._id;
+  game = await gameSchema
+    .findByIdAndUpdate(
+      game._id,
+      {
+        player2: player._id,
+        isGameStarted: true,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+    .populate("player1", "name _id");
 
-  await games.save();
-  games.player2 = null;
-  await games.populate("player1", "name _id");
+  game.player2 = null;
 
   return res.status(200).json({
     success: true,
     message: "Game started",
-    info: games,
+    info: game,
   });
 });
 
@@ -82,6 +121,7 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
       $and: [
         { $or: [{ player1: userId }, { player2: userId }] },
         { winner: 0 },
+        { $or: [{ withRandom: true }, { isGameStarted: true }] },
       ],
     })
     .populate("player1", "name _id")
@@ -97,6 +137,39 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
 
     return game;
   });
+
+  games.reverse();
+
+  //return the info
+  return res.status(200).json({
+    success: true,
+    message: "Successful",
+    info: games,
+  });
+});
+
+//get challanges
+const gameChallanges = AsyncHandler(async (req, res, _) => {
+  const { userId } = req.params;
+
+  if (!userId)
+    return res.status(400).json({
+      success: true,
+      message: "Successful",
+      info: [],
+    });
+
+  let games = await gameSchema
+    .find({
+      $and: [
+        { withRandom: false },
+        { isGameStarted: false },
+        { $or: [{ player1: userId }, { player2: userId }] },
+      ],
+    })
+    .populate("player1", "name _id")
+    .populate("player2", "name _id");
+
   games.reverse();
 
   //return the info
@@ -224,4 +297,65 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
   });
 });
 
-export { gameInit, gameMove, gameOngoing, gameDone, gameInfoSingle, gameEnd };
+const gameDelete = AsyncHandler(async (req, res, _) => {
+  const { gameId } = req.params;
+
+  if (!gameId)
+    return res.status(400).json({
+      success: false,
+      message: "Game id is not found",
+    });
+
+  const game = await gameSchema.findById(gameId);
+
+  if (!game)
+    return res.status(400).json({
+      success: false,
+      message: "Game is not found.",
+    });
+
+  await game.deleteOne();
+
+  return res.status(200).json({
+    success: true,
+    message: "Challange rejected!",
+  });
+});
+
+const gameAccept = AsyncHandler(async (req, res, _) => {
+  const { gameId } = req.params;
+
+  if (!gameId)
+    return res.status(400).json({
+      success: false,
+      message: "Game id is not found",
+    });
+
+  const game = await gameSchema.findById(gameId);
+
+  if (!game)
+    return res.status(400).json({
+      success: false,
+      message: "Game is not found.",
+    });
+
+  game.isGameStarted = true;
+  await game.save({ validateBeforeSave: false });
+
+  return res.status(200).json({
+    success: true,
+    message: "Challange Accepted!",
+  });
+});
+
+export {
+  gameInit,
+  gameMove,
+  gameOngoing,
+  gameDone,
+  gameInfoSingle,
+  gameEnd,
+  gameDelete,
+  gameChallanges,
+  gameAccept,
+};

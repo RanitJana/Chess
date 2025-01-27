@@ -29,9 +29,20 @@ const gameSchema = new Schema(
       type: Number,
       default: 0,
     },
+
     userMove: {
       type: Number,
       default: 0,
+    },
+
+    isGameStarted: {
+      type: Boolean,
+      default: false,
+    },
+
+    withRandom: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

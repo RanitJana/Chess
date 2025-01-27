@@ -3,7 +3,7 @@ function WaitingForOpponent({ player }) {
   if (player) return;
 
   return (
-    <div className="absolute inset-0 bg-black opacity-75 flex justify-center items-center">
+    <div className="absolute inset-0 bg-black opacity-75 z-10 flex justify-center items-center">
       <p className="text-white font-semibold text-sm text-center">
         Waiting for an opponent...
       </p>

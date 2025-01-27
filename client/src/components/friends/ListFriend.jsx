@@ -4,6 +4,8 @@ import { useState } from "react";
 import { rejectFriendRequest } from "../../api/friend.js";
 import GetAvatar from "../../utils/GetAvatar.js";
 import Toast from "../../utils/Toast.js";
+import { gameInit } from "../../api/game.js";
+import Loader from "../Loader.jsx";
 
 export default function ListFriend({
   user = {},
@@ -40,16 +42,29 @@ export default function ListFriend({
     }
   };
 
+  const handleCreateChallange = async function (player2) {
+    if (isSubmit) return;
+    try {
+      setIsSubmit(true);
+      const response = await gameInit({ player2 });
+      const { success, info, message } = response?.data || {};
+      if (success) {
+        Toast.success(message);
+        console.log(info);
+      }
+    } catch {
+      Toast.error("Try again");
+    } finally {
+      setIsSubmit(false);
+    }
+  };
+
   return (
     <li
       key={user._id}
       className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
     >
-      {isSubmit && (
-        <div className="fixed top-0 left-0 z-[1000] w-full h-full bg-[rgba(0,0,0,0.27)] flex justify-center items-center">
-          <span className="loader"></span>
-        </div>
-      )}
+      {isSubmit && <Loader />}
       <div className="flex items-center gap-5">
         <div className="relative">
           <div className="w-20 relative rounded-xl overflow-hidden">
@@ -89,6 +104,7 @@ export default function ListFriend({
             <div
               title="Challange"
               className="hover:cursor-pointer w-[10rem] px-7 py-3 flex items-center justify-start gap-2 hover:bg-blackDark transition-all"
+              onClick={() => handleCreateChallange(user._id)}
             >
               <img
                 src="/images/challange.png"

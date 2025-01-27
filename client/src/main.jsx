@@ -9,10 +9,7 @@ import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById("root")).render(
   <>
-    <Toaster
-      toastOptions={{ style: { zIndex: 9999 } }}
-      reverseOrder={false}
-    />
+    <Toaster toastOptions={{ style: { zIndex: 9999 } }} reverseOrder={false} />
     <BrowserRouter>
       <AuthContext>
         <SocketContext>

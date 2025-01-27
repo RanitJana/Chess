@@ -6,6 +6,7 @@ import CompletedGames from "../components/game/CompletedGames.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
+import ChallangesHome from "../components/game/ChallangesHome.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
@@ -103,6 +104,7 @@ function Home() {
       </div>
 
       {/* Games Section */}
+      {<ChallangesHome setAddNewGame={setAddNewGame} />}
       <CurrentGamePreview
         userId={playerInfo?._id}
         addNewGame={addNewGame}

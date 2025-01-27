@@ -33,6 +33,53 @@ const gameOngoing = async function (userId) {
   }
 };
 
+//get all ongoing challanges game info
+const gameChallanges = async function (userId) {
+  try {
+    let response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/challange/${userId}`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+//delete a challange
+const gameChallangeReject = async function (userId) {
+  try {
+    let response = await axios.delete(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/challange/${userId}`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+//get all ongoing challanges game info
+const gameChallangeAccept = async function (userId) {
+  try {
+    let response = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/challange/${userId}`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
+
 const gameDone = async function (total, userId) {
   try {
     let response = await axios.get(
@@ -96,4 +143,14 @@ const gameEnd = async function (body) {
   }
 };
 
-export { gameInit, gameOngoing, gameDone, gameSingle, gameMove, gameEnd };
+export {
+  gameInit,
+  gameOngoing,
+  gameDone,
+  gameSingle,
+  gameMove,
+  gameEnd,
+  gameChallanges,
+  gameChallangeReject,
+  gameChallangeAccept,
+};
