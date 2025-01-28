@@ -20,11 +20,10 @@ function ChallangesHeadline({ length = 0 }) {
   );
 }
 
-function ChallangesHome({ setAddNewGame }) {
+function ChallangesHome({ setAddNewGame, games, setGames }) {
   const { playerInfo } = useAuthContext();
   const userId = playerInfo?._id;
 
-  const [games, setGames] = useState([]);
   const [isLoading, setLoading] = useState(true);
 
   const fetchOngoingChallanges = useCallback(async () => {
@@ -38,7 +37,7 @@ function ChallangesHome({ setAddNewGame }) {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [setGames, userId]);
 
   useEffect(() => {
     fetchOngoingChallanges();

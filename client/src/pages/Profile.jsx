@@ -229,12 +229,14 @@ function Profile() {
           </div>
           <div className="flex gap-2 w-full mt-4">
             {/* challange button */}
-            <ActionButton
-              onClick={handleCreateChallange}
-              text="Challange"
-              icon="/images/challange.png"
-              disabled={isSendFriendRequest}
-            />
+            {userId !== playerInfo?._id && (
+              <ActionButton
+                onClick={handleCreateChallange}
+                text="Challange"
+                icon="/images/challange.png"
+                disabled={isSendFriendRequest}
+              />
+            )}
             {/* add friend */}
             {!isLoading && !user?.friend && userId !== playerInfo?._id && (
               <ActionButton

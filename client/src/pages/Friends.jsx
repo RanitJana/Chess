@@ -7,6 +7,7 @@ import { useSocketContext } from "../context/SocketContext.jsx";
 import ListFriend from "../components/friends/ListFriend.jsx";
 import Pending from "../components/friends/Pending.jsx";
 import Toast from "../utils/Toast.js";
+import SearchBar from "../components/SearchBar.jsx";
 
 function Friends() {
   const { userId } = useParams();
@@ -53,28 +54,14 @@ function Friends() {
   return (
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
-        {<NavBar />}
+        <NavBar />
         <p className="flex items-center justify-start gap-2 sm:p-0 pl-4">
           <img src="/images/friends.png" alt="" className="w-8" />
           <span className="font-bold text-white text-2xl">Friends</span>
         </p>
         <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6 sm:pt-10 pt-10">
           {/* search bar */}
-          <div className="relative flex w-full rounded-3xl overflow-hidden">
-            <img
-              src="/images/search.png"
-              alt=""
-              className="absolute left-3 top-1/2 translate-y-[-50%] w-6"
-            />
-            <input
-              type="text"
-              name=""
-              id=""
-              className="w-full bg-[rgb(61,58,57)] text-white outline-none p-3 pl-12 rounded-sm"
-              placeholder="Search by name"
-            />
-          </div>
-
+          <SearchBar />
           <div className="flex items-center gap-2 mb-[-0.5rem]">
             <div
               onClick={() => setOpenTab(() => 0)}

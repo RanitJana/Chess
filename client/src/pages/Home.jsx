@@ -7,6 +7,7 @@ import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
 import ChallangesHome from "../components/game/ChallangesHome.jsx";
+import ChallangeFriends from "../components/home/ChallangeFriends.jsx";
 
 function Home() {
   const { totalOnline } = useSocketContext();
@@ -14,7 +15,9 @@ function Home() {
   const { playerInfo } = useAuthContext();
 
   const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const [isOpen, setOpen] = useState(false);
   const [addNewGame, setAddNewGame] = useState(null);
+  const [games, setGames] = useState([]);
   // Create a new game
   const handleClick = useCallback(async () => {
     try {
@@ -23,14 +26,13 @@ function Home() {
       const { success, info, message } = response?.data || {};
       if (success) {
         setAddNewGame(info);
-        // setGames((prev) => [info, ...prev]);
         Toast.success(message);
       } else {
-        Toast.error(message || "Failed to create a game.");
+        Toast.error(message || "Failed to create a game");
       }
     } catch (error) {
       console.error("Error creating a game:", error);
-      Toast.error("Something went wrong while creating a game.");
+      Toast.error("Something went wrong while creating a game");
     } finally {
       setIsCreatingGame(false);
     }
@@ -39,6 +41,7 @@ function Home() {
   return (
     <div className="w-full flex flex-col items-center h-fit sm:p-8 p-0 gap-5">
       {<NavBar />}
+      {isOpen && <ChallangeFriends setOpen={setOpen} setGames={setGames} />}
       {/* Header Section */}
       <div className="flex w-full lg-930:flex-row max-w-[970px] flex-col justify-center items-center gap-10 sm:p-0 p-2">
         <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
@@ -74,7 +77,7 @@ function Home() {
           <div className="w-full flex flex-wrap gap-3 justify-center items-center">
             <button
               disabled={isCreatingGame}
-              className={`bg-blackDark ${isCreatingGame ? "opacity-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
+              className={`bg-blackDark ${isCreatingGame ? "brightness-50 cursor-not-allowed" : ""} w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
               onClick={handleClick}
             >
               <img
@@ -89,6 +92,7 @@ function Home() {
             <button
               disabled={isCreatingGame}
               className={`bg-blackDark w-full max-w-[25rem] rounded-lg h-[4rem] p-4 py-3 hover:bg-blackDarkest transition-colors hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.5rem] text-white shadow-[0_5px_0px_0px_rgb(29,28,26)] }`}
+              onClick={() => setOpen(true)}
             >
               <img
                 src="/images/handshake.svg"
@@ -104,7 +108,13 @@ function Home() {
       </div>
 
       {/* Games Section */}
-      {<ChallangesHome setAddNewGame={setAddNewGame} />}
+      {
+        <ChallangesHome
+          setAddNewGame={setAddNewGame}
+          games={games}
+          setGames={setGames}
+        />
+      }
       <CurrentGamePreview
         userId={playerInfo?._id}
         addNewGame={addNewGame}

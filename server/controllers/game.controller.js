@@ -15,6 +15,12 @@ const gameInit = AsyncHandler(async (req, res, _) => {
         message: "User does not exist",
       });
 
+    if (player._id.toString() === player2)
+      return res.status(400).json({
+        success: false,
+        message: "You can't challange yourself",
+      });
+
     let game = await gameSchema.create({
       player1: player._id,
       player2,
