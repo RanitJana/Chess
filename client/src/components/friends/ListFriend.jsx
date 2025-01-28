@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { rejectFriendRequest } from "../../api/friend.js";
 import GetAvatar from "../../utils/GetAvatar.js";
 import Toast from "../../utils/Toast.js";
@@ -15,6 +15,19 @@ export default function ListFriend({
 }) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
+  const moreBox = useRef(null);
+
+  const handleCloseMoreBox = (e) => {
+    const moreBoxRef = moreBox.current;
+    if (moreBoxRef && !moreBoxRef.contains(e.target)) {
+      setIsMoreOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("click", handleCloseMoreBox);
+    return () => window.removeEventListener("click", handleCloseMoreBox);
+  }, []);
 
   const handleRejectFriendRequest = async function (modelId) {
     if (isSubmit) return;
@@ -47,10 +60,10 @@ export default function ListFriend({
     try {
       setIsSubmit(true);
       const response = await gameInit({ player2 });
-      const { success, info, message } = response?.data || {};
+      const { success, message } = response?.data || {};
       if (success) {
         Toast.success(message);
-        console.log(info);
+        setIsMoreOpen(false);
       }
     } catch {
       Toast.error("Try again");
@@ -62,16 +75,16 @@ export default function ListFriend({
   return (
     <li
       key={user._id}
-      className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-4 px-2 odd:bg-blackLight rounded-lg"
+      className="relative justify-between flex flex-wrap flex-row gap-5 sm:p-4 py-2 px-2 odd:bg-blackLight rounded-lg"
     >
       {isSubmit && <Loader />}
       <div className="flex items-center gap-5">
         <div className="relative">
-          <div className="w-20 relative rounded-xl overflow-hidden">
-            <div
-              dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }}
-              className="w-20 rounded-xl bg-white"
-            />
+          <div
+            className="w-16 relative rounded-xl overflow-hidden hover:cursor-pointer"
+            onClick={() => navigate(`/member/${user._id}`)}
+          >
+            <div dangerouslySetInnerHTML={{ __html: GetAvatar(user?.name) }} />
           </div>
           {isOnline && (
             <div className="absolute right-0 translate-x-[50%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
@@ -79,20 +92,20 @@ export default function ListFriend({
         </div>
         <div>
           <span
-            className="text-white font-semibold hover:cursor-pointer"
+            className="text-white font-semibold hover:cursor-pointer line-clamp-1"
             onClick={() => navigate(`/member/${user._id}`)}
           >
-            {user.name}{" "}
+            {user.name + " "}
           </span>
           <span
-            className="text-gray-400 hover:cursor-pointer"
+            className="text-gray-400 hover:cursor-pointer text-sm"
             onClick={() => navigate(`/member/${user._id}`)}
           >
             ({user.rating})
           </span>
         </div>
       </div>
-      <div className="absolute right-3 z-20">
+      <div className="absolute right-3 z-20 shadow-2xl" ref={moreBox}>
         <img
           onClick={() => setIsMoreOpen((prev) => !prev)}
           src="/images/more.png"

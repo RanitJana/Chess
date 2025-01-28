@@ -5,7 +5,6 @@ import GetAvatar from "../../utils/GetAvatar.js";
 import { useCallback, useState } from "react";
 import { gameChallangeAccept, gameChallangeReject } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
-import Loader from "../Loader.jsx";
 
 function CurrentOngoingChallange({
   game,
@@ -14,7 +13,7 @@ function CurrentOngoingChallange({
   challanger,
   setAddNewGame,
 }) {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const updateGanes = useCallback(
     (gameId) => {
@@ -24,8 +23,9 @@ function CurrentOngoingChallange({
   );
 
   const handleReject = async () => {
+    if (isLoading) return;
     try {
-      setLoading(true);
+      setIsLoading(true);
       const { data } = await gameChallangeReject(game._id);
       if (data?.success) {
         updateGanes(game._id);
@@ -34,13 +34,14 @@ function CurrentOngoingChallange({
     } catch {
       Toast.error("An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleAccept = async () => {
+    if (isLoading) return;
     try {
-      setLoading(true);
+      setIsLoading(true);
       const { data } = await gameChallangeAccept(game._id);
       if (data?.success) {
         if (challanger) game.player1 = null;
@@ -52,7 +53,7 @@ function CurrentOngoingChallange({
     } catch {
       Toast.error("An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -61,7 +62,6 @@ function CurrentOngoingChallange({
       key={game._id}
       className="group relative rounded-md overflow-hidden cursor-pointer shadow-[0_5px_0px_0px_rgb(29,28,26)]"
     >
-      {loading && <Loader />}
       <div className="relative">
         <div className="absolute h-full w-full inset-0 bg-black opacity-80 flex justify-center items-center"></div>
         <ChessBoardPreview
@@ -87,7 +87,8 @@ function CurrentOngoingChallange({
           className={`grid ${challanger ? "" : "grid-cols-2"} gap-2 w-full h-full items-center `}
         >
           <button
-            className="bg-red-600 hover:bg-red-700 transition-all h-full flex justify-center items-center rounded-md "
+            disabled={isLoading}
+            className={`bg-red-600 ${isLoading ? "brightness-50 cursor-not-allowed" : "hover:bg-red-700 "} transition-all h-full flex justify-center items-center rounded-md`}
             onClick={handleReject}
           >
             <img
@@ -98,7 +99,8 @@ function CurrentOngoingChallange({
           </button>
           {!challanger && (
             <button
-              className="bg-green-600 hover:bg-green-700 transition-all h-full flex justify-center items-center rounded-md "
+              disabled={isLoading}
+              className={`bg-green-600 ${isLoading ? "brightness-50 cursor-not-allowed" : "hover:bg-green-700 "} transition-all h-full flex justify-center items-center rounded-md`}
               onClick={handleAccept}
             >
               <img

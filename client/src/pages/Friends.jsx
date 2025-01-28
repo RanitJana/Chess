@@ -78,7 +78,7 @@ function Friends() {
           <div className="flex items-center gap-2 mb-[-0.5rem]">
             <div
               onClick={() => setOpenTab(() => 0)}
-              className={` min-w-[7rem] border-b-4 pb-3 px-2 hover:cursor-pointer transition-all  ${openTab == 0 ? "border-b-white" : "border-b-transparent"}`}
+              className={`min-w-[6rem] text-sm border-b-2 pb-3 px-2 hover:cursor-pointer transition-all  ${openTab == 0 ? "border-b-white" : "border-b-transparent"}`}
             >
               <span className="text-white mr-2 font-semibold">Friends</span>
               <span className="bg-blackLight text-white px-2 py-1 rounded-md">
@@ -87,7 +87,7 @@ function Friends() {
             </div>
             <div
               onClick={() => setOpenTab(() => 1)}
-              className={`min-w-[7rem] border-b-4 pb-3 px-2 hover:cursor-pointer transition-all ${openTab == 1 ? "border-b-white" : "border-b-transparent"}`}
+              className={`min-w-[6rem] text-sm border-b-2 pb-3 px-2 hover:cursor-pointer transition-all ${openTab == 1 ? "border-b-white" : "border-b-transparent"}`}
             >
               <span className="text-white mr-2 font-semibold">Requests</span>
               <span className="bg-blackLight text-white px-2 py-1 rounded-md">

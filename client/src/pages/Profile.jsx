@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
@@ -5,6 +6,7 @@ import { useParams } from "react-router";
 import NavBar from "../components/NavBar.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { getUserInfo } from "../api/user.js";
+import { gameInit } from "../api/game.js";
 import CurrentGamePreview from "../components/game/CurrentGamePreview.jsx";
 import CompletedGames from "../components/game/CompletedGames.jsx";
 import { sendFriendRequest, rejectFriendRequest } from "../api/friend.js";
@@ -13,6 +15,20 @@ import { socket } from "../socket.js";
 import GetAvatar from "../utils/GetAvatar.js";
 import AllFriends from "../components/profile/AllFriends.jsx";
 import Toast from "../utils/Toast.js";
+import Loader from "../components/Loader.jsx";
+
+const ActionButton = ({ onClick, text, icon, disabled = false }) => (
+  <button
+    className={`flex gap-2 py-2 items-center justify-center rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] ${disabled && "brightness-50 hover:cursor-not-allowed"} transition-all w-[9rem]`}
+    onClick={onClick}
+    disabled={disabled}
+  >
+    <div className="w-5">
+      <img src={icon} alt="" className="invert" />
+    </div>
+    <span className="font-semibold text-white text-sm">{text}</span>
+  </button>
+);
 
 function timeAgo(lastSeen) {
   const diffInSeconds = Math.floor(
@@ -109,7 +125,7 @@ function Profile() {
     }
   };
 
-  const handleRejectFriendRequest = async function (modelId) {
+  const handleRejectFriendRequest = async (modelId) => {
     if (isSendFriendRequest) return;
     try {
       setIsSendFriendRequest(true);
@@ -127,6 +143,25 @@ function Profile() {
       setIsSendFriendRequest(false);
     }
   };
+
+  const handleCreateChallange = async () => {
+    if (isSendFriendRequest) return;
+    try {
+      setIsSendFriendRequest(true);
+      const response = await gameInit({ player2: userId });
+      const { success, message } = response?.data || {};
+
+      if (success) {
+        Toast.success(message);
+      } else Toast.error(message || "Try again");
+    } catch {
+      Toast.error("Try again");
+    } finally {
+      setIsSendFriendRequest(false);
+    }
+  };
+
+  if (!user) return <Loader />;
 
   return (
     <div className="flex flex-col items-center sm:p-8 p-0">
@@ -192,55 +227,42 @@ function Profile() {
               </ul>
             </div>
           </div>
-          {!isLoading && !user?.friend && userId !== playerInfo?._id && (
-            <div className="mt-6">
-              <button
-                className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
-                style={{
-                  opacity: isSendFriendRequest ? "0.5" : "1",
-                  cursor: isSendFriendRequest ? "not-allowed" : "pointer",
-                }}
+          <div className="flex gap-2 w-full mt-4">
+            {/* challange button */}
+            <ActionButton
+              onClick={handleCreateChallange}
+              text="Challange"
+              icon="/images/challange.png"
+              disabled={isSendFriendRequest}
+            />
+            {/* add friend */}
+            {!isLoading && !user?.friend && userId !== playerInfo?._id && (
+              <ActionButton
                 onClick={handleSendFriendRequest}
+                text="Add Friend"
+                icon="/images/add-user.png"
                 disabled={isSendFriendRequest}
-              >
-                <div className="w-5">
-                  <img src="/images/add-user.png" alt="" className="invert" />
-                </div>
-                <span className="font-semibold text-white">Add Friend</span>
-              </button>
-            </div>
-          )}
-          {user?.friend?.accept == false && userId !== playerInfo?._id && (
-            <div className="mt-6">
-              <button
-                className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
+              />
+            )}
+            {/* req already sent */}
+            {user?.friend?.accept === false && userId !== playerInfo?._id && (
+              <ActionButton
+                onClick={null}
+                text="Request sent"
+                icon="/images/add-user.png"
                 disabled={true}
-              >
-                <div className="w-5">
-                  <img src="/images/add-user.png" alt="" className="invert" />
-                </div>
-                <span className="font-semibold text-white">Request sent</span>
-              </button>
-            </div>
-          )}
-          {user?.friend?.accept == true && userId !== playerInfo?._id && (
-            <div className="mt-6">
-              <button
-                className="flex gap-2 items-center justify-center px-4 py-3 rounded-md bg-[rgb(66,66,62)] active:bg-[rgba(66,66,62,0.64)] transition-colors w-[10rem]"
-                style={{
-                  opacity: isSendFriendRequest ? "0.5" : "1",
-                  cursor: isSendFriendRequest ? "not-allowed" : "pointer",
-                }}
+              />
+            )}
+            {/* unfriend */}
+            {user?.friend?.accept === true && userId !== playerInfo?._id && (
+              <ActionButton
                 onClick={() => handleRejectFriendRequest(user?.friend?._id)}
+                text="Unfriend"
+                icon="/images/unfriend.png"
                 disabled={isSendFriendRequest}
-              >
-                <div className="w-5">
-                  <img src="/images/unfriend.png" alt="" className="invert" />
-                </div>
-                <span className="font-semibold text-white">Unfriend</span>
-              </button>
-            </div>
-          )}
+              />
+            )}
+          </div>
         </div>
         <AllFriends userId={userId} />
         <CurrentGamePreview userId={userId} />
