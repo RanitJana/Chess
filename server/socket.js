@@ -5,25 +5,25 @@ import playerSchema from "./models/player.model.js";
 const chatSection = function (socket, roomId) {
   // Handle room joining
   socket.on("join-game", (gameId) => {
-    roomId = gameId; // Assign the room ID
+    roomId.id = gameId; // Assign the room ID
     socket.join(gameId); // Join the specific game room
   });
   socket.on("new-message", (info) => {
-    socket.to(roomId).emit("receive-new-message", info);
+    socket.to(roomId.id).emit("receive-new-message", info);
   });
   socket.on("chat-reaction", (info) => {
-    socket.to(roomId).emit("chat-reaction-receiver", info);
+    socket.to(roomId.id).emit("chat-reaction-receiver", info);
   });
   socket.on("new-message-update-id", (info) => {
-    socket.to(roomId).emit("new-message-update-id-user", info);
+    socket.to(roomId.id).emit("new-message-update-id-user", info);
   });
 
   socket.on("typing", (value) => {
-    socket.to(roomId).emit("server-typing", value);
+    socket.to(roomId.id).emit("server-typing", value);
   });
 
   socket.on("not-typing", (value) => {
-    socket.to(roomId).emit("server-not-typing", value);
+    socket.to(roomId.id).emit("server-not-typing", value);
   });
 };
 
@@ -61,9 +61,9 @@ const ongoingGameSection = function (socket, games) {
   });
 };
 
-const ongoingGameSectionPreview = function (socket) {
+const ongoingGameSectionPreview = function (socket, roomId) {
   socket.on("move-done", (clearedBoard) => {
-    socket.to(roomId).emit("opponent-move", clearedBoard);
+    socket.to(roomId.id).emit("opponent-move", clearedBoard);
   });
 };
 
@@ -123,7 +123,7 @@ const realTimeInit = function (server) {
     addSocketOnline(io, socket, userIdsave, userSockets);
 
     //handle chat in game
-    let roomId;
+    const roomId = { id: null };
     chatSection(socket, roomId);
 
     //handle challange ongoing
@@ -134,7 +134,7 @@ const realTimeInit = function (server) {
     ongoingGameSection(socket, games);
 
     //handle ngoing daily games preview
-    ongoingGameSectionPreview(socket);
+    ongoingGameSectionPreview(socket, roomId);
 
     // Handle disconnection
     deleteSocketOnline(io, socket, userIdsave, userSockets);

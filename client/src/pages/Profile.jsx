@@ -149,10 +149,10 @@ function Profile() {
     try {
       setIsSendFriendRequest(true);
       const response = await gameInit({ player2: userId });
-      const { success, message } = response?.data || {};
-
+      const { success, info, message } = response?.data || {};
       if (success) {
         Toast.success(message);
+        socket.emit("send-challange", { game: info, userId });
       } else Toast.error(message || "Try again");
     } catch {
       Toast.error("Try again");
