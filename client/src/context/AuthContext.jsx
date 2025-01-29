@@ -53,7 +53,7 @@ export default function AuthContext({ children }) {
         <div className="min-h-fit">
           {location.pathname == "/login" ? (
             <Login />
-          ) : Location.pathname == "/signup" ? (
+          ) : location.pathname == "/signup" ? (
             <SignUp />
           ) : isAuth ? (
             children
