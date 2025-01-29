@@ -7,6 +7,7 @@ import { useAuthContext } from "../../context/AuthContext.jsx";
 import Toast from "../../utils/Toast.js";
 import SearchBar from "../SearchBar.jsx";
 import GetAvatar from "../../utils/GetAvatar.js";
+import { socket } from "../../socket.js";
 
 function PrintFriends({ friends, userId, isSubmit, handleCreateChallange }) {
   return (
@@ -82,6 +83,7 @@ function ChallangeFriends({ setOpen, setGames }) {
       const { success, info, message } = response?.data || {};
       if (success) {
         Toast.success(message);
+        socket.emit("send-challange", { game: info, userId: player2 });
         setOpen(false);
         setGames((prev) => [info, ...prev]);
       }

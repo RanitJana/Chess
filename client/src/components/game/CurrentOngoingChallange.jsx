@@ -5,6 +5,7 @@ import GetAvatar from "../../utils/GetAvatar.js";
 import { useCallback, useState } from "react";
 import { gameChallangeAccept, gameChallangeReject } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
+import { socket } from "../../socket.js";
 
 function CurrentOngoingChallange({
   game,
@@ -29,6 +30,10 @@ function CurrentOngoingChallange({
       const { data } = await gameChallangeReject(game._id);
       if (data?.success) {
         updateGanes(game._id);
+        socket.emit("reject-challange", {
+          gameId: game._id,
+          userId: player._id,
+        });
         Toast.success(data.message);
       } else Toast.error(data?.message || "Try again");
     } catch {
@@ -44,6 +49,13 @@ function CurrentOngoingChallange({
       setIsLoading(true);
       const { data } = await gameChallangeAccept(game._id);
       if (data?.success) {
+        game.moves = ["0"];
+        socket.emit("accept-challange", {
+          game: challanger
+            ? { ...game, player2: null, isGameStarted: true }
+            : { ...game, player1: null, isGameStarted: true },
+          userId: player._id,
+        });
         if (challanger) game.player1 = null;
         else game.player2 = null;
         setAddNewGame(game);

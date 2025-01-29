@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSocketContext } from "../context/SocketContext.jsx";
 import { gameInit } from "../api/game.js";
 import CurrentGamePreview from "../components/game/CurrentGamePreview.jsx";
@@ -8,11 +8,13 @@ import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
 import ChallangesHome from "../components/game/ChallangesHome.jsx";
 import ChallangeFriends from "../components/home/ChallangeFriends.jsx";
+import { socket } from "../socket.js";
 
 function Home() {
   const { totalOnline } = useSocketContext();
 
   const { playerInfo } = useAuthContext();
+  const userId = playerInfo._id;
 
   const [isCreatingGame, setIsCreatingGame] = useState(false);
   const [isOpen, setOpen] = useState(false);
@@ -38,19 +40,43 @@ function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    const handleReceiveNewChallange = (info) => {
+      if (info) {
+        Toast.success("You have a new challange");
+        setGames((prev) => [info, ...prev]);
+      }
+    };
+    const handleDeleteChallange = (gameId) => {
+      if (gameId)
+        setGames((prev) => prev.filter((game) => game._id !== gameId));
+    };
+    const handleInitChallange = (game) => {
+      if (game) {
+        Toast.success("Challange accepted!");
+        handleDeleteChallange(game._id);
+        setAddNewGame(game);
+      }
+    };
+
+    const listeners = [
+      ["receive-challange", handleReceiveNewChallange],
+      ["delete-challange", handleDeleteChallange],
+      ["init-challange", handleInitChallange],
+    ];
+
+    listeners.forEach(([event, handler]) => socket.on(event, handler));
+    return () =>
+      listeners.forEach(([event, handler]) => socket.off(event, handler));
+  }, [userId]);
+
   return (
     <div className="w-full flex flex-col items-center h-fit sm:p-8 p-0 gap-5">
-      {<NavBar />}
+      <NavBar />
       {isOpen && <ChallangeFriends setOpen={setOpen} setGames={setGames} />}
       {/* Header Section */}
       <div className="flex w-full lg-930:flex-row max-w-[970px] flex-col justify-center items-center gap-10 sm:p-0 p-2">
         <div className="w-[min(28rem,100%)] aspect-square bg-[rgba(255,255,255,0.2)] overflow-hidden rounded-md">
-          {/* <img
-            src="/images/standardboard.png"
-            draggable={false}
-            alt="Chess Board"
-            className="w-[min(28rem,100%)] h-full"
-          /> */}
           <video
             src="/videos/chess.mp4"
             autoPlay
@@ -108,19 +134,17 @@ function Home() {
       </div>
 
       {/* Games Section */}
-      {
-        <ChallangesHome
-          setAddNewGame={setAddNewGame}
-          games={games}
-          setGames={setGames}
-        />
-      }
+      <ChallangesHome
+        setAddNewGame={setAddNewGame}
+        games={games}
+        setGames={setGames}
+      />
       <CurrentGamePreview
-        userId={playerInfo?._id}
+        userId={userId}
         addNewGame={addNewGame}
         setAddNewGame={setAddNewGame}
       />
-      <CompletedGames userId={playerInfo?._id} />
+      <CompletedGames userId={userId} />
     </div>
   );
 }

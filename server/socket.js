@@ -16,14 +16,17 @@ const realTimeInit = function (server) {
 
   const onlineUsers = {};
   let totalOnline = 0;
+  const userSockets = new Map(); // Store userId -> socketId
 
   io.on("connection", (socket) => {
     let userIdsave = null; // Assume user ID is sent when connecting
 
     socket.on("add-online-user", (userId) => {
       onlineUsers[userId] = true;
-      totalOnline = totalOnline + 1;
+      totalOnline += 1;
+      userSockets.set(userId, socket.id); // Store mapping
       userIdsave = userId;
+
       io.emit("online-user", { onlineUsers, totalOnline });
     });
 
@@ -58,6 +61,27 @@ const realTimeInit = function (server) {
       socket.to(roomId).emit("opponent-move", clearedBoard);
     });
 
+    //challange send
+    socket.on("send-challange", (info) => {
+      const { game, userId } = info;
+      const socketId = userSockets.get(userId);
+      socket.to(socketId).emit("receive-challange", game);
+    });
+
+    //challange reject
+    socket.on("reject-challange", (info) => {
+      const { gameId, userId } = info;
+      const socketId = userSockets.get(userId);
+      socket.to(socketId).emit("delete-challange", gameId);
+    });
+
+    //challange accept
+    socket.on("accept-challange", (info) => {
+      const { game, userId } = info;
+      const socketId = userSockets.get(userId);
+      socket.to(socketId).emit("init-challange", game);
+    });
+
     let games = [];
 
     socket.on("game-show", (gameId) => {
@@ -72,7 +96,10 @@ const realTimeInit = function (server) {
     // Handle disconnection
     socket.on("disconnect", async () => {
       totalOnline = Math.max(0, totalOnline - 1);
-      if (userIdsave) delete onlineUsers[userIdsave];
+      if (userIdsave) {
+        userSockets.delete(userIdsave);
+        delete onlineUsers[userIdsave];
+      }
 
       io.emit("online-user", { onlineUsers, totalOnline });
 
