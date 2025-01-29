@@ -51,6 +51,27 @@ function Friends() {
     handleGetAllFriends();
   }, [userId]);
 
+  const handleSearch = (text) => {
+    // if (!friends) return;
+    // setFriends((prev) => {
+    //   return [...prev].sort((a, b) => {
+    //     const infoA =
+    //       a.receiver._id.toString() === userId ? a.sender : a.receiver;
+    //     const infoB =
+    //       b.receiver._id.toString() === userId ? b.sender : b.receiver;
+    //     const aStartsWith = infoA.name
+    //       .toLowerCase()
+    //       .startsWith(text.toLowerCase());
+    //     const bStartsWith = infoB.name
+    //       .toLowerCase()
+    //       .startsWith(text.toLowerCase());
+    //     if (aStartsWith && !bStartsWith) return -1; // `a` comes first
+    //     if (!aStartsWith && bStartsWith) return 1; // `b` comes first
+    //     return 0; // Keep the same order otherwise
+    //   });
+    // });
+  };
+
   return (
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
@@ -61,7 +82,7 @@ function Friends() {
         </p>
         <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6 sm:pt-10 pt-10">
           {/* search bar */}
-          <SearchBar />
+          <SearchBar handleFunction={handleSearch} />
           <div className="flex items-center gap-2 mb-[-0.5rem]">
             <div
               onClick={() => setOpenTab(() => 0)}

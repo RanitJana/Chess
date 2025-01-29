@@ -1,4 +1,17 @@
-function SearchBar() {
+/* eslint-disable react/prop-types */
+import { useRef } from "react";
+
+function SearchBar({ handleFunction }) {
+  const debouncingRef = useRef(null);
+
+  const handleOnChange = function (e) {
+    clearTimeout(debouncingRef.current);
+    debouncingRef.current = setTimeout(
+      () => handleFunction(e.target.value),
+      500
+    );
+  };
+
   return (
     <div className="relative flex w-full rounded-3xl overflow-hidden">
       <img
@@ -7,6 +20,7 @@ function SearchBar() {
         className="absolute left-3 top-1/2 translate-y-[-50%] w-5"
       />
       <input
+        onChange={handleOnChange}
         type="text"
         name=""
         id=""

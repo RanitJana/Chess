@@ -100,6 +100,29 @@ function ChallangeFriends({ setOpen, setGames }) {
     }
   };
 
+  const handleSearch = (text) => {
+    if (!friends) return;
+    setFriends((prev) => {
+      return [...prev].sort((a, b) => {
+        const infoA =
+          a.receiver._id.toString() === userId ? a.sender : a.receiver;
+        const infoB =
+          b.receiver._id.toString() === userId ? b.sender : b.receiver;
+        const aStartsWith = infoA.name
+          .toLowerCase()
+          .startsWith(text.toLowerCase());
+        const bStartsWith = infoB.name
+          .toLowerCase()
+          .startsWith(text.toLowerCase());
+
+        if (aStartsWith && !bStartsWith) return -1; // `a` comes first
+        if (!aStartsWith && bStartsWith) return 1; // `b` comes first
+
+        return 0; // Keep the same order otherwise
+      });
+    });
+  };
+
   useEffect(() => {
     handleGetAllFriends();
   }, [handleGetAllFriends]);
@@ -118,7 +141,7 @@ function ChallangeFriends({ setOpen, setGames }) {
         ref={contentRef}
       >
         <div className="flex gap-2">
-          <SearchBar />
+          <SearchBar handleFunction={handleSearch} />
           <button
             disabled={isSubmit}
             className={`bg-red-500 hover:bg-red-600 transition-colors rounded-md w-[5rem] flex justify-center items-center ${isSubmit && "brightness-50"}`}
