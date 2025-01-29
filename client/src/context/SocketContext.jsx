@@ -21,15 +21,13 @@ export default function SocketContext({ children }) {
   }, [playerInfo]);
 
   useEffect(() => {
-    socket.on("online-user", ({ onlineUsers, totalOnline }) => {
-      setTotalOnline(totalOnline);
+    const handleOnlineOfflineEvents = ({ onlineUsers }) => {
+      setTotalOnline(Object.keys(onlineUsers).length);
       setOnlineUsers(onlineUsers);
-    });
-
-    return () => {
-      // Clean up the event listener when the component unmounts
-      socket.off("online-user");
     };
+    socket.on("online-user", handleOnlineOfflineEvents);
+
+    return () => socket.off("online-user", handleOnlineOfflineEvents);
   }, []);
 
   return (
