@@ -30,13 +30,13 @@ function MentionInText({ mentionText, setMentionText }) {
   return (
     <div
       className={`bg-[rgb(17,26,33)] rounded-xl ${
-        mentionText ? "m-[0.15rem] max-h-[5rem]" : "max-h-0"
+        mentionText ? "m-[0.15rem] max-h-[8.5rem]" : "max-h-0"
       } overflow-hidden`}
       style={{
         transition: "all 0.1s ease",
       }}
     >
-      <div className="text-sm border-l-4 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
+      <div className="text-sm border-l-4 pb-1 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
         <div className="flex items-center justify-between w-full px-2 py-1">
           <span className="text-[rgb(13,160,157)] font-bold transition-all">
             {savedMention?.owner}
@@ -53,7 +53,7 @@ function MentionInText({ mentionText, setMentionText }) {
             />
           </span>
         </div>
-        <span className="px-2 pb-1 w-[99%] text-[rgb(174,174,174)] line-clamp-3 break-all text-pretty mb-1">
+        <span className="px-2 w-[99%] text-[rgb(174,174,174)] line-clamp-3 break-all text-pretty mb-1">
           {savedMention?.text}
         </span>
       </div>

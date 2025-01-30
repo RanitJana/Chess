@@ -1,9 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useState, memo } from "react";
+import { useEffect, useRef, useState, memo, useCallback } from "react";
 import Picker from "./Picker.jsx";
 import axios from "axios";
 import DifferentDayChatSeparator from "./DifferentDayChatSeparator.jsx";
+
+const urlRegex = /\b((https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*\b/g;
+// Regex to match only emojis and exclude other characters like numbers
+const emojiRegex = /^[\p{Extended_Pictographic}]+$/u;
 
 function MentionSection({ mentionText, senderId, userId }) {
   if (!mentionText?._id) return;
@@ -29,8 +32,6 @@ function MentionSection({ mentionText, senderId, userId }) {
 }
 
 function isOnlyEmojis(text) {
-  // Regex to match only emojis and exclude other characters like numbers
-  const emojiRegex = /^[\p{Extended_Pictographic}]+$/u;
   return emojiRegex.test(text.trim());
 }
 
@@ -63,52 +64,56 @@ function SingleChat({
   const chatSecRef = useRef(null);
   const mainSectionRef = useRef(null);
 
-  const urlRegex = /\b((https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*\b/g;
+  const hanldleMentionText = useCallback(
+    function () {
+      setMentionText(() => ({
+        text: info.message,
+        _id: info._id,
+        owner: info.senderId == userId ? "You" : "Opponent",
+      }));
 
-  const hanldleMentionText = function () {
-    setMentionText(() => ({
-      text: info.message,
-      _id: info._id,
-      owner: info.senderId == userId ? "You" : "Opponent",
-    }));
+      allRefs.current.textareaRef?.focus();
+      scrollChatElementBottom();
+    },
+    [info, userId, allRefs, scrollChatElementBottom, setMentionText]
+  );
 
-    allRefs.current.textareaRef?.focus();
-    scrollChatElementBottom();
-  };
-
-  const handleMouseDown = (e) => {
+  const handleMouseDown = useCallback((e) => {
     setDragStart(() => ({
       x: e.clientX || e.touches[0].clientX || 0,
       y: e.clientY || e.touches[0].clientY || 0,
     }));
     setIsDragging(true);
-  };
+  }, []);
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!isDragging) return;
 
-    const currentX = e.clientX || e.touches[0].clientX || 0;
-    const currentY = e.clientY || e.touches[0].clientY || 0;
-    let distanceX = currentX - dragStart.x;
-    const distanceY = Math.abs(currentY - dragStart.y);
+      const currentX = e.clientX || e.touches[0].clientX || 0;
+      const currentY = e.clientY || e.touches[0].clientY || 0;
+      let distanceX = currentX - dragStart.x;
+      const distanceY = Math.abs(currentY - dragStart.y);
 
-    if (distanceY > 20) {
-      setIsDragging(false);
-      setDragDistance(0);
-      return;
-    }
+      if (distanceY > 20) {
+        setIsDragging(false);
+        setDragDistance(0);
+        return;
+      }
 
-    // Prevent dragging to the left
-    if (distanceX < 0) distanceX = 0;
+      // Prevent dragging to the left
+      if (distanceX < 0) distanceX = 0;
 
-    // Apply dampening factor to make it slower as distanceX increases
-    const dampeningFactor = 1 / (1 + distanceX / 180); // Adjust divisor (50) for sensitivity
-    distanceX *= dampeningFactor;
+      // Apply dampening factor to make it slower as distanceX increases
+      const dampeningFactor = 1 / (1 + distanceX / 100); // Adjust divisor (50) for sensitivity
+      distanceX *= dampeningFactor;
 
-    setDragDistance(distanceX);
-  };
+      setDragDistance(distanceX);
+    },
+    [dragStart.x, dragStart.y, isDragging]
+  );
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     // Trigger reply if dragged beyond 50px
     if (dragDistance > 50) {
@@ -116,40 +121,47 @@ function SingleChat({
       hanldleMentionText();
     }
     setDragDistance(0);
-  };
+  }, [dragDistance, hanldleMentionText]);
 
-  const handleDoubleClick = (e) => {
-    setReactionMessageId(() => info._id);
-    setOpenReactionBox((prev) => !prev);
-    const target = mainSectionRef.current;
-    const rect = target.getBoundingClientRect();
+  const handleDoubleClick = useCallback(
+    (e) => {
+      setReactionMessageId(() => info._id);
+      setOpenReactionBox((prev) => !prev);
+      const target = mainSectionRef.current;
+      const rect = target.getBoundingClientRect();
 
-    const x =
-      (e.clientX || (e.touches && e.touches[0]?.clientX) || 0) - rect.left;
-    const y =
-      (e.clientY || (e.touches && e.touches[0]?.clientY) || 0) - rect.top;
+      const x =
+        (e.clientX || (e.touches && e.touches[0]?.clientX) || 0) - rect.left;
+      const y =
+        (e.clientY || (e.touches && e.touches[0]?.clientY) || 0) - rect.top;
 
-    setReactionLocation({
-      x: Math.max(0, x),
-      y: Math.max(0, y),
-    });
-  };
+      setReactionLocation({
+        x: Math.max(0, x),
+        y: Math.max(0, y),
+      });
+    },
+    [info._id, setReactionMessageId]
+  );
+
+  const fetchLinkInfo = useCallback(async () => {
+    try {
+      const url = info.message;
+      if (url.match(urlRegex)) {
+        const response = await axios.get(
+          `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`
+        );
+        if (response.data) setLinkInfo(response.data);
+      }
+    } catch {
+      // console.error("Error fetching the URL:", error.message);
+    }
+  }, [info.message]);
 
   useEffect(() => {
-    const fetchLinkInfo = async () => {
-      try {
-        const url = info.message;
-        if (url.match(urlRegex)) {
-          const response = await axios.get(
-            `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`
-          );
-          if (response.data) setLinkInfo(response.data);
-        }
-      } catch {
-        // console.error("Error fetching the URL:", error.message);
-      }
-    };
+    fetchLinkInfo();
+  }, [fetchLinkInfo]);
 
+  useEffect(() => {
     const handleUnsetReactionMenu = (e) => {
       if (
         chatSecRef.current &&
@@ -160,8 +172,6 @@ function SingleChat({
         setOpenReactionBox(false);
       }
     };
-
-    fetchLinkInfo();
 
     const listeners = ["click", "mousedown"];
     listeners.forEach((event) =>
@@ -189,7 +199,7 @@ function SingleChat({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging]); // Only re-run when isDragging changes
+  }, [handleMouseMove, handleMouseUp, isDragging]); // Only re-run when isDragging changes
 
   return (
     <div
