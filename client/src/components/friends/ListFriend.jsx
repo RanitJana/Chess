@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-
 import { useEffect, useRef, useState } from "react";
 import { rejectFriendRequest } from "../../api/friend.js";
 import GetAvatar from "../../utils/GetAvatar.js";
 import Toast from "../../utils/Toast.js";
 import { gameInit } from "../../api/game.js";
 import Loader from "../Loader.jsx";
+import { socket } from "../../socket.js";
 
 export default function ListFriend({
   user = {},
@@ -60,9 +60,10 @@ export default function ListFriend({
     try {
       setIsSubmit(true);
       const response = await gameInit({ player2 });
-      const { success, message } = response?.data || {};
+      const { success, info, message } = response?.data || {};
       if (success) {
         Toast.success(message);
+        socket.emit("send-challange", { game: info, userId: player2 });
         setIsMoreOpen(false);
       }
     } catch {

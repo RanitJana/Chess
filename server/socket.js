@@ -91,14 +91,17 @@ const updateLastSeenUser = async function (io, userIdsave) {
 };
 
 const deleteSocketOnline = function (io, socket, userIdsave, userSockets) {
-  socket.on("disconnect", async () => {
+  const handleUpdate = async () => {
     userSockets.delete(userIdsave.id);
 
     io.emit("online-user", { onlineUsers: Object.fromEntries(userSockets) });
 
     //handle last seen
     await updateLastSeenUser(io, userIdsave.id);
-  });
+  };
+
+  socket.on("log-out", handleUpdate);
+  socket.on("disconnect", handleUpdate);
 };
 
 const realTimeInit = function (server) {
