@@ -3,12 +3,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { convertTo2DArray } from "../../pages/Game.jsx";
+import { colors } from "../../constants.js";
 
 function ChessBoardPreview({ boardString, playerColor }) {
   const [board, setBoard] = useState(null);
 
   useEffect(() => {
-    if (playerColor == "black") {
+    if (playerColor == colors.black) {
       boardString = boardString.split("").reverse().join("");
     }
 

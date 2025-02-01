@@ -60,7 +60,10 @@ function NavBar() {
       </div> */}
 
       {/* name info */}
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2 hover:cursor-pointer"
+        onClick={() => navigate(`/member/${playerInfo?._id}`)}
+      >
         <div
           dangerouslySetInnerHTML={{ __html: GetAvatar(playerInfo?.name) }}
           className="relative w-[2rem] rounded-md overflow-hidden"

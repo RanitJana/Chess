@@ -1,5 +1,6 @@
 import AsyncHandler from "../utils/AsyncHandler.js";
 import playarSchema from "../models/player.model.js";
+import gameSchema from "../models/game.model.js";
 import friendSchema from "../models/friend.model.js";
 import { cookieOptions } from "../constants.js";
 
@@ -102,6 +103,16 @@ const verify = AsyncHandler(async (req, res, _) => {
       { receiver: req.player._id, accept: true },
     ],
   });
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const totalGamesToday = await gameSchema.countDocuments({
+    createdAt: { $gte: startOfDay, $lte: endOfDay },
+  });
+
   return res.status(200).json({
     success: true,
     message: "Verified",
@@ -117,6 +128,7 @@ const verify = AsyncHandler(async (req, res, _) => {
       friendsCount,
       views: req.player.views,
       lastSeen: req.player.lastSeen,
+      totalGamesToday,
     },
   });
 });

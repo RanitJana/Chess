@@ -103,11 +103,7 @@ function CurrentOngoingChallange({
             className={`bg-red-600 ${isLoading ? "brightness-50 cursor-not-allowed" : "hover:bg-red-700 "} transition-all h-full flex justify-center items-center rounded-md`}
             onClick={handleReject}
           >
-            <img
-              src="/images/reject.png"
-              alt=""
-              className="w-6 invert brightness-0"
-            />
+            <span className="text-white font-bold text-sm">Reject</span>
           </button>
           {!challanger && (
             <button
@@ -115,11 +111,7 @@ function CurrentOngoingChallange({
               className={`bg-green-600 ${isLoading ? "brightness-50 cursor-not-allowed" : "hover:bg-green-700 "} transition-all h-full flex justify-center items-center rounded-md`}
               onClick={handleAccept}
             >
-              <img
-                src="/images/accept.png"
-                alt=""
-                className="w-6 invert brightness-0"
-              />
+              <span className="text-white font-bold text-sm">Accept</span>
             </button>
           )}
         </div>

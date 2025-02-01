@@ -92,7 +92,9 @@ function Home() {
           </h2>
           <div className="flex sm:flex-row flex-col gap-1 justify-between w-full px-10 my-5 items-center">
             <div>
-              <span className="text-white font-bold">15,145,763</span>
+              <span className="text-white font-bold">
+                {playerInfo.totalGamesToday}
+              </span>
               <span className="pl-1 text-gray-400 font-bold">Games Today</span>
             </div>
             <div>

@@ -29,7 +29,7 @@ function CurrentOngingAccepted({ game, player, isOnline }) {
           <div className="h-10 aspect-square rounded-xl bg-white overflow-hidden relative">
             <div
               dangerouslySetInnerHTML={{
-                __html: GetAvatar(player?.name),
+                __html: GetAvatar(player?.name || "guest"),
               }}
             />
           </div>
@@ -42,9 +42,7 @@ function CurrentOngingAccepted({ game, player, isOnline }) {
           <p className="font-bold line-clamp-1">
             {player?.name || " waiting..."}
           </p>
-          <p className="text-gray-400 line-clamp-1">
-            {player ? "3 days" : "...."}
-          </p>
+          <p className="text-gray-400 line-clamp-1">3 days</p>
         </div>
       </div>
     </div>
