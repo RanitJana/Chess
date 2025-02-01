@@ -55,36 +55,37 @@ export default function Game() {
     player1: { name: "Loading..", rating: 200 },
     player2: { name: "Loading..", rating: 200 },
   });
-  const [isCheckMate, setCheckMate] = useState(0);
+  const [isCheckMate, setCheckMate] = useState(null);
+  const [winnerReason, setWinnerReason] = useState("");
 
   const fetchGameInfo = useCallback(async () => {
     try {
       const response = await gameSingle(gameId);
+      console.log(response);
 
-      if (response?.data.info) {
-        let { color, game } = response.data.info;
-        const board = convertTo2DArray(game.board);
-
-        let moves = game.moves.map((val) => JSON.parse(val));
+      if (response?.data) {
+        let { color, game } = response.data;
 
         setPlayerColor(color);
-        setChessboard(board);
+        setIsUserMove(game.turn == color);
+
+        //reverse the board when user is black
+        if (color == colors.black)
+          game.board = game.board.split("").reverse().join("");
+
+        setChessboard(convertTo2DArray(game.board));
+
+        const moves = game.moves.map((val) => JSON.parse(val));
         setAllMoves(moves);
-        //0 for no one, 1for white, 2 for black, 3 for draw
         setCheckMate(game.winner);
-
-        if (color == colors.white && game.userMove == 0) setIsUserMove(true);
-        else if (color == colors.black && game.userMove == 1)
-          setIsUserMove(true);
-        else setIsUserMove(false);
-
+        setWinnerReason(game.winReason);
         setPlayers({
-          player1: response.data.info.game.player1,
-          player2: response.data.info.game.player2,
+          player1: game.player1,
+          player2: game.player2,
         });
 
-        if (color == colors.white) setOpponent(response.data.info.game.player2);
-        else setOpponent(response.data.info.game.player1);
+        if (color == colors.white) setOpponent(game.player2);
+        else setOpponent(game.player1);
       }
       socket.emit("join-game", gameId);
     } catch (error) {
@@ -120,6 +121,7 @@ export default function Game() {
         setCurrPiece,
         isCheckMate,
         setCheckMate,
+        setWinnerReason,
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">
@@ -127,6 +129,7 @@ export default function Game() {
           playerColor={playerColor}
           isCheckMate={isCheckMate}
           setCheckMate={setCheckMate}
+          winnerReason={winnerReason}
         />
         <div className="sm:p-4 p-0 w-full flex justify-center items-center">
           {<NavBar />}

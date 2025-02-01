@@ -26,13 +26,28 @@ const gameSchema = new Schema(
     },
 
     winner: {
-      type: Number,
-      default: 0,
+      type: String,
+      enum: ["white", "black", "draw", null],
+      default: null,
     },
 
-    userMove: {
-      type: Number,
-      default: 0,
+    winReason: {
+      type: String,
+      enum: [
+        "by checkmate",
+        "by draw",
+        "by white resigns",
+        "by black resigns",
+        "by stalemate",
+        null,
+      ],
+      default: null,
+    },
+
+    turn: {
+      type: String,
+      enum: ["white", "black"],
+      default: "white",
     },
 
     isGameStarted: {

@@ -97,7 +97,7 @@ const gameMove = AsyncHandler(async (req, res, _) => {
   //assuming the board is already rotated if the player er black(from frontend)
   game.board = board;
 
-  game.userMove = !game.userMove;
+  game.turn = game.turn == "white" ? "black" : "white";
 
   //save the info
   await game.save({ validateBeforeSave: false });
@@ -126,7 +126,7 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
     .find({
       $and: [
         { $or: [{ player1: userId }, { player2: userId }] },
-        { winner: 0 },
+        { winner: null },
         { $or: [{ withRandom: true }, { isGameStarted: true }] },
       ],
     })
@@ -193,7 +193,7 @@ const gameDone = AsyncHandler(async (req, res, _) => {
   const query = {
     $and: [
       { $or: [{ player1: userId }, { player2: userId }] },
-      { $nor: [{ winner: 0 }] },
+      { $nor: [{ winner: null }] },
     ],
   };
 
@@ -209,23 +209,20 @@ const gameDone = AsyncHandler(async (req, res, _) => {
     .populate("player2", "name _id rating");
 
   const gameRequiredInfo = games.map((value) => ({
-    board: value.board,
     updatedAt: value.updatedAt,
     totalMoves: value.moves.length,
     _id: value._id,
+    winner: value.winner,
+    withRandom: value.withRandom,
     player1: {
       name: value.player1.name,
       _id: value.player1._id,
       rating: value.player1.rating,
-      won: value.winner == 1,
-      draw: value.winner == 3,
     },
     player2: {
       name: value.player2.name,
       _id: value.player2._id,
       rating: value.player2.rating,
-      won: value.winner == 2,
-      draw: value.winner == 3,
     },
   }));
 
@@ -255,44 +252,25 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
       message: "Game not found",
     });
 
-  let board = game.board.split("").join("");
-
-  //if the player is 1 then he is white otherwiese black
-  if (game.player1._id.toString() == req.player._id.toString()) {
-    game.board = board;
-    return res.status(200).json({
-      success: true,
-      message: "Game found",
-      info: {
-        color: "white",
-        game,
-      },
-    });
-  }
-
-  //reverse the board for black
-  board = board.split("").reverse().join("");
-
-  //
-  game.board = board;
-
   //return info as black
   return res.status(200).json({
     success: true,
     message: "Game found",
-    info: {
-      color: "black",
-      game,
-    },
+    color:
+      game.player1._id.toString() == req.player._id.toString()
+        ? "white"
+        : "black",
+    game,
   });
 });
 
 const gameEnd = AsyncHandler(async (req, res, _) => {
-  let { winner, gameId } = req.body;
+  let { winner, reason, gameId } = req.body;
 
   let game = await gameSchema.findById(gameId);
 
   game.winner = winner;
+  game.winReason = reason;
 
   //save the info
   await game.save({ validateBeforeSave: false });

@@ -5,6 +5,20 @@ const colors = Object.freeze({
   black: "black",
 });
 
+const winner = Object.freeze({
+  white: colors.white,
+  black: colors.black,
+  draw: "draw",
+});
+
+const winReason = Object.freeze({
+  byCheckmate: "by checkmate",
+  byDraw: "by draw",
+  byWhiteResigns: "by white resigns",
+  byBlackResigns: "by black resigns",
+  byStalemate: "by stalemate",
+});
+
 const soundType = Object.freeze({
   capture: "capture",
   move: "move",
@@ -45,4 +59,11 @@ const getPieceImagePath = (piece) => {
 
 const movingPieceTime = 100; //ns
 
-export { colors, makeSound, getPieceImagePath, movingPieceTime };
+export {
+  colors,
+  winner,
+  winReason,
+  makeSound,
+  getPieceImagePath,
+  movingPieceTime,
+};

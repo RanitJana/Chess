@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef } from "react";
 import MoveType from "./MoveType";
+import { winner } from "../../constants";
 
 function Canvas() {
   const canvasRef = useRef(null);
@@ -181,15 +182,16 @@ function Canvas() {
   );
 }
 
-function WinnerBoard({ playerColor, isCheckMate, setCheckMate }) {
+function WinnerBoard({ playerColor, winnerReason, isCheckMate, setCheckMate }) {
   function isYourWin() {
     return (
-      (playerColor == "white" && isCheckMate == 1) ||
-      (playerColor == "black" && isCheckMate == 2)
+      playerColor == isCheckMate ||
+      playerColor == isCheckMate ||
+      isCheckMate == winner.draw
     );
   }
 
-  if (isCheckMate == 0) return;
+  if (!isCheckMate) return;
 
   return (
     <div className="flex justify-center items-center w-dvw h-dvh fixed top-0 left-0 z-[999] bg-[rgba(0,0,0,0.5)]">
@@ -203,22 +205,17 @@ function WinnerBoard({ playerColor, isCheckMate, setCheckMate }) {
           />
           {isYourWin() ? (
             <>
-              {/* <img
-                src="/images/win.gif"
-                alt=""
-                className="absolute w-[15rem] top-0 left-0 translate-y-[-50%] translate-x-[20%]"
-              /> */}
               {<Canvas />}
               <img src="/images/trophy.png" alt="" className="mr-4" />
               <div className="flex flex-col items-center justify-center">
                 <p className="font-bold text-2xl">You Won!</p>
-                <span className="text-sm text-gray-300">By checkmate</span>
+                <span className="text-sm text-gray-300">{winnerReason}</span>
               </div>
             </>
           ) : (
             <div className="flex flex-col items-center justify-center">
               <p className="font-bold text-2xl">You Lost!</p>
-              <span className="text-sm text-gray-300">By checkmate</span>
+              <span className="text-sm text-gray-300">{winnerReason}</span>
             </div>
           )}
         </div>

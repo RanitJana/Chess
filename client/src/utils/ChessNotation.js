@@ -1,8 +1,10 @@
+import { colors } from "../constants.js";
+
 export default function convertToChessNotation(move) {
   // Map row and column to chessboard coordinates
   function toChessCoord(row, col, color) {
     // Adjust for black perspective (0-based indexing assumed)
-    if (color === "black") {
+    if (color === colors.black) {
       row = 7 - row;
       col = 7 - col;
     }

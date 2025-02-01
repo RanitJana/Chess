@@ -9,7 +9,12 @@ import { kingCheckMate } from "../../utils/KingCheck.js";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
-import { colors, makeSound, movingPieceTime } from "../../constants.js";
+import {
+  colors,
+  makeSound,
+  movingPieceTime,
+  winReason,
+} from "../../constants.js";
 import { getColor } from "../../utils/PieceMove.js";
 import Toast from "../../utils/Toast.js";
 
@@ -26,6 +31,8 @@ export default function ChessBoard() {
     chessboard,
     players,
     setCheckMate,
+    isCheckMate,
+    setWinnerReason,
   } = useGameContext();
   const { playerInfo } = useAuthContext();
   const { onlineUsers } = useSocketContext();
@@ -74,17 +81,19 @@ export default function ChessBoard() {
           playerColor == colors.white ? colors.black : colors.white
         )
       ) {
-        const winner = playerColor == colors.white ? 1 : 2;
+        let winner = playerColor;
+        const reason = winReason.byCheckmate;
+
         setCheckMate(winner);
-        await gameEnd({ winner, gameId });
+        setWinnerReason(reason);
+
+        await gameEnd({ winner, reason, gameId });
       }
 
       if (response) {
-        const { userMove } = response.data.info.game;
+        const { turn } = response.data.info.game;
 
-        if (playerColor == colors.white && userMove == 0) setIsUserMove(true);
-        else if (playerColor == colors.black && userMove == 1)
-          setIsUserMove(true);
+        if (turn == playerColor && !isCheckMate) setIsUserMove(true);
         else setIsUserMove(false);
       }
     } catch (error) {
@@ -107,7 +116,7 @@ export default function ChessBoard() {
     updatedBoard = convertTo2DArray(updatedBoard);
 
     if (kingCheckMate(updatedBoard, playerColor))
-      setCheckMate(playerColor == colors.white ? 2 : 1);
+      setCheckMate(playerColor == colors.white ? colors.black : colors.white);
 
     setIsUserMove(true);
 
