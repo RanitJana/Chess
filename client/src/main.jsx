@@ -6,6 +6,9 @@ import AuthContext from "./context/AuthContext.jsx";
 import SocketContext from "./context/SocketContext.jsx";
 import App from "./App.jsx";
 import { Toaster } from "react-hot-toast";
+import preloadImages from "./utils/PreLoadImages.js";
+
+preloadImages();
 
 createRoot(document.getElementById("root")).render(
   <>
