@@ -193,11 +193,7 @@ export default function ChessBoard() {
       </div>
       {/* user info */}
       <PlayerInfoInGame
-        player={
-          players.player1._id == playerInfo._id
-            ? players.player1
-            : players.player2
-        }
+        player={playerInfo}
         isOnline={onlineUsers[playerInfo._id]}
         opponentColor={
           playerColor == colors.white ? colors.black : colors.white

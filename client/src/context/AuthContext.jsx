@@ -5,7 +5,6 @@ import { useLocation, Navigate } from "react-router-dom"; // Import useLocation
 import { verify } from "../api/auth";
 import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
-import getCountryNameFlag from "../utils/getCountryNameFlag.js";
 
 const authContext = createContext();
 
@@ -27,7 +26,7 @@ export default function AuthContext({ children }) {
         let response = await verify();
         if (response?.data.success) {
           const info = response.data.player;
-          info.nationality = { ...getCountryNameFlag(info.nationality) };
+          // info.nationality = { ...getCountryNameFlag(info.nationality) };
           setPlayerInfo(info);
           setAuth(true);
         }

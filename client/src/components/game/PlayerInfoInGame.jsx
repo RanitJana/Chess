@@ -94,7 +94,14 @@ function PlayerInfoInGame({
               {player.name}
             </span>
             <span className="text-gray-400">({player.rating})</span>
-            {flagInfo && <img src={flagInfo.link} alt="" className="w-8" />}
+            {flagInfo && (
+              <img
+                src={flagInfo.link}
+                title={flagInfo.name}
+                alt=""
+                className="w-8"
+              />
+            )}
           </p>
           <div className="flex justify-start relative">
             {opponentTakenPieces?.map((piece, idx) => {

@@ -27,10 +27,7 @@ function Edit() {
     name: playerInfo?.name || "",
     email: playerInfo?.email || "",
     about: playerInfo?.about || "",
-    nationality:
-      playerInfo?.nationality.name == "International"
-        ? ""
-        : playerInfo?.nationality.name,
+    nationality: playerInfo?.nationality || "",
   });
   const [isSubmit, setIsSubmit] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -54,13 +51,7 @@ function Edit() {
           name: userInfo.name.trim(),
           email: userInfo.email.trim(),
           about: userInfo.about.trim(),
-          nationality: {
-            ...getCountryNameFlag(
-              userInfo.nationality == "International"
-                ? ""
-                : userInfo.nationality
-            ),
-          },
+          nationality: userInfo.nationality,
         }));
       } else Toast.error(message);
     } catch (error) {
@@ -77,7 +68,7 @@ function Edit() {
       name: playerInfo?.name || "",
       email: playerInfo?.email || "",
       about: playerInfo?.about || "",
-      nationality: playerInfo?.nationality || {},
+      nationality: playerInfo?.nationality || "",
     });
   };
 
@@ -106,10 +97,10 @@ function Edit() {
             <p className="text-white font-bold text-2xl flex gap-2">
               {playerInfo?.name || "Loading.."}
               <img
-                src={playerInfo?.nationality.link}
+                src={getCountryNameFlag(playerInfo?.nationality).link}
                 alt=""
                 className="w-8"
-                title={playerInfo?.nationality.name}
+                title={getCountryNameFlag(playerInfo?.nationality).name}
               />
             </p>
             <p>{playerInfo?.about || "Loading.."}</p>
@@ -163,7 +154,7 @@ function Edit() {
                   value={
                     userInfo.nationality == ""
                       ? "International"
-                      : userInfo.nationality
+                      : getCountryNameFlag(userInfo.nationality).name
                   }
                   onChange={(e) => e.preventDefault()}
                   onClick={() => setIsMapOpen(true)}

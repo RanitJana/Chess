@@ -6,6 +6,7 @@ import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
 import { socket } from "../socket.js";
 import GetAvatar from "../utils/GetAvatar.js";
+import getCountryNameFlag from "../utils/getCountryNameFlag.js";
 
 function NavBar() {
   const { playerInfo } = useAuthContext();
@@ -62,10 +63,10 @@ function NavBar() {
             {" (" + playerInfo?.rating + ")"}
           </span>
           <img
-            src={playerInfo?.nationality?.link}
+            src={getCountryNameFlag(playerInfo?.nationality).link}
             alt=""
             className="w-8"
-            title={playerInfo?.nationality?.name}
+            title={getCountryNameFlag(playerInfo?.nationality).name}
           />
         </div>
       </div>

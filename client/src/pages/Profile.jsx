@@ -16,6 +16,7 @@ import GetAvatar from "../utils/GetAvatar.js";
 import AllFriends from "../components/profile/AllFriends.jsx";
 import Toast from "../utils/Toast.js";
 import Loader from "../components/Loader.jsx";
+import getCountryNameFlag from "../utils/getCountryNameFlag.js";
 
 const ActionButton = ({ onClick, text, icon, disabled = false }) => (
   <button
@@ -186,10 +187,10 @@ function Profile() {
                 <p className="text-white font-bold text-2xl flex gap-2">
                   {user?.name || "Loading.."}
                   <img
-                    src={playerInfo?.nationality.link}
+                    src={getCountryNameFlag(user?.nationality).link}
                     alt=""
                     className="w-8"
-                    title={playerInfo?.nationality.name}
+                    title={getCountryNameFlag(user?.nationality).name}
                   />
                 </p>
                 <p>{user?.about || "Loading.."}</p>
