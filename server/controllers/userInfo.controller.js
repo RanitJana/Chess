@@ -39,12 +39,13 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       friendsCount,
       views: player.views,
       lastSeen: player.lastSeen,
+      nationality: player.nationality,
     },
   });
 });
 
 const handleUpdatePlayer = AsyncHandler(async (req, res, _) => {
-  const { name, email, about } = req.body;
+  const { name, email, about, nationality } = req.body;
   if (!name || !email || !about)
     return res.status(400).json({
       success: false,
@@ -67,6 +68,7 @@ const handleUpdatePlayer = AsyncHandler(async (req, res, _) => {
   player.name = name;
   player.email = email;
   player.about = about;
+  player.nationality = nationality;
 
   await player.save({ validateBeforeSave: false });
 
@@ -77,6 +79,7 @@ const handleUpdatePlayer = AsyncHandler(async (req, res, _) => {
       name: player.name,
       email: player.email,
       about: player.about,
+      nationality: player.nationality,
     },
   });
 });

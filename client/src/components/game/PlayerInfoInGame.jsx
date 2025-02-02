@@ -5,6 +5,7 @@ import GetAvatar from "../../utils/GetAvatar.js";
 import { useEffect, useState } from "react";
 import { colors, getPieceImagePath } from "../../constants.js";
 import { getColor } from "../../utils/PieceMove.js";
+import getCountryNameFlag from "../../utils/getCountryNameFlag.js";
 
 function PlayerInfoInGame({
   player = {},
@@ -15,6 +16,7 @@ function PlayerInfoInGame({
   const navigate = useNavigate();
   const [opponentTakenPieces, setOpponentTakenPieces] = useState([]);
   const [initialPiecesCount, setInitialPiecesCount] = useState(null);
+  const [flagInfo, setFlagInfo] = useState({});
 
   useEffect(() => {
     // Initialize initial piece counts based on opponent color
@@ -62,6 +64,13 @@ function PlayerInfoInGame({
     }
   }, [chessboard, initialPiecesCount]);
 
+  useEffect(() => {
+    const info = getCountryNameFlag(player?.nationality);
+    console.log(player.nationality);
+
+    setFlagInfo(info);
+  }, [player]);
+
   if (!player) return;
   return (
     <div className="flex justify-between items-center">
@@ -77,14 +86,15 @@ function PlayerInfoInGame({
           )}
         </div>
         <div className="w-full">
-          <p className="text-sm line-clamp-1 overflow-hidden text-white">
+          <p className="text-sm line-clamp-1 flex gap-1 overflow-hidden text-white">
             <span
               onClick={() => navigate(`/member/${player._id}`)}
-              className="text-white font-semibold mr-1 hover:cursor-pointer"
+              className="text-white font-semibold hover:cursor-pointer"
             >
               {player.name}
             </span>
             <span className="text-gray-400">({player.rating})</span>
+            {flagInfo && <img src={flagInfo.link} alt="" className="w-8" />}
           </p>
           <div className="flex justify-start relative">
             {opponentTakenPieces?.map((piece, idx) => {

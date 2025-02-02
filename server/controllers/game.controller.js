@@ -205,8 +205,8 @@ const gameDone = AsyncHandler(async (req, res, _) => {
     .find(query)
     .sort({ createdAt: -1 })
     .limit(total ? parseInt(total) : undefined)
-    .populate("player1", "name _id rating")
-    .populate("player2", "name _id rating");
+    .populate("player1", "name _id rating nationality")
+    .populate("player2", "name _id rating nationality");
 
   const gameRequiredInfo = games.map((value) => ({
     updatedAt: value.updatedAt,
@@ -218,11 +218,13 @@ const gameDone = AsyncHandler(async (req, res, _) => {
       name: value.player1.name,
       _id: value.player1._id,
       rating: value.player1.rating,
+      nationality: value.player1.nationality,
     },
     player2: {
       name: value.player2.name,
       _id: value.player2._id,
       rating: value.player2.rating,
+      nationality: value.player2.nationality,
     },
   }));
 
@@ -242,8 +244,8 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
   //search for the game
   const game = await gameSchema
     .findById(gameId)
-    .populate("player1", "name _id rating")
-    .populate("player2", "name _id rating");
+    .populate("player1", "name _id rating nationality")
+    .populate("player2", "name _id rating nationality");
 
   //if game id is invalid or game is not found
   if (!game)

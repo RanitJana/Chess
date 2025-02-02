@@ -34,6 +34,23 @@ const login = AsyncHandler(async (req, res, _) => {
 
   await player.save({ validateBeforeSave: false });
 
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const totalGamesToday = await gameSchema.countDocuments({
+    createdAt: { $gte: startOfDay, $lte: endOfDay },
+  });
+
+  const friendsCount = await friendSchema.countDocuments({
+    $or: [
+      { sender: player._id, accept: true },
+      { receiver: player._id, accept: true },
+    ],
+  });
+
   return res
     .cookie("accessToken", accessToken, cookieOptions)
     .status(200)
@@ -49,8 +66,11 @@ const login = AsyncHandler(async (req, res, _) => {
         about: player.about,
         createdAt: player.createdAt,
         updatedAt: player.updatedAt,
-        friends: player.friends,
+        friendsCount,
         views: player.views,
+        lastSeen: player.lastSeen,
+        totalGamesToday,
+        nationality: player.nationality,
       },
     });
 });
@@ -129,6 +149,7 @@ const verify = AsyncHandler(async (req, res, _) => {
       views: req.player.views,
       lastSeen: req.player.lastSeen,
       totalGamesToday,
+      nationality: req.player.nationality,
     },
   });
 });

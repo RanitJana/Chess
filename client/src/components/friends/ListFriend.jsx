@@ -6,6 +6,7 @@ import Toast from "../../utils/Toast.js";
 import { gameInit } from "../../api/game.js";
 import Loader from "../Loader.jsx";
 import { socket } from "../../socket.js";
+import getCountryNameFlag from "../../utils/getCountryNameFlag.js";
 
 export default function ListFriend({
   user = {},
@@ -16,7 +17,9 @@ export default function ListFriend({
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
   const [lowerWidthOption, setLowerWidthOption] = useState(false);
+  const [flagInfo, setFlagInfo] = useState({});
   const moreBox = useRef(null);
+  console.log(user);
 
   useEffect(() => {
     const handleActiveLowerWidth = () => {
@@ -36,6 +39,10 @@ export default function ListFriend({
       setIsMoreOpen(false);
     }
   };
+
+  useEffect(() => {
+    setFlagInfo(getCountryNameFlag(user.nationality || ""));
+  }, [user.nationality]);
 
   useEffect(() => {
     window.addEventListener("click", handleCloseMoreBox);
@@ -104,7 +111,7 @@ export default function ListFriend({
             <div className="absolute right-0 translate-x-[50%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
           )}
         </div>
-        <div className="line-clamp-1 text-sm text-white">
+        <div className="line-clamp-1 text-sm flex gap-1 text-white">
           <span
             className="text-white font-semibold hover:cursor-pointer"
             onClick={() => navigate(`/member/${user._id}`)}
@@ -117,6 +124,7 @@ export default function ListFriend({
           >
             ({user.rating})
           </span>
+          {flagInfo && <img src={flagInfo.link} alt="" className="w-8" />}
         </div>
       </div>
       {lowerWidthOption ? (

@@ -40,6 +40,10 @@ const playerSchema = new Schema(
       type: Number,
       default: 0,
     },
+    nationality: {
+      type: String,
+      default: "",
+    },
     about: {
       type: String,
       default: "Chess is the gymnasium of the mind.",

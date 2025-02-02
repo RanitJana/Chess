@@ -61,7 +61,6 @@ export default function Game() {
   const fetchGameInfo = useCallback(async () => {
     try {
       const response = await gameSingle(gameId);
-      console.log(response);
 
       if (response?.data) {
         let { color, game } = response.data;

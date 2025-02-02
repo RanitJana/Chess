@@ -47,18 +47,6 @@ function NavBar() {
   return (
     <div className="flex items-center max-w-[970px] w-full justify-between sm:p-0 sm:mb-0 mb-[-1rem] p-4 z-[1000]">
       {isLoggingOut && <Loader />}
-      {/* <div
-        className="flex gap-2 items-center hover:cursor-pointer"
-        onClick={() => navigate("/")}
-      >
-        <img
-          src="/images/chess.com.png"
-          alt=""
-          decoding="sync"
-          className="w-[8rem]"
-        />
-      </div> */}
-
       {/* name info */}
       <div
         className="flex items-center gap-2 hover:cursor-pointer"
@@ -68,11 +56,17 @@ function NavBar() {
           dangerouslySetInnerHTML={{ __html: GetAvatar(playerInfo?.name) }}
           className="relative w-[2rem] rounded-md overflow-hidden"
         />
-        <div className="font-semibold text-sm line-clamp-1 text-white">
+        <div className="font-semibold flex gap-1 text-sm line-clamp-1 text-white">
           <span>{playerInfo?.name}</span>
           <span className="text-gray-400">
             {" (" + playerInfo?.rating + ")"}
           </span>
+          <img
+            src={playerInfo?.nationality?.link}
+            alt=""
+            className="w-8"
+            title={playerInfo?.nationality?.name}
+          />
         </div>
       </div>
       {/* more options */}

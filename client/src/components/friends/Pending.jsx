@@ -1,14 +1,20 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import GetAvatar from "../../utils/GetAvatar.js";
 import { rejectFriendRequest, acceptFriendRequest } from "../../api/friend.js";
 import Toast from "../../utils/Toast.js";
+import getCountryNameFlag from "../../utils/getCountryNameFlag.js";
 
 function Pending({ user = {}, isOnline = false, setFriends }) {
   const navigate = useNavigate();
 
   const [isSubmit, setIsSubmit] = useState(false);
+  const [flagInfo, setFlagInfo] = useState({});
+
+  useEffect(() => {
+    setFlagInfo(getCountryNameFlag(user.nationality || ""));
+  }, [user.nationality]);
 
   const handleRejectFriendRequest = async function (modelId) {
     if (isSubmit) return;
@@ -79,7 +85,7 @@ function Pending({ user = {}, isOnline = false, setFriends }) {
           )}
         </div>
         <div className="flex flex-col gap-1 w-full text-sm">
-          <div>
+          <div className="flex gap-1">
             <span
               className="text-white font-semibold hover:cursor-pointer"
               onClick={() => navigate(`/member/${user._id}`)}
@@ -92,8 +98,9 @@ function Pending({ user = {}, isOnline = false, setFriends }) {
             >
               ({user.rating})
             </span>
+            {flagInfo && <img src={flagInfo.link} alt="" className="w-8" />}
           </div>
-          <div className="grid grid-cols-2 gap-2 w-full max-w-[15rem]">
+          <div className="grid grid-cols-2 gap-2 w-full max-w-[15rem] mt-1">
             <button
               className={`bg-red-500 hover:bg-red-600 rounded-md h-10 flex items-center justify-center w-full transition-colors ${isSubmit && "brightness-50 cursor-not-allowed"}`}
               disabled={isSubmit}

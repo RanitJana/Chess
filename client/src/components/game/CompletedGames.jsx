@@ -67,7 +67,7 @@ function CompletedGames({ userId }) {
         </div>
       )}
 
-      {games.length && (
+      {games.length ? (
         <div className="overflow-x-scroll">
           <table className="w-full min-w-[30rem] text-gray-300 h-fit bg-gray-700">
             <thead className=" bg-[rgb(27,27,27)]">
@@ -115,6 +115,8 @@ function CompletedGames({ userId }) {
             </tbody>
           </table>
         </div>
+      ) : (
+        ""
       )}
     </div>
   );

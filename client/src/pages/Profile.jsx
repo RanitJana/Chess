@@ -183,8 +183,14 @@ function Profile() {
             </div>
             <div className="flex flex-col justify-between w-full text-[rgb(146,147,145)] gap-5">
               <div>
-                <p className="text-white font-bold text-2xl">
+                <p className="text-white font-bold text-2xl flex gap-2">
                   {user?.name || "Loading.."}
+                  <img
+                    src={playerInfo?.nationality.link}
+                    alt=""
+                    className="w-8"
+                    title={playerInfo?.nationality.name}
+                  />
                 </p>
                 <p>{user?.about || "Loading.."}</p>
               </div>
