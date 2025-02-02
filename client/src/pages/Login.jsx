@@ -6,7 +6,6 @@ import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
-import getCountryNameFlag from "../utils/getCountryNameFlag.js";
 
 export default function Login() {
   const [info, setInfo] = useState({
@@ -40,7 +39,6 @@ export default function Login() {
       if (success) {
         Toast.success(message);
         setAuth(true);
-        player.nationality = { ...getCountryNameFlag(player.nationality) };
         setPlayerInfo(player);
         navigate("/");
       } else {
