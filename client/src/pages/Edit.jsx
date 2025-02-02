@@ -117,7 +117,7 @@ function Edit() {
               imgPath={"/images/about.png"}
               instruction={"About"}
             />
-            <div className="flex gap-2 text-sm">
+            <div className="flex gap-2 text-sm py-4">
               <button
                 className={`w-fit min-w-[5rem] ${isSubmit ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-green-700 hover:cursor-pointer"} bg-green-600  transition-all px-4 py-2 rounded-md text-white font-bold`}
                 onClick={handleUpateProfile}

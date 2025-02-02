@@ -1,17 +1,15 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
 import GetAvatar from "../../utils/GetAvatar.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import { useNavigate } from "react-router";
 
-function SingleFriend({ info, userId }) {
+function SingleFriend({ info }) {
   const navigate = useNavigate();
   const { onlineUsers } = useSocketContext();
 
   return (
     <div
-      className="w-fit hover:cursor-pointer max-w-[5rem] overflow-hidden"
+      className="w-fit hover:cursor-pointer max-w-[5rem]"
       onClick={() => navigate(`/member/${info._id}`)}
     >
       <div className="mb-1">
