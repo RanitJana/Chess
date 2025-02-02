@@ -8,23 +8,13 @@ function CountryList({ setIsMapOpen, setUserInfo }) {
   const [allCountry, setAllCountry] = useState(countries || []);
 
   const handleSearch = (name) => {
-    setAllCountry((prev) => [
-      ...prev.sort((a, b) => {
-        // Check if each country starts with the search term (ignoring case)
-        const aStarts = getCountryNameFlag(a)
-          .name.toLowerCase()
-          .startsWith(name.toLowerCase());
-        const bStarts = getCountryNameFlag(b)
-          .name.toLowerCase()
-          .startsWith(name.toLowerCase());
-
-        if (aStarts && !bStarts) return -1; // a should come before b
-        if (!aStarts && bStarts) return 1; // b should come before a
-
-        // If both either match or don't match, sort alphabetically:
-        return a.localeCompare(b);
-      }),
-    ]);
+    setAllCountry(() =>
+      countries.filter((country) =>
+        getCountryNameFlag(country)
+          .name.toLocaleLowerCase()
+          .startsWith(name.toLocaleLowerCase())
+      )
+    );
   };
 
   return (
@@ -53,7 +43,7 @@ function CountryList({ setIsMapOpen, setUserInfo }) {
                   setUserInfo((prev) => ({ ...prev, nationality: country }));
                   setIsMapOpen(false);
                 }}
-                className="flex items-center gap-3 p-2 bg-blackLight rounded-md"
+                className="flex items-center gap-3 p-2 bg-blackDark rounded-md hover:cursor-pointer hover:bg-blackLight transition-all"
               >
                 <img className="w-8" alt={info.name} src={info.link} />
                 <span className="text-white text-sm font-bold">
@@ -62,6 +52,11 @@ function CountryList({ setIsMapOpen, setUserInfo }) {
               </li>
             );
           })}
+          {allCountry.length == 0 && (
+            <div className="text-white text-center mt-5">
+              No result is found
+            </div>
+          )}
         </ul>
       </div>
     </div>

@@ -156,9 +156,9 @@ function Edit() {
                       ? "International"
                       : getCountryNameFlag(userInfo.nationality).name
                   }
-                  onChange={(e) => e.preventDefault()}
+                  readOnly
                   onClick={() => setIsMapOpen(true)}
-                  className="bg-blackLight transition-all hover:border-gray-400 focus:border-gray-400 p-2 outline-none border-[1px] border-gray-700 text-white pl-9 w-full rounded-2xl"
+                  className="bg-blackLight transition-all hover:cursor-pointer hover:border-gray-400  focus:border-gray-400 p-2 outline-none border-[1px] border-gray-700 text-white pl-9 w-full rounded-2xl"
                 />
               </div>
             </div>
