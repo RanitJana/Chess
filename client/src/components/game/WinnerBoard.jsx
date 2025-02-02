@@ -194,7 +194,7 @@ function WinnerBoard({ playerColor, winnerReason, isCheckMate, setCheckMate }) {
   if (!isCheckMate) return;
 
   return (
-    <div className="flex justify-center items-center w-dvw h-dvh fixed top-0 left-0 z-[999] bg-[rgba(0,0,0,0.5)]">
+    <div className="flex justify-center items-center w-dvw h-dvh fixed top-0 left-0 z-[9999] bg-[rgba(0,0,0,0.5)]">
       <div className="relative bg-blackDarkest rounded-md text-white w-[min(100dvw,20rem)] flex flex-col items-center justify-center shadow-lg">
         <div className="flex justify-center items-center bg-blackLight p-4 w-[min(100dvw,20rem)] rounded-tl-md rounded-tr-md">
           <img

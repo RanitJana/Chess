@@ -43,4 +43,42 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
   });
 });
 
-export { handlePlayerDetails };
+const handleUpdatePlayer = AsyncHandler(async (req, res, _) => {
+  const { name, email, about } = req.body;
+  if (!name || !email || !about)
+    return res.status(400).json({
+      success: false,
+      message: "All fields must be filled",
+    });
+
+  const player = req.player;
+
+  const isAnotherPlayerSameEmail = await playerSchema.findOne({ email });
+
+  if (
+    isAnotherPlayerSameEmail &&
+    isAnotherPlayerSameEmail._id.toString() != player._id.toString()
+  )
+    return res.status(400).json({
+      success: false,
+      message: "Email is already being by another user",
+    });
+
+  player.name = name;
+  player.email = email;
+  player.about = about;
+
+  await player.save({ validateBeforeSave: false });
+
+  return res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    player: {
+      name: player.name,
+      email: player.email,
+      about: player.about,
+    },
+  });
+});
+
+export { handlePlayerDetails, handleUpdatePlayer };

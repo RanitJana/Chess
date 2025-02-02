@@ -7,6 +7,7 @@ import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import Profile from "./pages/Profile.jsx";
 import Friends from "./pages/Friends.jsx";
+import Edit from "./pages/Edit.jsx";
 import { useAuthContext } from "./context/AuthContext.jsx";
 import { useEffect } from "react";
 
@@ -63,6 +64,10 @@ export default function App() {
         <Route
           path="/member/:userId"
           element={isAuth ? <Profile /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/member/edit"
+          element={isAuth ? <Edit /> : <Navigate to={"/login"} />}
         />
         <Route
           path="/friends/:userId"

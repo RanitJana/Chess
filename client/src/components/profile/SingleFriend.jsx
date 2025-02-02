@@ -14,15 +14,15 @@ function SingleFriend({ info, userId }) {
       className="w-fit hover:cursor-pointer max-w-[5rem] overflow-hidden"
       onClick={() => navigate(`/member/${info._id}`)}
     >
-      <div className="relative mb-1">
-        <div className="h-[4rem] flex justify-center items-center sm:w-fit left-1/2 rounded-sm overflow-hidden aspect-square">
-          <div className="relative w-full rounded-2xl overflow-hidden">
+      <div className="mb-1">
+        <div className="h-[4rem] relative flex justify-center items-center sm:w-fit rounded-sm aspect-square">
+          <div className="w-full rounded-2xl overflow-hidden">
             <div dangerouslySetInnerHTML={{ __html: GetAvatar(info.name) }} />
           </div>
+          {onlineUsers[info._id] && (
+            <div className="absolute right-0 translate-x-[50%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
+          )}
         </div>
-        {onlineUsers[info._id] && (
-          <div className="absolute right-0 translate-x-[0%] bottom-0 w-5 aspect-square rounded-full bg-green-600"></div>
-        )}
       </div>
       <div className="text-white font-semibold text-xs text-wrap line-clamp-1 overflow-hidden w-full">
         <span>{info.name}</span>

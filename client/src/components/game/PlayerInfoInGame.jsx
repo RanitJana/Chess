@@ -77,7 +77,7 @@ function PlayerInfoInGame({
           )}
         </div>
         <div className="w-full">
-          <p className="text-sm line-clamp-1 text-white">
+          <p className="text-sm line-clamp-1 overflow-hidden text-white">
             <span
               onClick={() => navigate(`/member/${player._id}`)}
               className="text-white font-semibold mr-1 hover:cursor-pointer"
@@ -106,9 +106,9 @@ function PlayerInfoInGame({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-evenly gap-1 w-full max-w-[7rem] bg-white p-2 rounded-md">
-        <img src="/images/time.gif" alt="" />
-        <span>3 days</span>
+      <div className="flex items-center justify-evenly gap-1 w-[5rem] bg-white p-2 rounded-md">
+        <img src="/images/time.gif" alt="" className="w-4" />
+        <span className="text-sm">3 days</span>
       </div>
     </div>
   );

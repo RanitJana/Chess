@@ -103,21 +103,40 @@ function NavBar() {
           />
           {toggleSetting ? (
             <ul
-              className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(18rem,100dvw)] text-white overflow-hidden shadow-xl"
+              className="absolute top-[100%] pt-1 right-0 rounded-md w-[min(15rem,100dvw)] text-white overflow-hidden shadow-xl"
               ref={moreRef}
             >
               <li
                 onClick={() => navigate("/member/" + playerInfo._id)}
-                className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
-                <img src="/images/user.png" alt="" className="w-[1.5rem]" />
+                <img
+                  src="/images/user.png"
+                  alt=""
+                  className="w-[1.5rem] invert brightness-0"
+                />
                 <span>Profile</span>
               </li>
               <li
-                onClick={handleLogOut}
-                className="flex justify-start items-center gap-3 p-4 hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                onClick={() => navigate("/member/edit/")}
+                className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
-                <img src="/images/exit.png" alt="" className="w-[1.5rem]" />
+                <img
+                  src="/images/edit.png"
+                  alt=""
+                  className="w-[1.5rem] invert brightness-0"
+                />
+                <span>Edit profile</span>
+              </li>
+              <li
+                onClick={handleLogOut}
+                className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+              >
+                <img
+                  src="/images/exit.png"
+                  alt=""
+                  className="w-[1.5rem] invert brightness-0"
+                />
                 <span>Log out</span>
               </li>
             </ul>
