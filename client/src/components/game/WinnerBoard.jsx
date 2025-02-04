@@ -182,15 +182,14 @@ function Canvas() {
   );
 }
 
+function isYourWin(playerColor, isCheckMate) {
+  return (
+    playerColor == isCheckMate ||
+    playerColor == isCheckMate ||
+    isCheckMate == winner.draw
+  );
+}
 function WinnerBoard({ playerColor, winnerReason, isCheckMate, setCheckMate }) {
-  function isYourWin() {
-    return (
-      playerColor == isCheckMate ||
-      playerColor == isCheckMate ||
-      isCheckMate == winner.draw
-    );
-  }
-
   if (!isCheckMate) return;
 
   return (
@@ -203,7 +202,7 @@ function WinnerBoard({ playerColor, winnerReason, isCheckMate, setCheckMate }) {
             alt=""
             className="z-50 absolute hover:cursor-pointer right-0 top-0 rounded-md w-8"
           />
-          {isYourWin() ? (
+          {isYourWin(playerColor, isCheckMate) ? (
             <>
               {<Canvas />}
               <img src="/images/trophy.png" alt="" className="mr-4" />

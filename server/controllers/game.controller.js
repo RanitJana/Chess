@@ -90,6 +90,18 @@ const gameMove = AsyncHandler(async (req, res, _) => {
 
   let game = await gameSchema.findById(gameId);
 
+  if (!game)
+    return res.status(400).json({
+      success: false,
+      message: "Unknown game",
+    });
+
+  if (game.winner)
+    return res.status(400).json({
+      success: false,
+      message: "Already game over",
+    });
+
   moves = moves.map((val) => JSON.stringify(val));
 
   //board must be in string format ans moves in array
@@ -270,6 +282,18 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
   let { winner, reason, gameId } = req.body;
 
   let game = await gameSchema.findById(gameId);
+
+  if (!game)
+    return res.status(400).json({
+      success: false,
+      message: "Unknown game",
+    });
+
+  if (game.winner)
+    return res.status(400).json({
+      success: false,
+      message: "Already game over",
+    });
 
   game.winner = winner;
   game.winReason = reason;

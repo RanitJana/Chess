@@ -90,7 +90,7 @@ export default function ChessBoard() {
         await gameEnd({ winner, reason, gameId });
       }
 
-      if (response) {
+      if (response.data.info) {
         const { turn } = response.data.info.game;
 
         if (turn == playerColor && !isCheckMate) setIsUserMove(true);
@@ -185,6 +185,7 @@ export default function ChessBoard() {
                   updateMoves={updateMoves}
                   boardDetails={boardRef.current?.getBoundingClientRect()}
                   isViewer={isViewer}
+                  isCheckMate={isCheckMate}
                 />
               );
             })}

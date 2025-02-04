@@ -66,8 +66,6 @@ function PlayerInfoInGame({
 
   useEffect(() => {
     const info = getCountryNameFlag(player?.nationality);
-    console.log(player.nationality);
-
     setFlagInfo(info);
   }, [player]);
 

@@ -98,6 +98,15 @@ export default function Game() {
     fetchGameInfo();
   }, [gameId, fetchGameInfo]);
 
+  useEffect(() => {
+    const handleResignWin = (info) => {
+      setCheckMate(info.winner);
+      setWinnerReason(info.reason);
+    };
+    socket.on("accept-resign", handleResignWin);
+    return () => socket.off("accept-resign", handleResignWin);
+  }, [gameId]);
+
   return (
     <GameContext.Provider
       value={{

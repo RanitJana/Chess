@@ -29,6 +29,7 @@ function ChessBoardBox({
   updateMoves,
   boardDetails,
   isViewer,
+  isCheckMate,
 }) {
   const {
     chessboard,
@@ -95,6 +96,7 @@ function ChessBoardBox({
 
   //final updation of placing a piece
   const mustMovePiece = (clearedBoard, isPawnPromotion = false) => {
+    if (isCheckMate || isViewer()) return;
     clearedBoard[currPiece.row][currPiece.col] = " ";
 
     //delay a litle to show moving animation
@@ -139,28 +141,17 @@ function ChessBoardBox({
 
   //move a piece logic
   const handlePlacePiece = useCallback(() => {
-    if (isViewer()) return;
+    if (isViewer() || isCheckMate) return;
 
     setMovingPiece({ from: currPiece, to: { row, col } });
     const clearedBoard = clearPieceMove(chessboard);
 
     //move a piece
     if (!shouldPreparePawnPromotion(clearedBoard)) mustMovePiece(clearedBoard);
-  }, [
-    currPiece,
-    chessboard,
-    row,
-    col,
-    playerColor,
-    setMovePossible,
-    setChessboard,
-    setCurrPiece,
-    setMovingPiece,
-    updateMoves,
-  ]);
+  }, [isViewer, isCheckMate, setMovingPiece, currPiece, row, col, chessboard]);
 
   const handleDisplayPossibleMoves = useCallback(() => {
-    if (isViewer()) return;
+    if (isViewer() || isCheckMate) return;
 
     const pieceColor = getColor(chessboard, row, col);
     if (pieceColor && playerColor !== pieceColor) return;
@@ -168,28 +159,30 @@ function ChessBoardBox({
     const clearedBoard = clearPieceMove(chessboard);
     const moves = pieceMove(clearedBoard, row, col, true);
     if (moves.length != 0) setCurrPiece({ row, col, moves });
-  }, [chessboard, row, col, playerColor]);
+  }, [isViewer, isCheckMate, chessboard, row, col, playerColor, setCurrPiece]);
 
   const handlePieceMove = useCallback(() => {
-    if (!movePossible || !isUserMove || isViewer()) return;
+    if (!movePossible || !isUserMove || isViewer() || isCheckMate) return;
     if (currPiece.moves?.some(([r, c]) => r === row && c === col)) {
       return handlePlacePiece();
     } else {
       return handleDisplayPossibleMoves();
     }
   }, [
-    currPiece,
-    row,
-    col,
     movePossible,
     isUserMove,
+    isViewer,
+    isCheckMate,
+    currPiece.moves,
+    row,
+    col,
     handlePlacePiece,
     handleDisplayPossibleMoves,
   ]);
 
   //promote the pawn
   const handlePawnPromotion = (idx) => {
-    if (!isUserMove || isViewer()) return;
+    if (!isUserMove || isViewer() || isCheckMate) return;
 
     const clearedBoard = clearPieceMove(chessboard.map((row) => [...row]));
 
