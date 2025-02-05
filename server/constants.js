@@ -7,6 +7,8 @@ const _env = {
   ACCESS_TOKEN_EXP: process.env.ACCESS_TOKEN_EXP,
   REFRESH_TOKEN_SEC: process.env.REFRESH_TOKEN_SEC,
   REFRESH_TOKEN_EXP: process.env.REFRESH_TOKEN_EXP,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 };
 
 const cookieOptions = {

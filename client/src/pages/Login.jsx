@@ -6,6 +6,8 @@ import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
+import GoogleLoginButton from "../components/login/GoogleLoginButton.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function Login() {
   const [info, setInfo] = useState({
@@ -53,7 +55,7 @@ export default function Login() {
   };
 
   return (
-    <div className="relative h-full min-h-[100dvh] w-full grid items-center justify-center">
+    <div className="relative h-full min-h-[100dvh] w-full flex items-center justify-center flex-col">
       <form
         onSubmit={handleFormSumbit}
         className="bg-blackDark h-fit max-w-[400px] w-[100dvw] min-w-fit rounded-xl flex flex-col gap-4 z-[2]"
@@ -112,6 +114,15 @@ export default function Login() {
           New? Sign up - and start playing chess!
         </Link>
       </form>
+      <p className="text-white font-bold py-4">Or</p>
+      <GoogleOAuthProvider clientId="135216261350-brkpk924g3jbgbd0froqmpru2lk8drll.apps.googleusercontent.com">
+        <GoogleLoginButton
+          setAuth={setAuth}
+          isSubmit={isSubmit}
+          setSubmit={setSubmit}
+          setPlayerInfo={setPlayerInfo}
+        />
+      </GoogleOAuthProvider>
     </div>
   );
 }

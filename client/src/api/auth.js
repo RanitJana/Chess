@@ -15,6 +15,21 @@ const login = async function (body) {
     return error?.response;
   }
 };
+const loginGoogle = async function (body) {
+  try {
+    let response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URI}/api/v1/google`,
+      body,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    return error?.response;
+  }
+};
 
 const signup = async function (body) {
   try {
@@ -64,4 +79,4 @@ const verify = async function () {
   }
 };
 
-export { login, signup, logout, verify };
+export { login, signup, logout, verify, loginGoogle };

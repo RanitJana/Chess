@@ -21,6 +21,12 @@ const login = AsyncHandler(async (req, res, _) => {
       message: "User does not exist",
     });
 
+  if (!player.password)
+    return res.status(401).json({
+      success: false,
+      message: "User registered via google login",
+    });
+
   if (!(await player.matchPassword(password)))
     return res.status(400).json({
       success: false,

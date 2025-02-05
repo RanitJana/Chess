@@ -17,7 +17,13 @@ const playerSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.isOAuthUser;
+      },
+    },
+    isOAuthUser: {
+      type: Boolean,
+      default: false,
     },
     avatar: {
       type: String,
