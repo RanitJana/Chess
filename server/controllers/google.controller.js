@@ -65,6 +65,11 @@ const googleLogin = AsyncHandler(async (req, res, _) => {
   const email = data.email;
   const name = data.name;
 
+  if(!email || !name) return res.status(500).json({
+    success:false,
+    message:"Please try again"
+  })
+
   const player = await playarSchema.findOne({ email });
 
   //sign up
