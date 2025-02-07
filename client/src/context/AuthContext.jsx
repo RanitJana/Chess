@@ -26,7 +26,6 @@ export default function AuthContext({ children }) {
         let response = await verify();
         if (response?.data.success) {
           const info = response.data.player;
-          // info.nationality = { ...getCountryNameFlag(info.nationality) };
           setPlayerInfo(info);
           setAuth(true);
         }

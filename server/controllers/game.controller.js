@@ -1,6 +1,7 @@
 import gameSchema from "../models/game.model.js";
 import AsyncHandler from "../utils/AsyncHandler.js";
 import playerSchema from "../models/player.model.js";
+import client from "../redis/client.js";
 
 const gameInit = AsyncHandler(async (req, res, _) => {
   const player = req.player;
@@ -95,6 +96,8 @@ const gameMove = AsyncHandler(async (req, res, _) => {
       success: false,
       message: "Unknown game",
     });
+
+  await client.del(`game:${gameId}`);
 
   if (game.winner)
     return res.status(400).json({
@@ -253,8 +256,23 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
   //get game id
   const gameId = req.params.gameId;
 
+  let game = await client.get(`game:${gameId}`);
+
+  if (game) {
+    game = JSON.parse(game);
+
+    return res.status(200).json({
+      success: true,
+      message: "Game found",
+      color:
+        game.player1._id.toString() == req.player._id.toString()
+          ? "white"
+          : "black",
+      game,
+    });
+  }
   //search for the game
-  const game = await gameSchema
+  game = await gameSchema
     .findById(gameId)
     .populate("player1", "name _id rating nationality")
     .populate("player2", "name _id rating nationality");
@@ -265,6 +283,8 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
       success: false,
       message: "Game not found",
     });
+
+  await client.set(`game:${gameId}`, JSON.stringify(game), "EX", 3600);
 
   //return info as black
   return res.status(200).json({
@@ -297,6 +317,8 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
 
   game.winner = winner;
   game.winReason = reason;
+
+  await client.del(`game:${gameId}`);
 
   //save the info
   await game.save({ validateBeforeSave: false });

@@ -19,7 +19,6 @@ export default function ListFriend({
   const [lowerWidthOption, setLowerWidthOption] = useState(false);
   const [flagInfo, setFlagInfo] = useState({});
   const moreBox = useRef(null);
-  console.log(user);
 
   useEffect(() => {
     const handleActiveLowerWidth = () => {

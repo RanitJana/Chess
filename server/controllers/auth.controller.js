@@ -123,6 +123,34 @@ const logout = AsyncHandler(async (req, res, _) => {
 });
 
 const verify = AsyncHandler(async (req, res, _) => {
+  const {
+    _id,
+    name,
+    email,
+    rating,
+    avatar,
+    about,
+    createdAt,
+    updatedAt,
+    views,
+    lastSeen,
+    nationality,
+  } = req.player;
+
+  const info = {
+    _id,
+    name,
+    email,
+    rating,
+    avatar,
+    about,
+    createdAt,
+    updatedAt,
+    views,
+    lastSeen,
+    nationality,
+  };
+
   const friendsCount = await friendSchema.countDocuments({
     $or: [
       { sender: req.player._id, accept: true },
@@ -139,24 +167,12 @@ const verify = AsyncHandler(async (req, res, _) => {
     createdAt: { $gte: startOfDay, $lte: endOfDay },
   });
 
+  const player = { ...info, friendsCount, totalGamesToday };
+
   return res.status(200).json({
     success: true,
     message: "Verified",
-    player: {
-      _id: req.player._id,
-      name: req.player.name,
-      email: req.player.email,
-      rating: req.player.rating,
-      avatar: req.player.avatar,
-      about: req.player.about,
-      createdAt: req.player.createdAt,
-      updatedAt: req.player.updatedAt,
-      friendsCount,
-      views: req.player.views,
-      lastSeen: req.player.lastSeen,
-      totalGamesToday,
-      nationality: req.player.nationality,
-    },
+    player,
   });
 });
 
