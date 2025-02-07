@@ -41,6 +41,10 @@ export default function ChessBoard() {
 
   const boardRef = useRef(null);
   const [opponent, setOpponent] = useState(null);
+  const [points, setPoints] = useState({
+    [colors.white]: 0,
+    [colors.black]: 0,
+  });
 
   useEffect(() => {
     if (players)
@@ -160,6 +164,8 @@ export default function ChessBoard() {
         opponentColor={playerColor}
         chessboard={chessboard}
         allMoves={allMoves}
+        points={points}
+        setPoints={setPoints}
       />
       {/* chessboard */}
       <div
@@ -202,6 +208,8 @@ export default function ChessBoard() {
         }
         chessboard={chessboard}
         allMoves={allMoves}
+        points={points}
+        setPoints={setPoints}
       />
     </div>
   );

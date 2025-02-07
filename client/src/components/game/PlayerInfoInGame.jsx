@@ -3,14 +3,17 @@
 import { useNavigate } from "react-router";
 import GetAvatar from "../../utils/GetAvatar.js";
 import { useEffect, useState } from "react";
-import { getPieceImagePath } from "../../constants.js";
+import { colors, getPieceImagePath } from "../../constants.js";
 import getCountryNameFlag from "../../utils/getCountryNameFlag.js";
+import piecePoint from "../../utils/PiecePoints.js";
 
 function PlayerInfoInGame({
   player = {},
   isOnline = false,
   opponentColor,
   allMoves,
+  points,
+  setPoints,
 }) {
   const navigate = useNavigate();
   const [opponentTakenPieces, setOpponentTakenPieces] = useState([]);
@@ -24,6 +27,12 @@ function PlayerInfoInGame({
       if (move.color != opponentColor && move.takes != " ")
         takenPieces.push(move.takes);
     });
+
+    const sum = takenPieces.reduce((sum, piece) => sum + piecePoint(piece), 0);
+
+    if (opponentColor == colors.black)
+      setPoints((prev) => ({ ...prev, [colors.white]: sum }));
+    else setPoints((prev) => ({ ...prev, [colors.black]: sum }));
 
     setOpponentTakenPieces(takenPieces);
   };
@@ -74,22 +83,35 @@ function PlayerInfoInGame({
             )}
           </p>
           <div className="flex justify-start relative">
-            {opponentTakenPieces?.map((piece, idx) => {
-              return (
-                <img
-                  key={idx}
-                  src={getPieceImagePath(piece)}
-                  alt=""
-                  className="w-5"
-                  style={{
-                    position: "absolute",
-                    left: `${idx * 1.1}rem`,
-                    zIndex: idx,
-                    transform: `translateX(-${idx * 8}px)`,
-                  }}
-                />
-              );
-            })}
+            {opponentTakenPieces?.map((piece, idx) => (
+              <img
+                key={idx}
+                src={getPieceImagePath(piece)}
+                alt=""
+                className="w-5"
+                style={{
+                  position: "absolute",
+                  left: `${idx * 1.1}rem`,
+                  zIndex: idx,
+                  transform: `translateX(-${idx * 8}px)`,
+                }}
+              />
+            ))}
+
+            <div
+              className="absolute h-5 flex items-center justify-center text-white text-xs"
+              style={{
+                left: `${opponentTakenPieces.length * 1.3}rem`,
+                transform: `translateX(-${opponentTakenPieces.length * 8}px)`,
+              }}
+            >
+              {opponentColor == colors.black && points.black < points.white ? (
+                <div>+{points.white - points.black}</div>
+              ) : null}
+              {opponentColor == colors.white && points.black > points.white ? (
+                <div>+{points.black - points.white}</div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
