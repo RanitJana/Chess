@@ -271,6 +271,7 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
       game,
     });
   }
+  console.log("not found");
   //search for the game
   game = await gameSchema
     .findById(gameId)
