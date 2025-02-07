@@ -159,6 +159,7 @@ export default function ChessBoard() {
         isOnline={onlineUsers[opponent._id]}
         opponentColor={playerColor}
         chessboard={chessboard}
+        allMoves={allMoves}
       />
       {/* chessboard */}
       <div
@@ -200,6 +201,7 @@ export default function ChessBoard() {
           playerColor == colors.white ? colors.black : colors.white
         }
         chessboard={chessboard}
+        allMoves={allMoves}
       />
     </div>
   );

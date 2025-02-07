@@ -52,8 +52,8 @@ export default function Game() {
     moves: null,
   });
   const [players, setPlayers] = useState({
-    player1: { name: "Loading..", rating: 200 },
-    player2: { name: "Loading..", rating: 200 },
+    player1: {},
+    player2: {},
   });
   const [isCheckMate, setCheckMate] = useState(null);
   const [winnerReason, setWinnerReason] = useState("");
@@ -138,6 +138,7 @@ export default function Game() {
           isCheckMate={isCheckMate}
           setCheckMate={setCheckMate}
           winnerReason={winnerReason}
+          players={players}
         />
         <div className="sm:p-4 p-0 w-full flex justify-center items-center">
           {<NavBar />}
