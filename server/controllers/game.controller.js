@@ -97,7 +97,7 @@ const gameMove = AsyncHandler(async (req, res, _) => {
       message: "Unknown game",
     });
 
-  await client.del(`game:${gameId}`);
+  await client.del(`game:single:${gameId}`);
 
   if (game.winner)
     return res.status(400).json({
@@ -279,7 +279,7 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
   //get game id
   const gameId = req.params.gameId;
 
-  let game = await client.get(`game:${gameId}`);
+  let game = await client.get(`game:single:${gameId}`);
 
   if (game) {
     game = JSON.parse(game);
@@ -307,7 +307,7 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
       message: "Game not found",
     });
 
-  await client.set(`game:${gameId}`, JSON.stringify(game), "EX", 3600);
+  await client.set(`game:single:${gameId}`, JSON.stringify(game), "EX", 3600);
 
   //return info as black
   return res.status(200).json({
@@ -342,7 +342,7 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
   game.winReason = reason;
 
   await client.del(
-    `game:${gameId}`,
+    `game:single:${gameId}`,
     `game:history:${game.player1._id}`,
     `game:history:${game.player2._id}`
   );
