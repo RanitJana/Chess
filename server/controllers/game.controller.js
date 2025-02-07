@@ -204,6 +204,21 @@ const gameChallanges = AsyncHandler(async (req, res, _) => {
 const gameDone = AsyncHandler(async (req, res, _) => {
   const { total, userId } = req.params;
 
+  if (total == 5) {
+    let response = await client.get(`game:history:${userId}`);
+
+    if (response) {
+      response = JSON.parse(response);
+
+      return res.status(200).json({
+        success: true,
+        message: "Successful",
+        info: response.gameRequiredInfo,
+        totalDocuments: response.totalDocuments,
+      });
+    }
+  }
+
   // Query to find games based on player and winner
   const query = {
     $and: [
@@ -243,6 +258,14 @@ const gameDone = AsyncHandler(async (req, res, _) => {
     },
   }));
 
+  if (total == 5)
+    await client.set(
+      `game:history:${userId}`,
+      JSON.stringify({ gameRequiredInfo, totalDocuments }),
+      "EX",
+      3600
+    );
+
   return res.status(200).json({
     success: true,
     message: "Successful",
@@ -271,7 +294,6 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
       game,
     });
   }
-  console.log("not found");
   //search for the game
   game = await gameSchema
     .findById(gameId)
@@ -319,7 +341,11 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
   game.winner = winner;
   game.winReason = reason;
 
-  await client.del(`game:${gameId}`);
+  await client.del(
+    `game:${gameId}`,
+    `game:history:${game.player1._id}`,
+    `game:history:${game.player2._id}`
+  );
 
   //save the info
   await game.save({ validateBeforeSave: false });
