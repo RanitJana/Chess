@@ -45,6 +45,8 @@ const themes = {
   checkers: "checkers",
   icy: "icy",
   real: "real",
+  graffiti: "graffiti",
+  glass: "glass",
 };
 
 const getPieceImagePath = (piece) => {
@@ -86,6 +88,14 @@ const themeChessboardBoxColor = {
   [themes.real]: {
     dark: "rgb(145,87,51)",
     light: "rgb(244,213,174)",
+  },
+  [themes.graffiti]: {
+    dark: "rgb(167,132,95)",
+    light: "rgb(173,173,172)",
+  },
+  [themes.glass]: {
+    dark: "rgb(34,43,54)",
+    light: "rgb(98,113,129)",
   },
 };
 
