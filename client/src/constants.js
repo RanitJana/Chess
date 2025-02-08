@@ -49,6 +49,7 @@ const themes = {
   graffiti: "graffiti",
   glass: "glass",
   light: "light",
+  tournament: "tournament",
 };
 
 const getPieceImagePath = (piece) => {
@@ -110,6 +111,10 @@ const themeChessboardBoxColor = {
   bases: {
     dark: "rgb(181,94,46)",
     light: "rgb(238,203,161)",
+  },
+  [themes.tournament]: {
+    dark: "rgb(48,100,73)",
+    light: "rgb(234,235,231)",
   },
 };
 
