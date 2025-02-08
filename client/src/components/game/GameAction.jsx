@@ -50,6 +50,7 @@ function GameAction() {
     <div className="p-4 flex gap-2">
       <button
         className={`w-[7rem] h-[2.5rem] bg-[rgb(70,70,70)] transition-all px-4 py-2 rounded-md text-white flex justify-center items-center text-sm font-bold ${isSubmit || isCheckMate ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-[rgb(55,55,55)]"} `}
+        disabled={isSubmit || isCheckMate}
       >
         <span className="text-xl font-extrabold pr-2">½</span>
         <span>Draw</span>
@@ -57,6 +58,7 @@ function GameAction() {
       <button
         className={`w-[7rem] h-[2.5rem] bg-[rgb(70,70,70)]  transition-all px-4 py-2 rounded-md text-white flex justify-center items-center text-sm font-bold ${isSubmit || isCheckMate ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-[rgb(55,55,55)]"} `}
         onClick={handleResign}
+        disabled={isSubmit || isCheckMate}
       >
         <img
           src="/images/resign.png"

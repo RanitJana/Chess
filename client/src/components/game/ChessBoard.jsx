@@ -41,16 +41,21 @@ export default function ChessBoard() {
 
   const boardRef = useRef(null);
   const [opponent, setOpponent] = useState(null);
+  const [user, setUser] = useState(null);
   const [points, setPoints] = useState({
     [colors.white]: 0,
     [colors.black]: 0,
   });
 
   useEffect(() => {
-    if (players)
+    if (players) {
       setOpponent(() =>
         userId == players.player1._id ? players.player2 : players.player1
       );
+      setUser(() =>
+        userId == players.player1._id ? players.player1 : players.player2
+      );
+    }
   }, [players]);
 
   const isViewer = () => {
@@ -201,8 +206,8 @@ export default function ChessBoard() {
       </div>
       {/* user info */}
       <PlayerInfoInGame
-        player={playerInfo}
-        isOnline={onlineUsers[playerInfo._id]}
+        player={user}
+        isOnline={onlineUsers[user._id]}
         opponentColor={
           playerColor == colors.white ? colors.black : colors.white
         }

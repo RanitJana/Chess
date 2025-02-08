@@ -158,7 +158,7 @@ function ChessBoardBox({
 
     const clearedBoard = clearPieceMove(chessboard);
     const moves = pieceMove(clearedBoard, row, col, true);
-    if (moves.length != 0) setCurrPiece({ row, col, moves });
+    setCurrPiece({ row, col, moves });
   }, [isViewer, isCheckMate, chessboard, row, col, playerColor, setCurrPiece]);
 
   const handlePieceMove = useCallback(() => {
@@ -288,7 +288,7 @@ function ChessBoardBox({
   }, [pawnUpdatePieces, currPiece]);
 
   return (
-    <span
+    <div
       style={{ backgroundColor: color }}
       className="relative w-full aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
       onClick={handlePieceMove}
@@ -334,7 +334,7 @@ function ChessBoardBox({
           {promotionItems}
         </ul>
       )}
-    </span>
+    </div>
   );
 }
 
