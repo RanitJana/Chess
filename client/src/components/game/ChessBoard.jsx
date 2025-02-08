@@ -11,6 +11,7 @@ import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import {
   colors,
+  getThemeColor,
   makeSound,
   movingPieceTime,
   winReason,
@@ -185,7 +186,8 @@ export default function ChessBoard() {
           <div className="grid grid-cols-8 w-full" key={rowIdx}>
             {row.map((piece, pieceIdx) => {
               const key = pieceIdx + rowIdx;
-              const color = key & 1 ? "rgb(115,149,82)" : "rgb(234,237,208)";
+              const themeColor = getThemeColor();
+              const color = key & 1 ? themeColor.dark : themeColor.light;
 
               return (
                 <ChessBoardBox

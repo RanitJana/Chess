@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { convertTo2DArray } from "../../pages/Game.jsx";
-import { colors } from "../../constants.js";
+import { colors, getPieceImagePath, getThemeColor } from "../../constants.js";
 
 function ChessBoardPreview({ boardString, playerColor }) {
   const [board, setBoard] = useState(null);
@@ -16,38 +16,24 @@ function ChessBoardPreview({ boardString, playerColor }) {
     setBoard(convertTo2DArray(boardString));
   }, [playerColor]);
 
-  const pieceMapping = {
-    r: "/images/rook-b.png",
-    p: "/images/pawn-b.png",
-    n: "/images/knight-b.png",
-    b: "/images/bishop-b.png",
-    q: "/images/queen-b.png",
-    k: "/images/nrking-b.png",
-    R: "/images/rook-w.png",
-    P: "/images/pawn-w.png",
-    N: "/images/knight-w.png",
-    B: "/images/bishop-w.png",
-    Q: "/images/queen-w.png",
-    K: "/images/nrking-w.png",
-  };
-
   return (
-    <div className="grid grid-cols-8 w-full aspect-square">
+    <div className="grid grid-cols-8 grid-rows-8 w-full aspect-square">
       {board?.map((row, rowIdx) => {
         return row.map((piece, pieceIdx) => {
-          const color =
-            (pieceIdx + rowIdx) % 2 === 0
-              ? "rgb(234,237,208)"
-              : "rgb(115,149,82)";
+          const themeColor = getThemeColor();
           return (
             <div
               key={rowIdx + pieceIdx}
-              style={{ backgroundColor: color }}
-              className="aspect-square"
+              style={{
+                backgroundColor:
+                  (rowIdx + pieceIdx) & 1 ? themeColor.dark : themeColor.light,
+              }}
+              className="aspect-square relative"
             >
               <img
-                src={pieceMapping[piece]}
+                src={getPieceImagePath(piece)}
                 style={{ userSelect: "none" }}
+                className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
                 draggable={false}
                 alt=""
               />

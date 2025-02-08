@@ -124,6 +124,17 @@ function NavBar() {
                 <span>Edit profile</span>
               </li>
               <li
+                onClick={() => navigate("/theme/")}
+                className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+              >
+                <img
+                  src="/images/theme.png"
+                  alt=""
+                  className="w-[1.5rem] p-[0.15rem] invert brightness-0"
+                />
+                <span>Board theme</span>
+              </li>
+              <li
                 onClick={handleLogOut}
                 className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >

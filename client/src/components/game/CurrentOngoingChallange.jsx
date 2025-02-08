@@ -75,12 +75,12 @@ function CurrentOngoingChallange({
       className="group relative rounded-md overflow-hidden cursor-pointer shadow-[0_5px_0px_0px_rgb(29,28,26)]"
     >
       <div className="relative">
-        <div className="absolute h-full w-full inset-0 bg-black opacity-80 flex justify-center items-center"></div>
+        <div className="absolute h-full w-full inset-0 bg-black opacity-50 flex justify-center items-center z-10"></div>
         <ChessBoardPreview
           boardString={game.board}
           playerColor={challanger ? colors.white : colors.black}
         />
-        <div className="absolute w-full top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center gap-1">
+        <div className="absolute w-full top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center gap-1 z-10">
           <div className="h-14 p-1 aspect-square rounded-xl bg-white overflow-hidden relative">
             <div
               dangerouslySetInnerHTML={{

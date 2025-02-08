@@ -1,15 +1,16 @@
+import { getThemeColor } from "../../constants.js";
+
 function EmptyBoard() {
   let board = Array(8)
     .fill()
     .map(() => Array(8).fill(" "));
   return board.map((row, rowIdx) => {
+    const themeColor = getThemeColor();
     return (
       <div className="grid grid-cols-8 w-full" key={rowIdx}>
         {row.map((_, colIdx) => {
           const color =
-            (colIdx + rowIdx) % 2 === 0
-              ? "rgb(234,237,208)"
-              : "rgb(115,149,82)";
+            (colIdx + rowIdx) & 1 ? themeColor.dark : themeColor.light;
           return (
             <div
               key={rowIdx + colIdx}

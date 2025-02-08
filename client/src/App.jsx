@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp.jsx";
 import Profile from "./pages/Profile.jsx";
 import Friends from "./pages/Friends.jsx";
 import Edit from "./pages/Edit.jsx";
+import Themes from "./pages/Themes.jsx";
 import { useAuthContext } from "./context/AuthContext.jsx";
 import { useEffect } from "react";
 
@@ -76,6 +77,10 @@ export default function App() {
         <Route
           path="/game/:gameId"
           element={isAuth ? <Game /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/theme"
+          element={isAuth ? <Themes /> : <Navigate to={"/login"} />}
         />
         <Route path="*" element={<Navigate to={"/login"} />} />
       </Routes>
