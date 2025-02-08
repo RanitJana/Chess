@@ -195,6 +195,7 @@ export default function ChessBoard() {
                   row={rowIdx}
                   col={pieceIdx}
                   color={color}
+                  themeColor={themeColor}
                   piece={piece}
                   updateMoves={updateMoves}
                   boardDetails={boardRef.current?.getBoundingClientRect()}

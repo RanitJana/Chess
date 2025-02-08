@@ -25,6 +25,7 @@ function ChessBoardBox({
   row,
   col,
   color,
+  themeColor,
   piece,
   updateMoves,
   boardDetails,
@@ -325,6 +326,7 @@ function ChessBoardBox({
         col={col}
         currPiece={currPiece}
         color={color}
+        themeColor={themeColor}
         playerColor={playerColor}
         chessboard={chessboard}
       />

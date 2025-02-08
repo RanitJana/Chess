@@ -1,5 +1,9 @@
 import NavBar from "../components/NavBar.jsx";
-import { themes, themeChessboardBoxColor } from "../constants.js";
+import {
+  themes,
+  themeChessboardBoxColor,
+  getThemeBackground,
+} from "../constants.js";
 import Toast from "../utils/Toast.js";
 
 function Themes() {
@@ -25,47 +29,58 @@ function Themes() {
           <span className="font-bold text-white text-2xl">Board themes</span>
         </p>
 
-        <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-1">
+        <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 grid sm:grid-cols-2 grid-cols-1 gap-1">
           {Object.keys(themes).map((theme, idx) => {
             return (
               <div
                 key={idx}
-                className="px-4 py-2 relative overflow-hidden rounded-md font-semibold text-white hover:cursor-pointer hover:brightness-110 transition-all flex justify-between"
+                className="p-4 relative overflow-hidden rounded-md font-semibold text-white hover:cursor-pointer hover:brightness-110 transition-all flex justify-between"
                 onClick={() => handleChangeTheme(theme)}
                 style={{
-                  backgroundColor: themeChessboardBoxColor[theme].dark,
+                  background: `url(${getThemeBackground(theme)})  ${themeChessboardBoxColor[theme].light} center top / cover no-repeat`,
                 }}
               >
-                <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.11)]"></div>
                 <span className="z-10 capitalize">{theme}</span>
-                <div className="grid grid-cols-2 grid-rows-2 w-[6rem] z-10 shadow-md">
+                <div className="grid grid-cols-2 grid-rows-2 w-[6.5rem] h-[6.5rem] z-10 shadow-md">
                   <div
                     style={{
                       backgroundColor: themeChessboardBoxColor[theme].light,
                     }}
                   >
-                    <img src={`/images/themes/${theme}/bn.png`} alt="" />
+                    <img
+                      src={`/images/themes/${themes[theme]}/bn.png`}
+                      alt=""
+                    />
                   </div>
                   <div
                     style={{
                       backgroundColor: themeChessboardBoxColor[theme].dark,
                     }}
                   >
-                    <img src={`/images/themes/${theme}/wn.png`} alt="" />
+                    <img
+                      src={`/images/themes/${themes[theme]}/wn.png`}
+                      alt=""
+                    />
                   </div>
                   <div
                     style={{
                       backgroundColor: themeChessboardBoxColor[theme].dark,
                     }}
                   >
-                    <img src={`/images/themes/${theme}/bp.png`} alt="" />
+                    <img
+                      src={`/images/themes/${themes[theme]}/bp.png`}
+                      alt=""
+                    />
                   </div>
                   <div
                     style={{
                       backgroundColor: themeChessboardBoxColor[theme].light,
                     }}
                   >
-                    <img src={`/images/themes/${theme}/wp.png`} alt="" />
+                    <img
+                      src={`/images/themes/${themes[theme]}/wp.png`}
+                      alt=""
+                    />
                   </div>
                 </div>
               </div>

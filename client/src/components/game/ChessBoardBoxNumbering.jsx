@@ -9,6 +9,7 @@ function ChessBoardBoxNumbering({
   col,
   currPiece,
   color,
+  themeColor,
   playerColor,
   chessboard,
 }) {
@@ -72,9 +73,7 @@ function ChessBoardBoxNumbering({
           className="absolute left-[2px] top-1 font-semibold text-[11px]"
           style={{
             color:
-              color == "rgb(115,149,82)"
-                ? "rgb(234,237,208)"
-                : "rgb(115,149,82)",
+              color == themeColor.dark ? themeColor.light : themeColor.dark,
           }}
         >
           {playerColor == colors.white ? 8 - row : row + 1}
@@ -85,9 +84,7 @@ function ChessBoardBoxNumbering({
           className="absolute right-[1px] bottom-[-2px] font-semibold text-[11px]"
           style={{
             color:
-              color == "rgb(115,149,82)"
-                ? "rgb(234,237,208)"
-                : "rgb(115,149,82)",
+              color == themeColor.dark ? themeColor.light : themeColor.dark,
           }}
         >
           {playerColor == colors.white

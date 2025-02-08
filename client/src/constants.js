@@ -44,28 +44,34 @@ const themes = {
   newspaper: "newspaper",
   checkers: "checkers",
   icy: "icy",
+  bases: "icy", //images are same
   real: "real",
   graffiti: "graffiti",
   glass: "glass",
+  light: "light",
 };
 
 const getPieceImagePath = (piece) => {
   const theme = localStorage.getItem("chess-theme") || themes.classic;
   const pieceMapping = {
-    r: `/images/themes/${theme}/br.png`,
-    p: `/images/themes/${theme}/bp.png`,
-    n: `/images/themes/${theme}/bn.png`,
-    b: `/images/themes/${theme}/bb.png`,
-    q: `/images/themes/${theme}/bq.png`,
-    k: `/images/themes/${theme}/bk.png`,
-    R: `/images/themes/${theme}/wr.png`,
-    P: `/images/themes/${theme}/wp.png`,
-    N: `/images/themes/${theme}/wn.png`,
-    B: `/images/themes/${theme}/wb.png`,
-    Q: `/images/themes/${theme}/wq.png`,
-    K: `/images/themes/${theme}/wk.png`,
+    r: `/images/themes/${themes[theme]}/br.png`,
+    p: `/images/themes/${themes[theme]}/bp.png`,
+    n: `/images/themes/${themes[theme]}/bn.png`,
+    b: `/images/themes/${themes[theme]}/bb.png`,
+    q: `/images/themes/${themes[theme]}/bq.png`,
+    k: `/images/themes/${themes[theme]}/bk.png`,
+    R: `/images/themes/${themes[theme]}/wr.png`,
+    P: `/images/themes/${themes[theme]}/wp.png`,
+    N: `/images/themes/${themes[theme]}/wn.png`,
+    B: `/images/themes/${themes[theme]}/wb.png`,
+    Q: `/images/themes/${themes[theme]}/wq.png`,
+    K: `/images/themes/${themes[theme]}/wk.png`,
   };
   return pieceMapping[piece] || "";
+};
+
+const getThemeBackground = (theme) => {
+  return `/images/themes/${themes[theme]}/${theme}.png`;
 };
 
 const themeChessboardBoxColor = {
@@ -97,6 +103,14 @@ const themeChessboardBoxColor = {
     dark: "rgb(34,43,54)",
     light: "rgb(98,113,129)",
   },
+  [themes.light]: {
+    dark: "rgb(169,169,169)",
+    light: "rgb(217,216,216)",
+  },
+  bases: {
+    dark: "rgb(181,94,46)",
+    light: "rgb(238,203,161)",
+  },
 };
 
 const getThemeColor = () => {
@@ -116,4 +130,5 @@ export {
   getThemeColor,
   themes,
   themeChessboardBoxColor,
+  getThemeBackground,
 };
