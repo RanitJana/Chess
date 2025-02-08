@@ -281,9 +281,12 @@ function ChessBoardBox({
       <li
         onClick={() => handlePawnPromotion(idx)}
         key={idx}
-        className={`relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px] ${idx & 1 ? "bg-[rgb(115,149,82)]" : "bg-[rgb(234,237,208)]"}`}
+        className={`relative aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]`}
+        style={{
+          backgroundColor: idx & 1 ? themeColor.dark : themeColor.light,
+        }}
       >
-        <img src={`/images/${val}.png`} alt="" decoding="async" />
+        <img src={val} alt="" decoding="async" />
       </li>
     ));
   }, [pawnUpdatePieces, currPiece]);

@@ -1,8 +1,18 @@
-import { colors } from "../constants.js";
+import { colors, getPieceImagePath } from "../constants.js";
 
 export default function pawnUpdatePieces(playerColor) {
   if (playerColor === colors.black) {
-    return ["queen-b", "rook-b", "bishop-b", "knight-b"];
+    return [
+      getPieceImagePath("q"),
+      getPieceImagePath("r"),
+      getPieceImagePath("b"),
+      getPieceImagePath("n"),
+    ];
   }
-  return ["queen-w", "rook-w", "bishop-w", "knight-w"];
+  return [
+    getPieceImagePath("Q"),
+    getPieceImagePath("R"),
+    getPieceImagePath("B"),
+    getPieceImagePath("N"),
+  ];
 }

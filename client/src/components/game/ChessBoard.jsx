@@ -125,10 +125,10 @@ export default function ChessBoard() {
 
     updatedBoard = convertTo2DArray(updatedBoard);
 
-    if (kingCheckMate(updatedBoard, playerColor))
+    if (kingCheckMate(updatedBoard, playerColor)) {
       setCheckMate(playerColor == colors.white ? colors.black : colors.white);
-
-    setIsUserMove(true);
+      setWinnerReason(winReason.byCheckmate);
+    } else setIsUserMove(true);
 
     const opponentMove = {
       from: { row: 7 - move.from.row, col: 7 - move.from.col },
