@@ -49,6 +49,15 @@ const challangeSection = function (socket, userSockets) {
     socket.to(socketId).emit("init-challange", game);
   });
 };
+const drawGameSection = function (socket, userSockets) {
+  socket.on("send-draw-proposal", ({ userId }) => {
+    const socketId = userSockets.get(userId);
+    socket.to(socketId).emit("receive-draw-proposal");
+  });
+  socket.on("accept-draw", ({ gameId, info }) => {
+    socket.to(gameId).emit("show-draw", info);
+  });
+};
 
 const ongoingGameSection = function (socket, games) {
   socket.on("game-show", (gameId) => {
@@ -135,6 +144,9 @@ const realTimeInit = function (server) {
 
     //handle challange ongoing
     challangeSection(socket, userSockets);
+
+    //game draw proposal
+    drawGameSection(socket, userSockets);
 
     //handle onging daily games
     let games = [];

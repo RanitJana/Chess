@@ -69,7 +69,7 @@ function CompletedGames({ userId }) {
 
       {games.length ? (
         <div className="overflow-x-scroll">
-          <table className="w-full min-w-[30rem] text-gray-300 h-fit bg-gray-700">
+          <table className="w-full min-w-[30rem] table-auto text-gray-300 h-fit bg-gray-700">
             <thead className=" bg-[rgb(27,27,27)]">
               <tr>
                 <th className="p-2">Players</th>

@@ -36,7 +36,7 @@ function SingleGameDone({
         borderBottom: !lastElement ? "1px solid rgb(80,80,80)" : "",
       }}
       onClick={() => navigate(`/game/${gameId}`)}
-      className="text-center hover:cursor-pointer hover:bg-[rgb(27,27,27)] bg-blackDarkest transition-colors"
+      className="text-center text-sm hover:cursor-pointer hover:bg-[rgb(27,27,27)] bg-blackDarkest transition-colors"
     >
       <td className="flex justify-center py-3">
         <div className="flex  items-center gap-4">
@@ -64,21 +64,37 @@ function SingleGameDone({
       </td>
       <td>
         <div className="flex justify-center items-center gap-4">
-          <div className="flex flex-col">
-            <span>{winner == colors.white ? 1 : 0}</span>
-            <span>{winner == colors.black ? 1 : 0}</span>
+          <div className="flex flex-col text-sm">
+            {winner == "draw" ? (
+              <>
+                <span>½</span>
+                <span>½</span>
+              </>
+            ) : (
+              <>
+                <span>{winner == colors.white ? 1 : 0}</span>
+                <span>{winner == colors.black ? 1 : 0}</span>
+              </>
+            )}
           </div>
           <div
             style={{
-              backgroundColor: isUserCurrentGameWinner
-                ? "rgb(128,183,76)"
-                : "red",
+              backgroundColor:
+                winner == "draw"
+                  ? "gray"
+                  : isUserCurrentGameWinner
+                    ? "rgb(128,183,76)"
+                    : "red",
             }}
             className="group relative h-4 w-4 font-bold flex items-center justify-center rounded-sm text-blackDarkest text-[17px]"
           >
-            {isUserCurrentGameWinner ? "+" : "-"}
+            {winner == "draw" ? "=" : isUserCurrentGameWinner ? "+" : "-"}
             <span className="absolute bottom-[150%] transition-opacity text-white bg-[rgba(0,0,0,0.68)] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 font-normal text-sm">
-              {isUserCurrentGameWinner ? "Won" : "Lost"}
+              {winner == "draw"
+                ? "Draw"
+                : isUserCurrentGameWinner
+                  ? "Won"
+                  : "Lost"}
             </span>
           </div>
         </div>

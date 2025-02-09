@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { colors, winner } from "../../constants.js";
 import GetAvatar from "../../utils/GetAvatar.js";
+import { useGameContext } from "../../pages/Game.jsx";
 
 function Canvas() {
   const canvasRef = useRef(null);
@@ -194,22 +195,20 @@ function closeContainer(reference, delay) {
   }, delay);
 }
 
-function WinnerBoard({
-  playerColor,
-  winnerReason,
-  isCheckMate,
-  setCheckMate,
-  players,
-}) {
+function WinnerBoard({ winnerReason }) {
+  const { playerColor, isCheckMate, setCheckMate, players } = useGameContext();
+
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    const closeWindow = (e) => {
-      closeContainer(containerRef.current, 150);
-    };
-    window.addEventListener("click", closeWindow);
-    return () => window.removeEventListener("click", closeWindow);
-  }, [setCheckMate]);
+  // useEffect(() => {
+  //   const closeWindow = (e) => {
+  //     closeContainer(containerRef.current, 150);
+  //   };
+  //   setTimeout(() => {
+  //     window.addEventListener("click", closeWindow);
+  //   }, 1000);
+  //   return () => window.removeEventListener("click", closeWindow);
+  // }, [setCheckMate]);
 
   if (!isCheckMate) return;
 
@@ -228,7 +227,12 @@ function WinnerBoard({
             alt=""
             className="z-50 absolute hover:cursor-pointer right-0 top-0 rounded-md w-8 p-1"
           />
-          {isYourWin(playerColor, isCheckMate) ? (
+          {isCheckMate == winner.draw ? (
+            <div className="flex flex-col items-center justify-center">
+              <p className="font-bold text-xl uppercase">Game Draw!</p>
+              <span className="text-sm text-gray-300">{winnerReason}</span>
+            </div>
+          ) : isYourWin(playerColor, isCheckMate) ? (
             <>
               {<Canvas />}
               <img src="/images/trophy.png" alt="" className="mr-2 w-8" />

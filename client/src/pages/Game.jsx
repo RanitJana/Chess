@@ -15,6 +15,7 @@ import GameSideSection from "../components/game/GameSideSection.jsx";
 import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { colors } from "../constants.js";
+import Draw from "../components/draw/Draw.jsx";
 
 const GameContext = createContext();
 
@@ -57,6 +58,7 @@ export default function Game() {
   });
   const [isCheckMate, setCheckMate] = useState(null);
   const [winnerReason, setWinnerReason] = useState("");
+  const [drawOpen, setDrawOpen] = useState(false);
 
   const fetchGameInfo = useCallback(async () => {
     try {
@@ -99,12 +101,26 @@ export default function Game() {
   }, [gameId, fetchGameInfo]);
 
   useEffect(() => {
-    const handleResignWin = (info) => {
+    const handleEndGame = (info) => {
       setCheckMate(info.winner);
       setWinnerReason(info.reason);
     };
-    socket.on("accept-resign", handleResignWin);
-    return () => socket.off("accept-resign", handleResignWin);
+
+    const handleDraw = () => {
+      setDrawOpen(true);
+      setTimeout(() => {
+        setDrawOpen(false);
+      }, 5000);
+    };
+    const listeners = [
+      ["accept-resign", handleEndGame],
+      ["receive-draw-proposal", handleDraw],
+      ["accept-draw", handleEndGame],
+    ];
+    listeners.forEach(([event, listener]) => socket.on(event, listener));
+    return () => {
+      listeners.forEach(([event, listener]) => socket.off(event, listener));
+    };
   }, [gameId]);
 
   return (
@@ -133,15 +149,10 @@ export default function Game() {
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">
-        <WinnerBoard
-          playerColor={playerColor}
-          isCheckMate={isCheckMate}
-          setCheckMate={setCheckMate}
-          winnerReason={winnerReason}
-          players={players}
-        />
+        <WinnerBoard winnerReason={winnerReason} />
+        <Draw isOpen={drawOpen} setOpen={setDrawOpen} />
         <div className="sm:p-4 p-0 w-full flex justify-center items-center">
-          {<NavBar />}
+          <NavBar />
         </div>
         <div className=" flex w-full justify-center items-center">
           <div className="grid grid-cols-1 w-full h-full gap-2 md:grid-cols-2 max-w-[970px]">

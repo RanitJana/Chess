@@ -6,8 +6,14 @@ import { colors, winReason } from "../../constants.js";
 import { socket } from "../../socket.js";
 
 function GameAction() {
-  const { isCheckMate, setCheckMate, setWinnerReason, gameId, playerColor } =
-    useGameContext();
+  const {
+    isCheckMate,
+    setCheckMate,
+    setWinnerReason,
+    gameId,
+    playerColor,
+    opponent,
+  } = useGameContext();
 
   const [isSubmit, setIsSubmit] = useState(false);
 
@@ -29,7 +35,7 @@ function GameAction() {
 
       const { success, message } = response.data;
       if (success) {
-        socket.emit("send-resign", {
+        socket.emit("accept-draw", {
           gameId,
           info: {
             winner: whoWon,
@@ -46,10 +52,14 @@ function GameAction() {
     }
   };
 
+  const sendDrawProposal = async () => {
+    socket.emit("send-draw-proposal", { userId: opponent._id });
+  };
   return (
     <div className="p-4 flex gap-2">
       <button
         className={`w-[7rem] h-[2.5rem] bg-[rgb(70,70,70)] transition-all px-4 py-2 rounded-md text-white flex justify-center items-center text-sm font-bold ${isSubmit || isCheckMate ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-[rgb(55,55,55)]"} `}
+        onClick={sendDrawProposal}
         disabled={isSubmit || isCheckMate}
       >
         <span className="text-xl font-extrabold pr-2">½</span>
