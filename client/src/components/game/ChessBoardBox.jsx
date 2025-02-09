@@ -18,6 +18,7 @@ import {
   makeSound,
   getPieceImagePath,
   movingPieceTime,
+  winner,
 } from "../../constants.js";
 import pawnUpdatePieces from "../../utils/PawanUpdatePieces.js";
 
@@ -301,6 +302,40 @@ function ChessBoardBox({
       onDrop={handlePieceMove}
       ref={boxRef}
     >
+      {/* Win or Defeat King Sticker */}
+      {isCheckMate &&
+        piece.toLowerCase() === "k" &&
+        (() => {
+          const isDraw = isCheckMate === winner.draw;
+          const isLosingKing = getColor(chessboard, row, col) !== isCheckMate;
+
+          if (isDraw)
+            return (
+              <div className="absolute top-0 right-0 w-7 h-7 flex justify-center items-center translate-x-[50%] translate-y-[-50%] p-[3px] bg-gray-500 font-bold text-white text-sm rounded-full z-20">
+                <span>½</span>
+              </div>
+            );
+
+          return (
+            <div
+              className={`absolute top-0 right-0 translate-x-[50%] translate-y-[-50%] p-[3px] rounded-full z-20 ${
+                isLosingKing ? "-rotate-90 bg-red-500" : "bg-green-500"
+              }`}
+            >
+              <img
+                src={
+                  isLosingKing
+                    ? "/images/themes/classic/wk.png"
+                    : "/images/king-win.png"
+                }
+                alt=""
+                decoding="async"
+                className={`w-5 ${!isLosingKing && "invert brightness-0"}`}
+              />
+            </div>
+          );
+        })()}
+
       <img
         src={imgPath}
         alt=""

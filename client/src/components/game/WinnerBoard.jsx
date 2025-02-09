@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { colors, winner } from "../../constants.js";
 import GetAvatar from "../../utils/GetAvatar.js";
 import { useGameContext } from "../../pages/Game.jsx";
+import Toast from "../../utils/Toast.js";
+import { gameInit } from "../../api/game.js";
 
 function Canvas() {
   const canvasRef = useRef(null);
@@ -199,16 +201,26 @@ function WinnerBoard({ winnerReason }) {
   const { playerColor, isCheckMate, setCheckMate, players } = useGameContext();
 
   const containerRef = useRef(null);
+  const [isCreatingGame, setIsCreatingGame] = useState(false);
 
-  // useEffect(() => {
-  //   const closeWindow = (e) => {
-  //     closeContainer(containerRef.current, 150);
-  //   };
-  //   setTimeout(() => {
-  //     window.addEventListener("click", closeWindow);
-  //   }, 1000);
-  //   return () => window.removeEventListener("click", closeWindow);
-  // }, [setCheckMate]);
+  const handleNewGame = async () => {
+    if (isCreatingGame) return;
+    try {
+      setIsCreatingGame(true);
+      const response = await gameInit();
+      const { success, info, message } = response?.data || {};
+      if (success) {
+        Toast.success(message);
+      } else {
+        Toast.error(message || "Failed to create a game");
+      }
+    } catch (error) {
+      console.error("Error creating a game:", error);
+      Toast.error("Something went wrong while creating a game");
+    } finally {
+      setIsCreatingGame(false);
+    }
+  };
 
   if (!isCheckMate) return;
 
@@ -278,10 +290,17 @@ function WinnerBoard({ winnerReason }) {
             Game Review
           </button>
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <button className="rounded-md bg-blackLight px-4 py-2 hover:bg-blackDark transition-all">
+            <button
+              className={`rounded-md bg-blackLight px-4 py-2 hover:bg-blackDark transition-all ${isCreatingGame ? "brightness-50 hover:cursor-not-allowed" : "hover:cursor-pointer"}`}
+              onClick={handleNewGame}
+              disabled={isCreatingGame}
+            >
               New 3 days
             </button>
-            <button className="rounded-md bg-blackLight px-4 py-2 hover:bg-blackDark transition-all">
+            <button
+              className={`rounded-md bg-blackLight px-4 py-2 hover:bg-blackDark transition-all ${isCreatingGame ? "brightness-50 hover:cursor-not-allowed" : "hover:cursor-pointer"}`}
+              disabled={isCreatingGame}
+            >
               Rematch
             </button>
           </div>
