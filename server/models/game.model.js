@@ -18,6 +18,7 @@ const gameSchema = new Schema(
       type: String,
       default:
         "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR",
+      // "       k      pp    Q                                          K"
     },
 
     moves: {
