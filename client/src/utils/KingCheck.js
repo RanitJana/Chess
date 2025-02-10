@@ -46,7 +46,7 @@ const kingCheck = (chessboard, row, col, kingColor) => {
   return threatPieces;
 };
 
-const kingCheckMate = (chessboard, color) => {
+const kingCheckMate = (chessboard, color, isPawnOpponent) => {
   //get all same color pieces
   //fetch possible moves for each pieces
   //if none of them is able to protect the king then this is checkmate
@@ -60,7 +60,11 @@ const kingCheckMate = (chessboard, color) => {
   );
 
   const isCheckMate = allPiecesPositions.reduce((prev, [row, col]) => {
-    return pieceMove(chessboard, row, col, color)?.length === 0 && prev;
+    let moves = pieceMove(chessboard, row, col, color);
+    if (isPawnOpponent && chessboard[row][col].toLowerCase() == "p") {
+      moves = moves.filter(([r, _]) => r >= row);
+    }
+    return moves?.length === 0 && prev;
   }, true);
 
   return isCheckMate;

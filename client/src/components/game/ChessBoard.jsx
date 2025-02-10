@@ -88,7 +88,8 @@ export default function ChessBoard() {
       if (
         kingCheckMate(
           convertTo2DArray(boardString),
-          playerColor == colors.white ? colors.black : colors.white
+          playerColor == colors.white ? colors.black : colors.white,
+          true
         )
       ) {
         let winner = playerColor;

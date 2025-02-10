@@ -217,11 +217,13 @@ const king = function (chessboard, row, col, kingColor) {
 
   //left
   destinationColor = getColor(chessboard, row, col - 1);
-  if (destinationColor != kingColor && c >= 0) finalMoves.push([row, col - 1]);
+  if (destinationColor != kingColor && col - 1 >= 0)
+    finalMoves.push([row, col - 1]);
 
   //right
   destinationColor = getColor(chessboard, row, col + 1);
-  if (destinationColor != kingColor && c < 8) finalMoves.push([row, col + 1]);
+  if (destinationColor != kingColor && col + 1 < 8)
+    finalMoves.push([row, col + 1]);
 
   //create a copy of current chessboard which will help us to decide the danger positions
   let newChessBoard = chessboard.map((row) => row.slice());
