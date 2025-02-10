@@ -162,63 +162,65 @@ export default function ChessBoard() {
   if (!players || !opponent) return;
 
   return (
-    <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
-      {/* opponent info */}
-      <PlayerInfoInGame
-        player={opponent}
-        isOnline={onlineUsers[opponent._id]}
-        opponentColor={playerColor}
-        chessboard={chessboard}
-        allMoves={allMoves}
-        points={points}
-        setPoints={setPoints}
-      />
-      {/* chessboard */}
-      <div
-        ref={boardRef}
-        className="relative w-full h-fit items-center justify-center flex flex-col"
-      >
-        {/* empty chessboard */}
-        {!chessboard && (
-          <div className="relative w-full h-fit">{<EmptyBoard />}</div>
-        )}
-        {chessboard?.map((row, rowIdx) => (
-          <div className="grid grid-cols-8 w-full" key={rowIdx}>
-            {row.map((piece, pieceIdx) => {
-              const key = pieceIdx + rowIdx;
-              const themeColor = getThemeColor();
-              const color = key & 1 ? themeColor.dark : themeColor.light;
+    <div className=" w-full flex items-center justify-center h-fit">
+      <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
+        {/* opponent info */}
+        <PlayerInfoInGame
+          player={opponent}
+          isOnline={onlineUsers[opponent._id]}
+          opponentColor={playerColor}
+          chessboard={chessboard}
+          allMoves={allMoves}
+          points={points}
+          setPoints={setPoints}
+        />
+        {/* chessboard */}
+        <div
+          ref={boardRef}
+          className="relative w-full h-fit items-center justify-center flex flex-col"
+        >
+          {/* empty chessboard */}
+          {!chessboard && (
+            <div className="relative w-full h-fit">{<EmptyBoard />}</div>
+          )}
+          {chessboard?.map((row, rowIdx) => (
+            <div className="grid grid-cols-8 w-full" key={rowIdx}>
+              {row.map((piece, pieceIdx) => {
+                const key = pieceIdx + rowIdx;
+                const themeColor = getThemeColor();
+                const color = key & 1 ? themeColor.dark : themeColor.light;
 
-              return (
-                <ChessBoardBox
-                  key={key}
-                  row={rowIdx}
-                  col={pieceIdx}
-                  color={color}
-                  themeColor={themeColor}
-                  piece={piece}
-                  updateMoves={updateMoves}
-                  boardDetails={boardRef.current?.getBoundingClientRect()}
-                  isViewer={isViewer}
-                  isCheckMate={isCheckMate}
-                />
-              );
-            })}
-          </div>
-        ))}
+                return (
+                  <ChessBoardBox
+                    key={key}
+                    row={rowIdx}
+                    col={pieceIdx}
+                    color={color}
+                    themeColor={themeColor}
+                    piece={piece}
+                    updateMoves={updateMoves}
+                    boardDetails={boardRef.current?.getBoundingClientRect()}
+                    isViewer={isViewer}
+                    isCheckMate={isCheckMate}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        {/* user info */}
+        <PlayerInfoInGame
+          player={user}
+          isOnline={onlineUsers[user._id]}
+          opponentColor={
+            playerColor == colors.white ? colors.black : colors.white
+          }
+          chessboard={chessboard}
+          allMoves={allMoves}
+          points={points}
+          setPoints={setPoints}
+        />
       </div>
-      {/* user info */}
-      <PlayerInfoInGame
-        player={user}
-        isOnline={onlineUsers[user._id]}
-        opponentColor={
-          playerColor == colors.white ? colors.black : colors.white
-        }
-        chessboard={chessboard}
-        allMoves={allMoves}
-        points={points}
-        setPoints={setPoints}
-      />
     </div>
   );
 }

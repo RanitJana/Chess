@@ -79,7 +79,7 @@ function Edit() {
         <CountryList setIsMapOpen={setIsMapOpen} setUserInfo={setUserInfo} />
       )}
       <div className="flex w-full max-w-[970px] flex-col gap-5">
-        <div className=" flex flex-wrap sm:flex-nowrap gap-5 bg-blackDarkest p-4 rounded-md">
+        <div className=" flex flex-wrap sm:flex-nowrap gap-5 bg-blackDark p-4 rounded-md">
           <div className="relative">
             <div className="max-h-[12rem] sm:w-fit w-full aspect-square">
               <div
@@ -106,7 +106,7 @@ function Edit() {
             <p>{playerInfo?.about || "Loading.."}</p>
           </div>
         </div>
-        <div className=" flex flex-col sm:flex-nowrap bg-blackDarkest rounded-md">
+        <div className=" flex flex-col sm:flex-nowrap bg-blackDark rounded-md">
           <EditHeadline />
           <div className="p-4 flex flex-col gap-3">
             {/* name */}

@@ -156,9 +156,7 @@ export default function Game() {
         </div>
         <div className=" flex w-full justify-center items-center">
           <div className="grid grid-cols-1 w-full h-full gap-2 md:grid-cols-2 max-w-[970px]">
-            <div className=" w-full flex items-center justify-center h-fit">
-              <ChessBoard />
-            </div>
+            <ChessBoard />
             <GameSideSection players={players} />
           </div>
         </div>

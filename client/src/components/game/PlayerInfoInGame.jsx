@@ -42,7 +42,7 @@ function PlayerInfoInGame({
   }, [allMoves]);
 
   useEffect(() => {
-    if (!player.nationality) return;
+    if (player.nationality == null || player.nationality == undefined) return;
     const info = getCountryNameFlag(player.nationality);
     setFlagInfo(info);
   }, [player.nationality]);
