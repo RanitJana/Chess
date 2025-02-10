@@ -1,0 +1,20 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - '5173:5173' 
+    env_file:
+      - './client/.env'
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    env_file:
+      - './server/.env'
+    dns:
+      - 1.1.1.1 #cloudflare dns to use google apikeys, redis and mongodb cluster 

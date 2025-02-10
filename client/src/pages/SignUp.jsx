@@ -22,7 +22,6 @@ export default function Login() {
     e.preventDefault();
 
     if (isSubmit) return Toast.loading("Please wait..");
-    console.log(info);
 
     if (!info.email || !info.password || !info.confirmPassword || !info.name)
       return Toast.error("Please fill all the fields..");

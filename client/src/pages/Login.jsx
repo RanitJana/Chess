@@ -115,7 +115,7 @@ export default function Login() {
         </Link>
       </form>
       <p className="text-white font-bold py-4">Or</p>
-      <GoogleOAuthProvider clientId="135216261350-brkpk924g3jbgbd0froqmpru2lk8drll.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <GoogleLoginButton
           setAuth={setAuth}
           isSubmit={isSubmit}
