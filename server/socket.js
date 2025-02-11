@@ -50,9 +50,8 @@ const challangeSection = function (socket, userSockets) {
   });
 };
 const drawGameSection = function (socket, userSockets) {
-  socket.on("send-draw-proposal", ({ userId }) => {
-    const socketId = userSockets.get(userId);
-    socket.to(socketId).emit("receive-draw-proposal");
+  socket.on("send-draw-proposal", ({ userId, gameId }) => {
+    socket.to(gameId).emit("receive-draw-proposal", { userId, gameId });
   });
   socket.on("accept-draw", ({ gameId, info }) => {
     socket.to(gameId).emit("show-draw", info);

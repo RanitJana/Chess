@@ -46,6 +46,8 @@ function ChessBoardBox({
     setMovingPiece,
     isUserMove,
     setIsUserMove,
+    caslingRights,
+    setCaslingRights,
   } = useGameContext();
 
   const imgPath = getPieceImagePath(piece);

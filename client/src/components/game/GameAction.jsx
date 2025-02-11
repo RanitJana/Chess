@@ -4,6 +4,7 @@ import Toast from "../../utils/Toast.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import { colors, winReason } from "../../constants.js";
 import { socket } from "../../socket.js";
+import { useAuthContext } from "../../context/AuthContext.jsx";
 
 function GameAction() {
   const {
@@ -14,6 +15,8 @@ function GameAction() {
     playerColor,
     opponent,
   } = useGameContext();
+
+  const { playerInfo } = useAuthContext();
 
   const [isSubmit, setIsSubmit] = useState(false);
 
@@ -53,7 +56,8 @@ function GameAction() {
   };
 
   const sendDrawProposal = async () => {
-    socket.emit("send-draw-proposal", { userId: opponent._id });
+    Toast.success("Proposal sent!");
+    socket.emit("send-draw-proposal", { userId: playerInfo?._id, gameId });
   };
   return (
     <div className="p-4 flex gap-2">

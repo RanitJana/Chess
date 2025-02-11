@@ -21,6 +21,24 @@ const gameSchema = new Schema(
       // "       k      pp    Q                                          K"
     },
 
+    caslingRights: {
+      type: String,
+      default: "KQkq",
+    },
+
+    enPassant: {
+      position: {
+        row: {
+          type: Number,
+          default: -1,
+        },
+        col: {
+          type: Number,
+          default: -1,
+        },
+      },
+    },
+
     moves: {
       type: [String],
       default: [],

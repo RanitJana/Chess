@@ -6,10 +6,11 @@ import React, {
   createContext,
   useContext,
   useCallback,
+  useRef,
 } from "react";
 import ChessBoard from "../components/game/ChessBoard.jsx";
 import { useParams } from "react-router";
-import { gameSingle } from "../api/game.js";
+import { gameEnd, gameSingle } from "../api/game.js";
 import { socket } from "../socket.js";
 import GameSideSection from "../components/game/GameSideSection.jsx";
 import WinnerBoard from "../components/game/WinnerBoard.jsx";
@@ -59,6 +60,9 @@ export default function Game() {
   const [isCheckMate, setCheckMate] = useState(null);
   const [winnerReason, setWinnerReason] = useState("");
   const [drawOpen, setDrawOpen] = useState(false);
+  const [caslingRights, setCaslingRights] = useState("");
+
+  const drawTimeRef = useRef(null);
 
   const fetchGameInfo = useCallback(async () => {
     try {
@@ -80,6 +84,7 @@ export default function Game() {
         setAllMoves(moves);
         setCheckMate(game.winner);
         setWinnerReason(game.winReason);
+        setCaslingRights(game.caslingRights);
         setPlayers({
           player1: game.player1,
           player2: game.player2,
@@ -106,11 +111,14 @@ export default function Game() {
       setWinnerReason(info.reason);
     };
 
-    const handleDraw = () => {
-      setDrawOpen(true);
-      setTimeout(() => {
-        setDrawOpen(false);
-      }, 5000);
+    const handleDraw = (info) => {
+      if (info.gameId == gameId) {
+        setDrawOpen(true);
+        if (drawTimeRef.current) clearTimeout(drawTimeRef.current);
+        drawTimeRef.current = setTimeout(() => {
+          setDrawOpen(false);
+        }, 5000);
+      }
     };
     const listeners = [
       ["accept-resign", handleEndGame],
@@ -146,6 +154,8 @@ export default function Game() {
         isCheckMate,
         setCheckMate,
         setWinnerReason,
+        caslingRights,
+        setCaslingRights,
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">
