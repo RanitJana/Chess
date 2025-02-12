@@ -9,6 +9,7 @@ import Profile from "./pages/Profile.jsx";
 import Friends from "./pages/Friends.jsx";
 import Edit from "./pages/Edit.jsx";
 import Themes from "./pages/Themes.jsx";
+import Rank from "./pages/Rank.jsx";
 import { useAuthContext } from "./context/AuthContext.jsx";
 import { useEffect } from "react";
 
@@ -73,6 +74,10 @@ export default function App() {
         <Route
           path="/friends/:userId"
           element={isAuth ? <Friends /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/rank"
+          element={isAuth ? <Rank /> : <Navigate to={"/login"} />}
         />
         <Route
           path="/game/:gameId"

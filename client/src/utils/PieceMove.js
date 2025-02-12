@@ -3,6 +3,7 @@ import isKingCheck from "./IsKingCheck.js";
 import { kingCheck } from "./KingCheck.js";
 import filterPieceMovesToPreventCheck from "./KingCheckPrevent.js";
 import { colors } from "../constants.js";
+import isCastlingPossible from "./Castling.js";
 
 const getColor = function (chessboard, row, col) {
   if (row < 0 || row > 7 || col < 0 || col > 7) return null;
@@ -190,7 +191,7 @@ const rook = function (chessboard, row, col, rookColor) {
 };
 
 //function to calculate the king's possible moves
-const king = function (chessboard, row, col, kingColor) {
+const king = function (chessboard, row, col, kingColor, caslingRights) {
   let finalMoves = [];
   let destinationColor;
 
@@ -225,6 +226,12 @@ const king = function (chessboard, row, col, kingColor) {
   if (destinationColor != kingColor && col + 1 < 8)
     finalMoves.push([row, col + 1]);
 
+  //castling moves
+  finalMoves = [
+    ...finalMoves,
+    ...isCastlingPossible(chessboard, row, col, kingColor, caslingRights),
+  ];
+
   //create a copy of current chessboard which will help us to decide the danger positions
   let newChessBoard = chessboard.map((row) => row.slice());
 
@@ -248,31 +255,28 @@ const king = function (chessboard, row, col, kingColor) {
 };
 
 //this function will return an array of positions
-export default function pieceMove(chessboard, row, col, checkKingSafe = false) {
+export default function pieceMove(
+  chessboard,
+  row,
+  col,
+  caslingRights,
+  checkKingSafe = false
+) {
   //no need to check if row and col is out of bound
-  const piece = chessboard[row][col],
+  const piece = chessboard[row][col].toLowerCase(),
     pieceColor = getColor(chessboard, row, col);
 
   let finalMoves = [];
 
-  if (piece == "p" || piece == "P")
-    finalMoves = pawn(chessboard, row, col, pieceColor);
-  else if (piece == "q" || piece == "Q")
-    finalMoves = queen(chessboard, row, col, pieceColor);
-  else if (piece == "n" || piece == "N")
-    finalMoves = knight(chessboard, row, col, pieceColor);
-  else if (piece == "b" || piece == "B")
-    finalMoves = bishop(chessboard, row, col, pieceColor);
-  else if (piece == "r" || piece == "R")
-    finalMoves = rook(chessboard, row, col, pieceColor);
-  else if (piece == "k" || piece == "K")
-    finalMoves = king(chessboard, row, col, pieceColor);
+  if (piece == "p") finalMoves = pawn(chessboard, row, col, pieceColor);
+  else if (piece == "q") finalMoves = queen(chessboard, row, col, pieceColor);
+  else if (piece == "n") finalMoves = knight(chessboard, row, col, pieceColor);
+  else if (piece == "b") finalMoves = bishop(chessboard, row, col, pieceColor);
+  else if (piece == "r") finalMoves = rook(chessboard, row, col, pieceColor);
+  else if (piece == "k")
+    finalMoves = king(chessboard, row, col, pieceColor, caslingRights);
 
-  if (
-    checkKingSafe &&
-    chessboard[row][col] != "K" &&
-    chessboard[row][col] != "k"
-  ) {
+  if (checkKingSafe && piece != "k") {
     //if king is in danger and if current piece is able to protect it or not;
     finalMoves = isKingCheck(chessboard, finalMoves, row, col, pieceColor);
 

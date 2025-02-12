@@ -86,6 +86,13 @@ function NavBar() {
         >
           <img src="/images/friends.png" className="w-[1.6rem]" alt="" />
         </div>
+        {/* ranking */}
+        <div
+          className=" hover:cursor-pointer brightness-50 invert hover:brightness-0 transition-all"
+          onClick={() => navigate("/rank?page=1&count=10")}
+        >
+          <img src="/images/ranking.png" className="w-[1.6rem]" alt="" />
+        </div>
         {/* settings */}
         <div
           className="relative cursor-pointer w-fit"

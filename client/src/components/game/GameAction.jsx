@@ -7,14 +7,8 @@ import { socket } from "../../socket.js";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 
 function GameAction() {
-  const {
-    isCheckMate,
-    setCheckMate,
-    setWinnerReason,
-    gameId,
-    playerColor,
-    opponent,
-  } = useGameContext();
+  const { isCheckMate, setCheckMate, setWinnerReason, gameId, playerColor } =
+    useGameContext();
 
   const { playerInfo } = useAuthContext();
 

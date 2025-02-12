@@ -1,2 +1,12 @@
 /* eslint-disable no-unused-vars */
-export default function isCastlingPossible(chessboard) {}
+import { kingCheck } from "./KingCheck.js";
+
+export default function isCastlingPossible(
+  chessboard,
+  row,
+  col,
+  kingColor,
+  caslingRights
+) {
+  return [];
+}

@@ -161,7 +161,7 @@ function ChessBoardBox({
     if (pieceColor && playerColor !== pieceColor) return;
 
     const clearedBoard = clearPieceMove(chessboard);
-    const moves = pieceMove(clearedBoard, row, col, true);
+    const moves = pieceMove(clearedBoard, row, col, caslingRights, true);
     setCurrPiece({ row, col, moves });
   }, [isViewer, isCheckMate, chessboard, row, col, playerColor, setCurrPiece]);
 
