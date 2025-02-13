@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useRef } from "react";
 
-function SearchBar({ handleFunction }) {
+function SearchBar({ handleFunction, isLoading = false }) {
   const debouncingRef = useRef(null);
 
   const handleOnChange = function (e) {
@@ -24,9 +24,23 @@ function SearchBar({ handleFunction }) {
         type="text"
         name=""
         id=""
-        className="w-full bg-[rgb(61,58,57)] text-white outline-none p-3 py-2 pl-11 rounded-sm"
+        className="w-full bg-[rgb(61,58,57)] text-white outline-none p-3 py-2 px-11 rounded-sm"
         placeholder="Search by name"
       />
+      {isLoading ? (
+        <div className="absolute right-4 top-1/2 translate-y-[-50%] flex justify-center items-center">
+          <div
+            className="loader"
+            style={{
+              width: "1rem",
+              height: "1rem",
+              borderWidth: "2px",
+            }}
+          ></div>
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 }

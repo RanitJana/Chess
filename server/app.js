@@ -36,6 +36,7 @@ import userInfo from "./routes/UserInfo.route.js";
 import friends from "./routes/friend.route.js";
 import google from "./routes/google.route.js";
 import rank from "./routes/rank.route.js";
+import search from "./routes/search.route.js";
 
 app.use("/api/v1/login", login);
 app.use("/api/v1/signup", signup);
@@ -47,5 +48,6 @@ app.use("/api/v1/user/info", userInfo);
 app.use("/api/v1/friend", friends);
 app.use("/api/v1/google", google);
 app.use("/api/v1/rank", rank);
+app.use("/api/v1/search", search);
 
 export default app;

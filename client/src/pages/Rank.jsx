@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import NavBar from "../components/NavBar.jsx";
 import { useNavigate, useSearchParams } from "react-router";
@@ -8,6 +7,7 @@ import GetAvatar from "../utils/GetAvatar.js";
 import getCountryNameFlag from "../utils/getCountryNameFlag.js";
 import { useAuthContext } from "../context/AuthContext.jsx";
 import { handleRank } from "../api/rank.js";
+import { handleSearch } from "../api/search.js";
 
 function Friends() {
   const { playerInfo } = useAuthContext();
@@ -16,14 +16,35 @@ function Friends() {
   const [pages, setPages] = useState(1);
 
   const [users, setUsers] = useState([]);
+  const [searchUsers, setSearchUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
 
   useEffect(() => {
     const handleGetRank = async () => {
+      let currentPage = params.get("page");
+      if (currentPage > pages) {
+        currentPage = pages;
+        setParams((prev) => {
+          const newParams = new URLSearchParams(prev);
+          newParams.set("page", pages);
+          return newParams;
+        });
+      }
+
+      if (params.get("page") <= 0) {
+        currentPage = 1;
+        setParams((prev) => {
+          const newParams = new URLSearchParams(prev);
+          newParams.set("page", 1);
+          return newParams;
+        });
+      }
+
       try {
         setIsLoading(true);
         const { success, message, info } = (
-          await handleRank(params.get("page") || 1, params.get("count") || 10)
+          await handleRank(currentPage || 1, params.get("count") || 10)
         ).data;
 
         if (success) {
@@ -41,7 +62,7 @@ function Friends() {
     };
 
     handleGetRank();
-  }, [params]);
+  }, [pages, params, setParams]);
 
   const handleNextPage = () => {
     const currentPage = parseInt(params.get("page")) || 1;
@@ -65,25 +86,18 @@ function Friends() {
     }
   };
 
-  const handleSearch = (text) => {
-    // if (!friends) return;
-    // setFriends((prev) => {
-    //   return [...prev].sort((a, b) => {
-    //     const infoA =
-    //       a.receiver._id.toString() === userId ? a.sender : a.receiver;
-    //     const infoB =
-    //       b.receiver._id.toString() === userId ? b.sender : b.receiver;
-    //     const aStartsWith = infoA.name
-    //       .toLowerCase()
-    //       .startsWith(text.toLowerCase());
-    //     const bStartsWith = infoB.name
-    //       .toLowerCase()
-    //       .startsWith(text.toLowerCase());
-    //     if (aStartsWith && !bStartsWith) return -1; // `a` comes first
-    //     if (!aStartsWith && bStartsWith) return 1; // `b` comes first
-    //     return 0; // Keep the same order otherwise
-    //   });
-    // });
+  const search = async (username) => {
+    username = (username || "").trim();
+    try {
+      setSearchIsLoading(true);
+      const { users } = (await handleSearch(username)).data;
+      if (users) setSearchUsers(users);
+    } catch (error) {
+      console.log(error);
+      Toast.error(error.message);
+    } finally {
+      setSearchIsLoading(false);
+    }
   };
 
   return (
@@ -96,7 +110,45 @@ function Friends() {
         </p>
         <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 flex flex-col gap-6 sm:pt-10 pt-10">
           {/* search bar */}
-          <SearchBar handleFunction={handleSearch} />
+          <div className="relative">
+            <SearchBar handleFunction={search} isLoading={searchIsLoading} />
+            {searchUsers.length ? (
+              <div className="bg-blackDarkest shadow-md w-full p-1 flex flex-col gap-1 rounded-md mt-2 absolute bottom-0 translate-y-[105%] z-10 max-h-[12rem] overflow-y-scroll">
+                {searchUsers.map((user) => {
+                  const flag = getCountryNameFlag(user.nationality);
+                  return (
+                    <div
+                      key={user._id}
+                      className="bg-blackDark p-2 rounded-md flex items-center gap-1 text-sm"
+                    >
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: GetAvatar(user.name),
+                        }}
+                        onClick={() => navigate("/member/" + user._id)}
+                        className="relative w-[2rem] mr-2 rounded-md overflow-hidden hover:cursor-pointer"
+                      />
+                      <span
+                        className="hover:cursor-pointer text-white"
+                        onClick={() => navigate("/member/" + user._id)}
+                      >
+                        {user.name}
+                      </span>
+                      <span className="text-gray-400">({user.rating})</span>
+                      <img
+                        src={flag.link}
+                        alt=""
+                        title={flag.name}
+                        className="w-5"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
           <div className="overflow-x-scroll">
             <table className="w-full min-w-[30rem] table-auto text-gray-300 h-fit bg-gray-700">
               <thead className="bg-[rgb(27,27,27)] text-sm">
