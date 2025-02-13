@@ -143,7 +143,6 @@ export default function ChessBoard() {
         score = getScore(playerInfo.rating, opponent.rating, 1);
       else score = getScore(playerInfo.rating, opponent.rating, 0);
       setScore(score);
-      
     } else setIsUserMove(true);
 
     const opponentMove = {
@@ -152,7 +151,7 @@ export default function ChessBoard() {
     };
 
     makeSound(
-      playerColor,
+      playerColor == colors.white ? colors.black : colors.white,
       getColor(updatedBoard, opponentMove.to.row, opponentMove.to.col)
     );
 
