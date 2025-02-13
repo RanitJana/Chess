@@ -2,13 +2,20 @@ import { useState } from "react";
 import { gameEnd } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
 import { useGameContext } from "../../pages/Game.jsx";
-import { colors, winReason } from "../../constants.js";
+import { colors, getScore, winReason } from "../../constants.js";
 import { socket } from "../../socket.js";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 
 function GameAction() {
-  const { isCheckMate, setCheckMate, setWinnerReason, gameId, playerColor } =
-    useGameContext();
+  const {
+    isCheckMate,
+    setCheckMate,
+    setWinnerReason,
+    gameId,
+    playerColor,
+    setScore,
+    opponent,
+  } = useGameContext();
 
   const { playerInfo } = useAuthContext();
 
@@ -24,10 +31,16 @@ function GameAction() {
           ? winReason.byBlackResigns
           : winReason.byWhiteResigns;
 
+      let score;
+      if (playerColor == colors.black)
+        score = getScore(playerInfo.rating, opponent.rating, 1);
+      else score = getScore(playerInfo.rating, opponent.rating, 0);
+
       const response = await gameEnd({
         gameId,
         winner: whoWon,
         reason: winnerReason,
+        score,
       });
 
       const { success, message } = response.data;
@@ -37,10 +50,12 @@ function GameAction() {
           info: {
             winner: whoWon,
             reason: winnerReason,
+            score,
           },
         });
         setCheckMate(whoWon);
         setWinnerReason(winnerReason);
+        setScore(score);
       } else Toast.error(message);
     } catch (error) {
       Toast.error(error.message || "Please try again");

@@ -255,13 +255,7 @@ const king = function (chessboard, row, col, kingColor, caslingRights) {
 };
 
 //this function will return an array of positions
-export default function pieceMove(
-  chessboard,
-  row,
-  col,
-  caslingRights,
-  checkKingSafe = false
-) {
+export default function pieceMove(chessboard, row, col, caslingRights = "") {
   //no need to check if row and col is out of bound
   const piece = chessboard[row][col].toLowerCase(),
     pieceColor = getColor(chessboard, row, col);
@@ -276,7 +270,7 @@ export default function pieceMove(
   else if (piece == "k")
     finalMoves = king(chessboard, row, col, pieceColor, caslingRights);
 
-  if (checkKingSafe && piece != "k") {
+  if (piece != "k") {
     //if king is in danger and if current piece is able to protect it or not;
     finalMoves = isKingCheck(chessboard, finalMoves, row, col, pieceColor);
 

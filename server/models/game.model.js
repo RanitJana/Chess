@@ -50,6 +50,17 @@ const gameSchema = new Schema(
       default: null,
     },
 
+    score: {
+      white: {
+        type: Number,
+        default: 0,
+      },
+      black: {
+        type: Number,
+        default: 0,
+      },
+    },
+
     winReason: {
       type: String,
       enum: [

@@ -4,10 +4,13 @@ import { winReason, winner } from "../../constants.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import { gameEnd } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
+import { getScore } from "../../constants.js";
 import { socket } from "../../socket.js";
+import { useAuthContext } from "../../context/AuthContext.jsx";
 
-function Draw({ isOpen = false, setOpen }) {
-  const { gameId, setCheckMate, setWinnerReason } = useGameContext();
+function Draw({ isOpen = false, setOpen, opponent }) {
+  const { playerInfo } = useAuthContext();
+  const { gameId, setCheckMate, setWinnerReason, setScore } = useGameContext();
 
   const [left, setLeft] = useState(-100);
   const [isDrawSubmit, setIsDrawSubmit] = useState(false);
@@ -25,10 +28,13 @@ function Draw({ isOpen = false, setOpen }) {
       const whoWon = winner.draw;
       const winnerReason = winReason.byDraw;
 
+      const score = getScore(playerInfo.rating, opponent.rating, 0.5);
+
       const response = await gameEnd({
         gameId,
         winner: whoWon,
         reason: winnerReason,
+        score,
       });
 
       const { success, message } = response.data;
@@ -38,8 +44,10 @@ function Draw({ isOpen = false, setOpen }) {
           info: {
             winner: whoWon,
             reason: winnerReason,
+            score,
           },
         });
+        setScore(score);
         setCheckMate(whoWon);
         setWinnerReason(winnerReason);
       } else Toast.error(message);

@@ -322,7 +322,7 @@ const gameInfoSingle = AsyncHandler(async (req, res, _) => {
 });
 
 const gameEnd = AsyncHandler(async (req, res, _) => {
-  let { winner, reason, gameId } = req.body;
+  let { winner, reason, score, gameId } = req.body;
 
   let game = await gameSchema.findById(gameId);
 
@@ -338,8 +338,29 @@ const gameEnd = AsyncHandler(async (req, res, _) => {
       message: "Already game over",
     });
 
+  if (winner) {
+    const player1 = await playerSchema.findById(game.player1);
+    const player2 = await playerSchema.findById(game.player2);
+
+    if (!player1 || !player2) {
+      return res.status(400).json({
+        success: false,
+        message: "One or both players not found",
+      });
+    }
+
+    player1.rating = parseFloat((player1.rating + score.white ?? 0).toFixed(1));
+    player2.rating = parseFloat((player2.rating + score.black ?? 0).toFixed(1));
+
+    await Promise.all([
+      player1.save({ validateBeforeSave: false }),
+      player2.save({ validateBeforeSave: false }),
+    ]);
+  }
+
   game.winner = winner;
   game.winReason = reason;
+  game.score = score;
 
   await client.del(
     `game:single:${gameId}`,

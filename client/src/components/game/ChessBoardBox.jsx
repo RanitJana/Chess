@@ -47,7 +47,7 @@ function ChessBoardBox({
     isUserMove,
     setIsUserMove,
     caslingRights,
-    setCaslingRights,
+    // setCaslingRights,
   } = useGameContext();
 
   const imgPath = getPieceImagePath(piece);
@@ -161,7 +161,7 @@ function ChessBoardBox({
     if (pieceColor && playerColor !== pieceColor) return;
 
     const clearedBoard = clearPieceMove(chessboard);
-    const moves = pieceMove(clearedBoard, row, col, caslingRights, true);
+    const moves = pieceMove(clearedBoard, row, col, caslingRights);
     setCurrPiece({ row, col, moves });
   }, [isViewer, isCheckMate, chessboard, row, col, playerColor, setCurrPiece]);
 

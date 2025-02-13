@@ -24,6 +24,21 @@ const soundType = Object.freeze({
   move: "move",
 });
 
+const getScore = function (whiteRating, blackRating, result) {
+  const K = 20; // Common K-factor, adjust as needed
+
+  // Expected scores using the Elo formula
+  const expectedWhite =
+    1 / (1 + Math.pow(10, (blackRating - whiteRating) / 400));
+  const expectedBlack = 1 - expectedWhite;
+
+  // Adjustments based on result (1 = White wins, 0.5 = Draw, 0 = Black wins)
+  const whiteChange = parseFloat((K * (result - expectedWhite)).toFixed(1));
+  const blackChange = parseFloat((K * (1 - result - expectedBlack)).toFixed(1));
+
+  return { white: whiteChange, black: blackChange };
+};
+
 const makeSound = (playerColor, targetPieceColor) => {
   const sound =
     targetPieceColor && targetPieceColor !== playerColor
@@ -133,6 +148,7 @@ export {
   getPieceImagePath,
   movingPieceTime,
   getThemeColor,
+  getScore,
   themes,
   themeChessboardBoxColor,
   getThemeBackground,

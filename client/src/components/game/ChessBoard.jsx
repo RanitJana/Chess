@@ -11,6 +11,7 @@ import { useSocketContext } from "../../context/SocketContext.jsx";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import {
   colors,
+  getScore,
   getThemeColor,
   makeSound,
   movingPieceTime,
@@ -34,6 +35,7 @@ export default function ChessBoard() {
     setCheckMate,
     isCheckMate,
     setWinnerReason,
+    setScore,
   } = useGameContext();
   const { playerInfo } = useAuthContext();
   const { onlineUsers } = useSocketContext();
@@ -95,10 +97,16 @@ export default function ChessBoard() {
         let winner = playerColor;
         const reason = winReason.byCheckmate;
 
+        let score;
+        if (playerColor == colors.white)
+          score = getScore(playerInfo.rating, opponent.rating, 1);
+        else score = getScore(playerInfo.rating, opponent.rating, 0);
+
         setCheckMate(winner);
         setWinnerReason(reason);
+        setScore(score);
 
-        await gameEnd({ winner, reason, gameId });
+        await gameEnd({ winner, reason, gameId, score });
       }
 
       if (response.data.info) {
@@ -129,6 +137,13 @@ export default function ChessBoard() {
     if (kingCheckMate(updatedBoard, playerColor)) {
       setCheckMate(playerColor == colors.white ? colors.black : colors.white);
       setWinnerReason(winReason.byCheckmate);
+
+      let score;
+      if (playerColor == colors.white)
+        score = getScore(playerInfo.rating, opponent.rating, 1);
+      else score = getScore(playerInfo.rating, opponent.rating, 0);
+      setScore(score);
+      
     } else setIsUserMove(true);
 
     const opponentMove = {

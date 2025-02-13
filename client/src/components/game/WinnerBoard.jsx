@@ -197,8 +197,8 @@ function closeContainer(reference, delay) {
   }, delay);
 }
 
-function WinnerBoard({ winnerReason }) {
-  const { playerColor, isCheckMate, setCheckMate, players } = useGameContext();
+function WinnerBoard({ winnerReason, score }) {
+  const { playerColor, isCheckMate, players } = useGameContext();
 
   const containerRef = useRef(null);
   const [isCreatingGame, setIsCreatingGame] = useState(false);
@@ -274,6 +274,16 @@ function WinnerBoard({ winnerReason }) {
                 }}
               />
               <span>{players.player1?.name}</span>
+              <div>
+                <span className="mr-1">{players.player1?.rating}</span>(
+                <span
+                  className={`${score.white >= 0 ? "text-green-500" : "text-red-500"}`}
+                >
+                  {score.white >= 0 ? "+" : ""}
+                  {score.white}
+                </span>
+                )
+              </div>
             </div>
             <span className="text-white font-bold text-[1.5rem] px-3">vs</span>
             <div className="flex flex-col items-center gap-1 text-xs font-bold text-gray-400">
@@ -284,6 +294,16 @@ function WinnerBoard({ winnerReason }) {
                 }}
               />
               <span>{players.player2?.name}</span>
+              <span>
+                <span className="mr-1">{players.player2?.rating}</span>(
+                <span
+                  className={`${score.black >= 0 ? "text-green-500" : "text-red-500"}`}
+                >
+                  {score.black >= 0 ? "+" : ""}
+                  {score.black}
+                </span>
+                )
+              </span>
             </div>
           </div>
           <button className="bg-buttonLight w-full rounded-lg h-12 p-4 py-3 hover:cursor-pointer min-h-fit flex justify-center items-center gap-5 font-extrabold text-[1.3rem] text-white shadow-[0_5px_0px_0px_rgb(69,116,61)] mt-4 }">

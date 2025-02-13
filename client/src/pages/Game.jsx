@@ -61,6 +61,7 @@ export default function Game() {
   const [winnerReason, setWinnerReason] = useState("");
   const [drawOpen, setDrawOpen] = useState(false);
   const [caslingRights, setCaslingRights] = useState("");
+  const [score, setScore] = useState({ white: 0, black: 0 });
 
   const drawTimeRef = useRef(null);
 
@@ -89,6 +90,7 @@ export default function Game() {
           player1: game.player1,
           player2: game.player2,
         });
+        setScore(game.score);
 
         if (color == colors.white) setOpponent(game.player2);
         else setOpponent(game.player1);
@@ -99,7 +101,6 @@ export default function Game() {
     }
   }, [gameId]);
 
-  // Fetch initial game state and
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchGameInfo();
@@ -109,6 +110,7 @@ export default function Game() {
     const handleEndGame = (info) => {
       setCheckMate(info.winner);
       setWinnerReason(info.reason);
+      setScore(info.score);
     };
 
     const handleDraw = (info) => {
@@ -124,6 +126,7 @@ export default function Game() {
       ["accept-resign", handleEndGame],
       ["receive-draw-proposal", handleDraw],
       ["accept-draw", handleEndGame],
+      ["show-draw", handleEndGame],
     ];
     listeners.forEach(([event, listener]) => socket.on(event, listener));
     return () => {
@@ -156,11 +159,12 @@ export default function Game() {
         setWinnerReason,
         caslingRights,
         setCaslingRights,
+        setScore,
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">
-        <WinnerBoard winnerReason={winnerReason} />
-        <Draw isOpen={drawOpen} setOpen={setDrawOpen} />
+        <WinnerBoard winnerReason={winnerReason} score={score} />
+        <Draw isOpen={drawOpen} setOpen={setDrawOpen} opponent={opponent} />
         <div className="sm:p-4 p-0 w-full flex justify-center items-center">
           <NavBar />
         </div>
