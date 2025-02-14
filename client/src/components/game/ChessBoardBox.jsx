@@ -208,14 +208,14 @@ function ChessBoardBox({
       dragImg.current.style.pointerEvents = "none";
       setDragging(true);
 
-      const offsetX = e.clientX;
-      const offsetY = e.clientY;
+      const offsetX = e.clientX || e.touches?.[0].clientX;
+      const offsetY = e.clientY || e.touches?.[0].clientY;
 
       setOffsets({ offsetX, offsetY });
 
       if (isUserMove) handleDisplayPossibleMoves();
 
-      e.dataTransfer.setDragImage(transparentImage.current, 0, 0);
+      e.dataTransfer?.setDragImage(transparentImage.current, 0, 0);
     },
     [dragImg, setDragging, handleDisplayPossibleMoves]
   );
@@ -239,8 +239,8 @@ function ChessBoardBox({
       // Cancel any ongoing frame requests
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-      let newLeft = e.clientX - offsets.offsetX;
-      let newTop = e.clientY - offsets.offsetY;
+      let newLeft = (e.clientX || e.touches?.[0].clientX) - offsets.offsetX;
+      let newTop = (e.clientY || e.touches?.[0].clientY) - offsets.offsetY;
       const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
       animationFrameId = requestAnimationFrame(() => {
@@ -300,8 +300,10 @@ function ChessBoardBox({
       className="relative w-full aspect-square flex items-center justify-center hover:cursor-pointer active:cursor-grab p-[2px]"
       onClick={handlePieceMove}
       onDragStart={handleDragStart}
+      onTouchStart={handleDragStart}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handlePieceMove}
+      onTouchEnd={handlePieceMove}
       ref={boxRef}
     >
       {/* Win or Defeat King Sticker */}
@@ -356,7 +358,9 @@ function ChessBoardBox({
         alt=""
         className="max-w-full absolute z-20 opacity-0"
         onDrag={handleDragging}
+        onTouchMove={handleDragging}
         onDragEnd={handleDragEnd}
+        onTouchEnd={handleDragEnd}
         decoding="async"
       />
 
