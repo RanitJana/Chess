@@ -8,6 +8,7 @@ import { useAuthContext } from "../context/AuthContext.jsx";
 import Toast from "../utils/Toast.js";
 import GoogleLoginButton from "../components/login/GoogleLoginButton.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import areCookiesEnabled from "../utils/isCookieEnabled.js";
 
 export default function Login() {
   const [info, setInfo] = useState({
@@ -23,6 +24,8 @@ export default function Login() {
 
   const handleFormSumbit = async function (e) {
     e.preventDefault();
+
+    if (!areCookiesEnabled()) return Toast.error("Please allow cookies");
 
     if (isSubmit) return Toast.loading("Please wait..");
 
