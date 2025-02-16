@@ -146,6 +146,7 @@ function ChessBoard() {
           {boardStates.board?.board().map((row, rowIdx) => (
             <div className="grid grid-cols-8 w-full" key={rowIdx}>
               {row.map((piece, colIdx) => {
+                const pieceColor = piece?.color;
                 const key = colIdx + rowIdx;
                 const color = key & 1 ? themeColor.dark : themeColor.light;
                 const square = piece
@@ -161,6 +162,7 @@ function ChessBoard() {
                     key={key}
                     color={color}
                     piece={piece}
+                    pieceColor={pieceColor}
                     square={square}
                     possibleMoves={possibleMoves}
                     handleChessBoxClick={handleChessBoxClick}

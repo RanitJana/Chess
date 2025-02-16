@@ -23,7 +23,7 @@ function closeContainer(reference, parentContainerRef, delay) {
 }
 
 function WinnerBoard({ winnerReason, score }) {
-  const { isCheckMate, users } = useGameContext();
+  const { isCheckMate, users, gameInfo } = useGameContext();
 
   const containerRef = useRef(null);
   const parentContainerRef = useRef(null);
@@ -115,12 +115,12 @@ function WinnerBoard({ winnerReason, score }) {
               <div
                 className={`w-[4rem] rounded-2xl overflow-hidden border-4 ${isCheckMate == colors.white ? "border-green-600" : "border-white"}`}
                 dangerouslySetInnerHTML={{
-                  __html: GetAvatar(users.you?.name),
+                  __html: GetAvatar(gameInfo.player1?.name),
                 }}
               />
-              <span>{users.you?.name}</span>
+              <span>{gameInfo.player1?.name}</span>
               <div>
-                <span className="mr-1">{users.you?.rating}</span>(
+                <span className="mr-1">{gameInfo.player1?.rating}</span>(
                 <span
                   className={`${score.white >= 0 ? "text-green-500" : "text-red-500"}`}
                 >
@@ -135,12 +135,12 @@ function WinnerBoard({ winnerReason, score }) {
               <div
                 className={`w-[4rem] rounded-2xl overflow-hidden border-4 ${isCheckMate == colors.black ? "border-green-600" : "border-white"}`}
                 dangerouslySetInnerHTML={{
-                  __html: GetAvatar(users.opponent?.name),
+                  __html: GetAvatar(gameInfo.player2?.name),
                 }}
               />
-              <span>{users.opponent?.name}</span>
+              <span>{gameInfo.player2?.name}</span>
               <span>
-                <span className="mr-1">{users.opponent?.rating}</span>(
+                <span className="mr-1">{gameInfo.player2?.rating}</span>(
                 <span
                   className={`${score.black >= 0 ? "text-green-500" : "text-red-500"}`}
                 >

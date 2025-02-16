@@ -11,6 +11,7 @@ const pawnPromotionPieces = ["q", "r", "b", "n"];
 function ChessBoardBox({
   color,
   piece,
+  pieceColor,
   square,
   possibleMoves,
   handleChessBoxClick,
@@ -19,7 +20,7 @@ function ChessBoardBox({
   setPawnPieceDisplay,
   updatePieceNewLocation,
 }) {
-  const { rotateBoard, themeColor, users } = useGameContext();
+  const { rotateBoard, themeColor, users, isCheckMate } = useGameContext();
 
   return (
     <div
@@ -29,6 +30,39 @@ function ChessBoardBox({
     >
       <PossibleMoveBoxMark square={square} possibleMoves={possibleMoves} />
       <RecentMoveColor square={square} />
+      {isCheckMate && piece?.toLowerCase() == "k" ? (
+        <div
+          className={`absolute w-7 aspect-square flex justify-center items-center ${rotateBoard == "rotate(180deg)" ? "bottom-0 left-0 translate-x-[-50%] translate-y-[50%]" : "top-0 right-0 translate-x-[50%] translate-y-[-50%]"}p-1 w-7 rounded-full z-20`}
+          style={{
+            backgroundColor: isCheckMate[0] == pieceColor ? "green" : "red",
+          }}
+        >
+          {isCheckMate[0] == pieceColor ? (
+            <img
+              src="/images/king-win.png"
+              alt=""
+              className="w-5 invert brightness-0"
+              style={{
+                transform: rotateBoard,
+              }}
+            />
+          ) : (
+            <img
+              src="/images/themes/classic/wk.png"
+              alt=""
+              className="w-5"
+              style={{
+                transform:
+                  rotateBoard == "rotate(180deg)"
+                    ? "rotate(90deg)"
+                    : "rotate(-90deg)",
+              }}
+            />
+          )}
+        </div>
+      ) : (
+        ""
+      )}
 
       {piece && (
         <img
