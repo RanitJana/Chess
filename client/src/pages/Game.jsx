@@ -7,7 +7,7 @@ import { socket } from "../socket.js";
 import GameSideSection from "../components/game/GameSideSection.jsx";
 import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
-import { colors } from "../constants.js";
+import { colors, getScore, winReason } from "../constants.js";
 import Draw from "../components/draw/Draw.jsx";
 import rotateSquare from "../utils/game/rotateBoard.js";
 import { getThemeColor } from "../constants.js";
@@ -118,8 +118,10 @@ export default function Game() {
     const handleOpponentMove = (info) => {
       const boardInfo = info.fen.split(" ");
 
+      const newChess = new Chess(info.fen);
+
       setBoardStates({
-        board: new Chess(info.fen),
+        board: newChess,
         turn: boardInfo[1] == "w" ? colors.white : colors.black,
         castling: boardInfo[2],
         enPassant: boardInfo[3],
@@ -128,6 +130,16 @@ export default function Game() {
           full: parseInt(boardInfo[5]),
         },
       });
+
+      if (newChess.isCheckmate()) {
+        setCheckMate(boardInfo[1] == "w" ? colors.black : colors.white);
+        setWinnerReason(winReason.byCheckmate);
+        let score;
+        if (users.you?.colors == colors.black)
+          score = getScore(users.you?.rating, users.opponent?.rating, 1);
+        else score = getScore(users.you?.rating, users.opponent?.rating, 0);
+        setScore(score);
+      }
 
       setMoves((prev) => [...prev, JSON.parse(info.lastMove)]);
     };
@@ -140,7 +152,7 @@ export default function Game() {
       socket.off("join-game");
       socket.off("opponent-move", handleOpponentMove);
     };
-  }, [gameId]);
+  }, [gameId, users.opponent?.rating, users.you?.colors, users.you?.rating]);
 
   useEffect(() => {
     const handleEndGame = (info) => {

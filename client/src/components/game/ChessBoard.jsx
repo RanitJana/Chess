@@ -2,7 +2,7 @@ import { useState } from "react";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import EmptyBoard from "./EmptyBoard.jsx";
-import { colors } from "../../constants.js";
+import { colors, winReason, getScore } from "../../constants.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import {
   getSquareName,
@@ -10,7 +10,7 @@ import {
 } from "../../utils/game/getSquareNames.js";
 import { socket } from "../../socket.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
-import { gameMove } from "../../api/game.js";
+import { gameMove, gameEnd } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
 
 function ChessBoard() {
@@ -25,6 +25,9 @@ function ChessBoard() {
     rotateBoard,
     gameId,
     isCheckMate,
+    setCheckMate,
+    setWinnerReason,
+    setScore,
     moveIndex,
   } = useGameContext();
   const { onlineUsers } = useSocketContext();
@@ -34,7 +37,7 @@ function ChessBoard() {
   const [pawnPromotion, setPawnPromotion] = useState(false);
   const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
 
-  const updatePieceNewLocation = (pieceMoveLocation) => {
+  const updatePieceNewLocation = async (pieceMoveLocation) => {
     setPossibleMoves([]);
 
     boardStates.board?.move(pieceMoveLocation);
@@ -47,6 +50,29 @@ function ChessBoard() {
         board: boardStates.board.fen(),
         moves: [...moves, history[history.length - 1]],
       });
+
+      if (boardStates.board.isCheckmate()) {
+        const whoWon = users.you?.color;
+        const winnerReason = winReason.byCheckmate;
+
+        let score;
+        if (users.you?.colors == colors.black)
+          score = getScore(users.you?.rating, users.opponent?.rating, 1);
+        else score = getScore(users.you?.rating, users.opponent?.rating, 0);
+
+        const { data } = await gameEnd({
+          gameId,
+          winner: whoWon,
+          reason: winnerReason,
+          score,
+        });
+
+        if (data?.success) {
+          setCheckMate(whoWon);
+          setWinnerReason(winnerReason);
+          setScore(score);
+        }
+      }
     } catch (error) {
       console.log(error);
       Toast.error("Unable to update the move");
@@ -75,7 +101,7 @@ function ChessBoard() {
     if (
       users.you?.color[0] != boardStates.turn[0] ||
       isCheckMate ||
-      moveIndex < moves?.length-1
+      moveIndex < moves?.length - 1
     )
       return;
 
