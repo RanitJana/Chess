@@ -1,22 +1,35 @@
 /* eslint-disable react-refresh/only-export-components */
-/* eslint-disable no-unused-vars */
-import React, {
-  useState,
-  useEffect,
-  createContext,
-  useContext,
-  useCallback,
-  useRef,
-} from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import ChessBoard from "../components/game/ChessBoard.jsx";
 import { useParams } from "react-router";
-import { gameEnd, gameSingle } from "../api/game.js";
+import { gameSingle } from "../api/game.js";
 import { socket } from "../socket.js";
 import GameSideSection from "../components/game/GameSideSection.jsx";
 import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { colors } from "../constants.js";
 import Draw from "../components/draw/Draw.jsx";
+import rotateSquare from "../utils/game/rotateBoard.js";
+import { getThemeColor } from "../constants.js";
+import { Chess } from "chess.js";
+import Toast from "../utils/Toast.js";
+
+Chess.prototype.revBoard = function () {
+  const rotated = this.board()
+    // .slice() // clone the outer array
+    .reverse() // reverse the rows (vertical flip)
+    .map((row) => row.slice().reverse()); // reverse each row (horizontal flip)
+
+  // Update the `square` property for each piece:
+  return rotated.map((row) =>
+    row.map((piece) => {
+      if (piece && piece.square) {
+        return { ...piece, square: rotateSquare(piece.square) };
+      }
+      return piece;
+    })
+  );
+};
 
 const GameContext = createContext();
 
@@ -24,87 +37,110 @@ function useGameContext() {
   return useContext(GameContext);
 }
 
-function convertTo2DArray(chessString) {
-  const rows = [];
-  const rowLength = 8; // Each row has 8 characters
-
-  for (let i = 0; i < chessString.length; i += rowLength) {
-    const row = chessString.slice(i, i + rowLength).split("");
-    rows.push(row);
-  }
-
-  return rows;
-}
-
-export { convertTo2DArray, useGameContext };
+export { useGameContext };
 
 export default function Game() {
   const { gameId } = useParams();
+  const themeColor = getThemeColor();
 
-  const [opponent, setOpponent] = useState(null);
-  const [chessboard, setChessboard] = useState(null);
-  const [playerColor, setPlayerColor] = useState(colors.black);
-  const [allMoves, setAllMoves] = useState([]);
-  const [movingPiece, setMovingPiece] = useState(null);
-  const [movePossible, setMovePossible] = useState(true);
-  const [isUserMove, setIsUserMove] = useState(false);
-  const [currPiece, setCurrPiece] = useState({
-    row: null,
-    col: null,
-    moves: null,
+  const [boardStates, setBoardStates] = useState({
+    board: null,
+    turn: null,
+    castling: null,
+    enPassant: null,
+    move: {
+      half: 0,
+      full: 1,
+    },
   });
-  const [players, setPlayers] = useState({
-    player1: {},
-    player2: {},
+  const [gameInfo, setGameInfo] = useState(null);
+  const [moves, setMoves] = useState([]);
+  const [users, setusers] = useState({
+    you: null,
+    opponent: null,
   });
-  const [isCheckMate, setCheckMate] = useState(null);
-  const [winnerReason, setWinnerReason] = useState("");
+  const [rotateBoard, setRotateboard] = useState("rotate(0deg)");
   const [drawOpen, setDrawOpen] = useState(false);
-  const [caslingRights, setCaslingRights] = useState("");
-  const [score, setScore] = useState({ white: 0, black: 0 });
+
+  const [isCheckMate, setCheckMate] = useState(null);
+  const [winnerReason, setWinnerReason] = useState(null);
+  const [score, setScore] = useState(0);
+
+  const [moveIndex, setMoveIndex] = useState(null);
 
   const drawTimeRef = useRef(null);
 
-  const fetchGameInfo = useCallback(async () => {
-    try {
-      const response = await gameSingle(gameId);
-
-      if (response?.data) {
-        let { color, game } = response.data;
-
-        setPlayerColor(color);
-        setIsUserMove(game.turn == color);
-
-        //reverse the board when user is black
-        if (color == colors.black)
-          game.board = game.board.split("").reverse().join("");
-
-        setChessboard(convertTo2DArray(game.board));
-
-        const moves = game.moves.map((val) => JSON.parse(val));
-        setAllMoves(moves);
-        setCheckMate(game.winner);
-        setWinnerReason(game.winReason);
-        setCaslingRights(game.caslingRights);
-        setPlayers({
-          player1: game.player1,
-          player2: game.player2,
-        });
-        setScore(game.score);
-
-        if (color == colors.white) setOpponent(game.player2);
-        else setOpponent(game.player1);
-      }
-      socket.emit("join-game", gameId);
-    } catch (error) {
-      console.error("Error fetching game info:", error);
-    }
-  }, [gameId]);
-
   useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchGameInfo();
-  }, [gameId, fetchGameInfo]);
+    const getGameInfo = async () => {
+      try {
+        const { data } = await gameSingle(gameId);
+        if (data) {
+          const { color, game } = data;
+
+          if (color == colors.white)
+            setusers({
+              you: { ...game.player1, color },
+              opponent: { ...game.player2, color: colors.black },
+            });
+          else {
+            setusers({
+              you: { ...game.player2, color: colors.black },
+              opponent: game.player1,
+              color,
+            });
+            setRotateboard("rotate(180deg)");
+          }
+
+          const boardInfo = game.board.split(" ");
+
+          setBoardStates({
+            board: new Chess(game.board),
+            turn: boardInfo[1] == "w" ? colors.white : colors.black,
+            castling: boardInfo[2],
+            enPassant: boardInfo[3],
+            move: {
+              half: parseInt(boardInfo[4]),
+              full: parseInt(boardInfo[5]),
+            },
+          });
+          setGameInfo(game);
+          setScore(game.score);
+          setWinnerReason(game.winReason);
+          setCheckMate(game.winner);
+          setMoves(game.moves.map((move) => JSON.parse(move)));
+        }
+      } catch (error) {
+        console.log(error);
+        Toast.error("Unable to fetch games");
+      }
+    };
+
+    const handleOpponentMove = (info) => {
+      const boardInfo = info.fen.split(" ");
+
+      setBoardStates({
+        board: new Chess(info.fen),
+        turn: boardInfo[1] == "w" ? colors.white : colors.black,
+        castling: boardInfo[2],
+        enPassant: boardInfo[3],
+        move: {
+          half: parseInt(boardInfo[4]),
+          full: parseInt(boardInfo[5]),
+        },
+      });
+
+      setMoves((prev) => [...prev, JSON.parse(info.lastMove)]);
+    };
+
+    getGameInfo();
+
+    socket.emit("join-game", gameId);
+    socket.on("opponent-move", handleOpponentMove);
+    return () => {
+      socket.off("join-game");
+      socket.off("opponent-move", handleOpponentMove);
+    };
+  }, [gameId]);
 
   useEffect(() => {
     const handleEndGame = (info) => {
@@ -138,40 +174,36 @@ export default function Game() {
     <GameContext.Provider
       value={{
         gameId,
-        players,
-        opponent,
-        setOpponent,
-        chessboard,
-        setChessboard,
-        playerColor,
-        allMoves,
-        setAllMoves,
-        movingPiece,
-        setMovingPiece,
-        movePossible,
-        setMovePossible,
-        isUserMove,
-        setIsUserMove,
-        currPiece,
-        setCurrPiece,
+        boardStates,
+        setBoardStates,
+        gameInfo,
+        users,
+        moves,
+        setMoves,
+        themeColor,
+        rotateBoard,
         isCheckMate,
         setCheckMate,
         setWinnerReason,
-        caslingRights,
-        setCaslingRights,
         setScore,
+        setMoveIndex,
+        moveIndex,
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">
         <WinnerBoard winnerReason={winnerReason} score={score} />
-        <Draw isOpen={drawOpen} setOpen={setDrawOpen} opponent={opponent} />
+        <Draw
+          isOpen={drawOpen}
+          setOpen={setDrawOpen}
+          opponent={users.opponent || {}}
+        />
         <div className="sm:p-4 p-0 w-full flex justify-center items-center">
           <NavBar />
         </div>
         <div className=" flex w-full justify-center items-center">
           <div className="grid grid-cols-1 w-full h-full gap-2 md:grid-cols-2 max-w-[970px]">
             <ChessBoard />
-            <GameSideSection players={players} />
+            <GameSideSection />
           </div>
         </div>
       </div>

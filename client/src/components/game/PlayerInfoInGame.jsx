@@ -22,10 +22,11 @@ function PlayerInfoInGame({
   const getAllPieces = () => {
     // Calculate which pieces have been taken by the opponent
     const takenPieces = [];
-
     allMoves.forEach((move) => {
-      if (move.color != opponentColor && move.takes != " ")
-        takenPieces.push(move.takes);
+      if (move.color != opponentColor?.[0] && move.captured)
+        takenPieces.push(
+          move.color == "w" ? move.captured : move.captured.toUpperCase()
+        );
     });
 
     const sum = takenPieces.reduce((sum, piece) => sum + piecePoint(piece), 0);

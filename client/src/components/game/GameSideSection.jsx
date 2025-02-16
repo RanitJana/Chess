@@ -4,6 +4,7 @@ import ChatInGame from "../chat/ChatInGame.jsx";
 import Moves from "./Moves.jsx";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import GameAction from "./GameAction.jsx";
+import { useGameContext } from "../../pages/Game.jsx";
 
 function Tab({ isActive, label, onClick }) {
   return (
@@ -18,20 +19,19 @@ function Tab({ isActive, label, onClick }) {
   );
 }
 
-function GameSideSection({ players }) {
+function GameSideSection() {
+  const { users } = useGameContext();
+
   const { playerInfo } = useAuthContext();
   const [activeTab, setActiveTab] = useState(0);
   const [isViewer, setIsViewer] = useState(true);
 
   useEffect(() => {
     if (
-      !(
-        playerInfo._id != players.player1._id &&
-        playerInfo._id != players.player2._id
-      )
+      !(playerInfo._id != users.you?._id && playerInfo._id != users.opponent?._id)
     )
       setIsViewer(false);
-  }, [players, playerInfo]);
+  }, [users, playerInfo]);
 
   const renderContent = () => {
     if (isViewer) return <Moves />;

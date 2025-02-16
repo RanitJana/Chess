@@ -1,237 +1,158 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
-import ChessBoardBox from "./ChessBoardBox.jsx";
-import { gameEnd, gameMove } from "../../api/game.js";
-import { socket } from "../../socket.js";
-import EmptyBoard from "./EmptyBoard.jsx";
-import { useGameContext, convertTo2DArray } from "../../pages/Game.jsx";
-import { kingCheckMate } from "../../utils/KingCheck.js";
-import { useAuthContext } from "../../context/AuthContext.jsx";
-import { useSocketContext } from "../../context/SocketContext.jsx";
+import { useState } from "react";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
+import ChessBoardBox from "./ChessBoardBox.jsx";
+import EmptyBoard from "./EmptyBoard.jsx";
+import { colors } from "../../constants.js";
+import { useGameContext } from "../../pages/Game.jsx";
 import {
-  colors,
-  getScore,
-  getThemeColor,
-  makeSound,
-  movingPieceTime,
-  winReason,
-} from "../../constants.js";
-import { getColor } from "../../utils/PieceMove.js";
+  getSquareName,
+  getSquareFromMove,
+} from "../../utils/game/getSquareNames.js";
+import { socket } from "../../socket.js";
+import { useSocketContext } from "../../context/SocketContext.jsx";
+import { gameMove } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
 
-export default function ChessBoard() {
+function ChessBoard() {
   const {
-    playerColor,
-    allMoves,
+    boardStates,
+    setBoardStates,
+    users,
+    opponent,
+    moves,
+    setMoves,
+    themeColor,
+    rotateBoard,
     gameId,
-    setChessboard,
-    setIsUserMove,
-    setAllMoves,
-    setMovingPiece,
-    setCurrPiece,
-    chessboard,
-    players,
-    setCheckMate,
     isCheckMate,
-    setWinnerReason,
-    setScore,
+    moveIndex,
   } = useGameContext();
-  const { playerInfo } = useAuthContext();
   const { onlineUsers } = useSocketContext();
 
-  const userId = playerInfo._id;
+  const [possibleMoves, setPossibleMoves] = useState([]);
+  const [points, setPoints] = useState(0);
+  const [pawnPromotion, setPawnPromotion] = useState(false);
+  const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
 
-  const boardRef = useRef(null);
-  const [opponent, setOpponent] = useState(null);
-  const [user, setUser] = useState(null);
-  const [points, setPoints] = useState({
-    [colors.white]: 0,
-    [colors.black]: 0,
-  });
+  const updatePieceNewLocation = (pieceMoveLocation) => {
+    setPossibleMoves([]);
 
-  useEffect(() => {
-    if (players) {
-      setOpponent(() =>
-        userId == players.player1._id ? players.player2 : players.player1
-      );
-      setUser(() =>
-        userId == players.player1._id ? players.player1 : players.player2
-      );
-    }
-  }, [players]);
-
-  const isViewer = () => {
-    if (userId != players.player1._id && userId != players.player2._id)
-      return true;
-  };
-
-  // Handle move updates
-  async function updateMoves(clearedBoard, info) {
-    if (isViewer()) return;
-
-    let boardString = clearedBoard.map((row) => row.join("")).join("");
-
-    if (playerColor == colors.black)
-      boardString = boardString.split("").reverse().join("");
+    boardStates.board?.move(pieceMoveLocation);
+    const boardInfo = boardStates.board.fen().split(" ");
+    const history = boardStates.board?.history({ verbose: true }) || [];
 
     try {
-      socket.emit("game-move", gameId);
-      socket.emit("move-done", { boardString, info });
-
-      setAllMoves((prevMoves) => [...prevMoves, info]);
-
-      const response = await gameMove({
-        moves: [...allMoves, info],
+      gameMove({
         gameId,
-        board: boardString,
+        board: boardStates.board.fen(),
+        moves: [...moves, history[history.length - 1]],
       });
-
-      if (
-        kingCheckMate(
-          convertTo2DArray(boardString),
-          playerColor == colors.white ? colors.black : colors.white,
-          true
-        )
-      ) {
-        let winner = playerColor;
-        const reason = winReason.byCheckmate;
-
-        let score;
-        if (playerColor == colors.white)
-          score = getScore(playerInfo.rating, opponent.rating, 1);
-        else score = getScore(playerInfo.rating, opponent.rating, 0);
-
-        setCheckMate(winner);
-        setWinnerReason(reason);
-        setScore(score);
-
-        await gameEnd({ winner, reason, gameId, score });
-      }
-
-      if (response.data.info) {
-        const { turn } = response.data.info.game;
-
-        if (turn == playerColor && !isCheckMate) setIsUserMove(true);
-        else setIsUserMove(false);
-      }
     } catch (error) {
-      Toast.error("Error updating moves.. Please try to refresh the page");
-      console.error("Error updating moves:", error);
-    }
-  }
-
-  //hanldle my move after opponent's move
-  function handleOpponentMove(val) {
-    if (isViewer()) return;
-
-    let updatedBoard = val.boardString;
-    let move = val.info;
-
-    if (playerColor === colors.black) {
-      updatedBoard = updatedBoard.split("").reverse().join(""); // Reverse only when displaying
+      console.log(error);
+      Toast.error("Unable to update the move");
     }
 
-    updatedBoard = convertTo2DArray(updatedBoard);
+    setMoves((prev) => [...prev, history[history.length - 1]]);
 
-    if (kingCheckMate(updatedBoard, playerColor)) {
-      setCheckMate(playerColor == colors.white ? colors.black : colors.white);
-      setWinnerReason(winReason.byCheckmate);
+    setBoardStates((prev) => ({
+      board: prev.board,
+      turn: boardInfo[1] == "w" ? colors.white : colors.black,
+      castling: boardInfo[2],
+      enPassant: boardInfo[3],
+      move: {
+        half: parseInt(boardInfo[4]),
+        full: parseInt(boardInfo[5]),
+      },
+    }));
 
-      let score;
-      if (playerColor == colors.white)
-        score = getScore(playerInfo.rating, opponent.rating, 1);
-      else score = getScore(playerInfo.rating, opponent.rating, 0);
-      setScore(score);
-    } else setIsUserMove(true);
+    socket.emit("move-done", {
+      fen: boardStates.board.fen(),
+      lastMove: JSON.stringify(history[history.length - 1]),
+    });
+  };
 
-    const opponentMove = {
-      from: { row: 7 - move.from.row, col: 7 - move.from.col },
-      to: { row: 7 - move.to.row, col: 7 - move.to.col },
-    };
+  const handleChessBoxClick = (square) => {
+    if (
+      users.you?.color[0] != boardStates.turn[0] ||
+      isCheckMate ||
+      moveIndex < moves?.length-1
+    )
+      return;
 
-    makeSound(
-      playerColor == colors.white ? colors.black : colors.white,
-      getColor(updatedBoard, opponentMove.to.row, opponentMove.to.col)
-    );
+    const pieceMoveLocation = possibleMoves.filter((val) => {
+      return getSquareFromMove(val, users.you?.color) == square;
+    });
 
-    // Update the moving piece for animations
-    setMovingPiece(opponentMove);
+    if (possibleMoves.length && pieceMoveLocation.length) {
+      if (pawnPromotion && !pawnPieceDisplay)
+        return setPawnPieceDisplay(square);
 
-    // Update the allMoves array directly
-    setAllMoves((prevMoves) => [...prevMoves, move]);
-    setCurrPiece({ row: null, col: null, moves: null });
-
-    // Delay to show animation
-    setTimeout(() => {
-      setMovingPiece(null);
-      setChessboard(updatedBoard);
-    }, movingPieceTime);
-  }
-
-  useEffect(() => {
-    socket.on("opponent-move", handleOpponentMove);
-    return () => socket.off("opponent-move", handleOpponentMove);
-  }, [allMoves]);
-
-  if (!players || !opponent) return;
+      updatePieceNewLocation(pieceMoveLocation[0]);
+    } else {
+      const tempMoves = boardStates.board?.moves({ square });
+      if (tempMoves.length && tempMoves[0].indexOf("=") != -1)
+        setPawnPromotion(true);
+      setPossibleMoves(tempMoves);
+    }
+  };
 
   return (
     <div className=" w-full flex items-center justify-center h-fit">
       <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
-        {/* opponent info */}
         <PlayerInfoInGame
-          player={opponent}
-          isOnline={onlineUsers[opponent._id]}
-          opponentColor={playerColor}
-          chessboard={chessboard}
-          allMoves={allMoves}
+          player={users.opponent || {}}
+          isOnline={onlineUsers[opponent?._id]}
+          opponentColor={users.you?.color}
+          allMoves={moves}
           points={points}
           setPoints={setPoints}
         />
-        {/* chessboard */}
         <div
-          ref={boardRef}
           className="relative w-full h-fit items-center justify-center flex flex-col"
+          style={{ transform: rotateBoard }}
         >
           {/* empty chessboard */}
-          {!chessboard && (
-            <div className="relative w-full h-fit">{<EmptyBoard />}</div>
+          {!boardStates.board && (
+            <div className="relative w-full h-fit">
+              <EmptyBoard />
+            </div>
           )}
-          {chessboard?.map((row, rowIdx) => (
+          {boardStates.board?.board().map((row, rowIdx) => (
             <div className="grid grid-cols-8 w-full" key={rowIdx}>
-              {row.map((piece, pieceIdx) => {
-                const key = pieceIdx + rowIdx;
-                const themeColor = getThemeColor();
+              {row.map((piece, colIdx) => {
+                const key = colIdx + rowIdx;
                 const color = key & 1 ? themeColor.dark : themeColor.light;
-
+                const square = piece
+                  ? piece.square
+                  : getSquareName(rowIdx, colIdx);
+                piece = piece
+                  ? piece.color == "w"
+                    ? piece.type.toUpperCase()
+                    : piece.type
+                  : null;
                 return (
                   <ChessBoardBox
                     key={key}
-                    row={rowIdx}
-                    col={pieceIdx}
                     color={color}
-                    themeColor={themeColor}
                     piece={piece}
-                    updateMoves={updateMoves}
-                    boardDetails={boardRef.current?.getBoundingClientRect()}
-                    isViewer={isViewer}
-                    isCheckMate={isCheckMate}
+                    square={square}
+                    possibleMoves={possibleMoves}
+                    handleChessBoxClick={handleChessBoxClick}
+                    pawnPieceDisplay={pawnPieceDisplay}
+                    setPawnPieceDisplay={setPawnPieceDisplay}
+                    setPawnPromotion={setPawnPromotion}
+                    updatePieceNewLocation={updatePieceNewLocation}
                   />
                 );
               })}
             </div>
           ))}
         </div>
-        {/* user info */}
         <PlayerInfoInGame
-          player={user}
-          isOnline={onlineUsers[user._id]}
-          opponentColor={
-            playerColor == colors.white ? colors.black : colors.white
-          }
-          chessboard={chessboard}
-          allMoves={allMoves}
+          player={users.you || {}}
+          isOnline={onlineUsers[users.you?._id]}
+          opponentColor={users.opponent?.color}
+          allMoves={moves}
           points={points}
           setPoints={setPoints}
         />
@@ -239,3 +160,5 @@ export default function ChessBoard() {
     </div>
   );
 }
+
+export default ChessBoard;

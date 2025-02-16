@@ -23,7 +23,7 @@ function closeContainer(reference, parentContainerRef, delay) {
 }
 
 function WinnerBoard({ winnerReason, score }) {
-  const { playerColor, isCheckMate, players } = useGameContext();
+  const { isCheckMate, users } = useGameContext();
 
   const containerRef = useRef(null);
   const parentContainerRef = useRef(null);
@@ -89,13 +89,13 @@ function WinnerBoard({ winnerReason, score }) {
               <p className="font-bold text-xl uppercase">Game Draw!</p>
               <span className="text-sm text-gray-300">{winnerReason}</span>
             </div>
-          ) : isYourWin(playerColor, isCheckMate) ? (
+          ) : isYourWin(users.you?.color, isCheckMate) ? (
             <>
               <Canvas />
               <img src="/images/trophy.png" alt="" className="mr-2 w-8" />
               <div className="flex flex-col items-center justify-center">
                 <p className="font-bold text-xl uppercase">
-                  {playerColor} Won !
+                  {users.you?.color} Won !
                 </p>
                 <span className="text-sm text-gray-300">{winnerReason}</span>
               </div>
@@ -103,7 +103,7 @@ function WinnerBoard({ winnerReason, score }) {
           ) : (
             <div className="flex flex-col items-center justify-center">
               <p className="font-bold text-xl uppercase">
-                {playerColor} Lost !
+                {users.you?.color} Lost !
               </p>
               <span className="text-sm text-gray-300">{winnerReason}</span>
             </div>
@@ -115,12 +115,12 @@ function WinnerBoard({ winnerReason, score }) {
               <div
                 className={`w-[4rem] rounded-2xl overflow-hidden border-4 ${isCheckMate == colors.white ? "border-green-600" : "border-white"}`}
                 dangerouslySetInnerHTML={{
-                  __html: GetAvatar(players.player1?.name),
+                  __html: GetAvatar(users.you?.name),
                 }}
               />
-              <span>{players.player1?.name}</span>
+              <span>{users.you?.name}</span>
               <div>
-                <span className="mr-1">{players.player1?.rating}</span>(
+                <span className="mr-1">{users.you?.rating}</span>(
                 <span
                   className={`${score.white >= 0 ? "text-green-500" : "text-red-500"}`}
                 >
@@ -135,12 +135,12 @@ function WinnerBoard({ winnerReason, score }) {
               <div
                 className={`w-[4rem] rounded-2xl overflow-hidden border-4 ${isCheckMate == colors.black ? "border-green-600" : "border-white"}`}
                 dangerouslySetInnerHTML={{
-                  __html: GetAvatar(players.player2?.name),
+                  __html: GetAvatar(users.opponent?.name),
                 }}
               />
-              <span>{players.player2?.name}</span>
+              <span>{users.opponent?.name}</span>
               <span>
-                <span className="mr-1">{players.player2?.rating}</span>(
+                <span className="mr-1">{users.opponent?.rating}</span>(
                 <span
                   className={`${score.black >= 0 ? "text-green-500" : "text-red-500"}`}
                 >

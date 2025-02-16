@@ -16,27 +16,7 @@ const gameSchema = new Schema(
 
     board: {
       type: String,
-      default:
-        "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR",
-      // "       k      pp    Q                                          K"
-    },
-
-    caslingRights: {
-      type: String,
-      default: "KQkq",
-    },
-
-    enPassant: {
-      position: {
-        row: {
-          type: Number,
-          default: -1,
-        },
-        col: {
-          type: Number,
-          default: -1,
-        },
-      },
+      default: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     },
 
     moves: {
@@ -74,12 +54,6 @@ const gameSchema = new Schema(
       default: null,
     },
 
-    turn: {
-      type: String,
-      enum: ["white", "black"],
-      default: "white",
-    },
-
     isGameStarted: {
       type: Boolean,
       default: false,
@@ -92,6 +66,9 @@ const gameSchema = new Schema(
   },
   { timestamps: true }
 );
+
+gameSchema.index({ player1: 1 });
+gameSchema.index({ player2: 1 });
 
 const Game = model("Game", gameSchema);
 

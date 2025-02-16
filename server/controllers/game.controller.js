@@ -112,8 +112,6 @@ const gameMove = AsyncHandler(async (req, res, _) => {
   //assuming the board is already rotated if the player er black(from frontend)
   game.board = board;
 
-  game.turn = game.turn == "white" ? "black" : "white";
-
   //save the info
   await game.save({ validateBeforeSave: false });
 

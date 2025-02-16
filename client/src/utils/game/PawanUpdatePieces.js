@@ -1,4 +1,4 @@
-import { colors, getPieceImagePath } from "../constants.js";
+import { colors, getPieceImagePath } from "../../constants.js";
 
 export default function pawnUpdatePieces(playerColor) {
   if (playerColor === colors.black) {

@@ -1,32 +1,28 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
-import { convertTo2DArray } from "../../pages/Game.jsx";
 import { colors, getPieceImagePath, getThemeColor } from "../../constants.js";
+import { Chess } from "chess.js";
 
-function ChessBoardPreview({ boardString, playerColor }) {
-  const [board, setBoard] = useState(null);
-
-  useEffect(() => {
-    if (playerColor == colors.black) {
-      boardString = boardString.split("").reverse().join("");
-    }
-
-    setBoard(convertTo2DArray(boardString));
-  }, [playerColor]);
+function ChessBoardPreview({ board, playerColor }) {
+  const themeColor = getThemeColor();
 
   return (
     <div className="grid grid-cols-8 grid-rows-8 w-full aspect-square">
-      {board?.map((row, rowIdx) => {
-        return row.map((piece, pieceIdx) => {
-          const themeColor = getThemeColor();
+      {(playerColor == colors.black
+        ? new Chess(board).revBoard()
+        : new Chess(board).board()
+      ).map((row, rowIdx) => {
+        return row.map((piece, colIdx) => {
+          piece = piece
+            ? piece.color == "w"
+              ? piece.type.toUpperCase()
+              : piece.type
+            : null;
           return (
             <div
-              key={rowIdx + pieceIdx}
+              key={rowIdx + colIdx}
               style={{
                 backgroundColor:
-                  (rowIdx + pieceIdx) & 1 ? themeColor.dark : themeColor.light,
+                  (rowIdx + colIdx) & 1 ? themeColor.dark : themeColor.light,
               }}
               className="aspect-square relative"
             >

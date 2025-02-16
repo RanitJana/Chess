@@ -102,6 +102,9 @@ const gameSingle = async function (gameId) {
       `${import.meta.env.VITE_BACKEND_URI}/api/v1/game/info/${gameId}`,
       {
         withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
     );
 

@@ -12,9 +12,8 @@ function GameAction() {
     setCheckMate,
     setWinnerReason,
     gameId,
-    playerColor,
     setScore,
-    opponent,
+    users,
   } = useGameContext();
 
   const { playerInfo } = useAuthContext();
@@ -25,16 +24,17 @@ function GameAction() {
     if (isSubmit) return;
     try {
       setIsSubmit(true);
-      const whoWon = playerColor == colors.white ? colors.black : colors.white;
+      const whoWon =
+        users.you?.color == colors.white ? colors.black : colors.white;
       const winnerReason =
         whoWon == colors.white
           ? winReason.byBlackResigns
           : winReason.byWhiteResigns;
 
       let score;
-      if (playerColor == colors.black)
-        score = getScore(playerInfo.rating, opponent.rating, 1);
-      else score = getScore(playerInfo.rating, opponent.rating, 0);
+      if (users.you?.colors == colors.black)
+        score = getScore(playerInfo.rating, users.opponent?.rating, 1);
+      else score = getScore(playerInfo.rating, users.opponent?.rating, 0);
 
       const response = await gameEnd({
         gameId,
