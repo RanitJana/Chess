@@ -2,7 +2,13 @@ import { useState } from "react";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import EmptyBoard from "./EmptyBoard.jsx";
-import { colors, winReason, getScore } from "../../constants.js";
+import {
+  colors,
+  winReason,
+  getScore,
+  makeSound,
+  soundType,
+} from "../../constants.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import {
   getSquareName,
@@ -45,6 +51,9 @@ function ChessBoard() {
     const boardInfo = boardStates.board.fen().split(" ");
     const history = boardStates.board?.history({ verbose: true }) || [];
 
+    makeSound(
+      history[history.length - 1]?.captured ? soundType.capture : soundType.move
+    );
     try {
       gameMove({
         gameId,

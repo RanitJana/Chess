@@ -39,11 +39,7 @@ const getScore = function (whiteRating, blackRating, result) {
   return { white: whiteChange, black: blackChange };
 };
 
-const makeSound = (playerColor, targetPieceColor) => {
-  const sound =
-    targetPieceColor && targetPieceColor !== playerColor
-      ? soundType.capture
-      : soundType.move;
+const makeSound = (sound) => {
   switch (sound) {
     case "move":
       moveSound();
@@ -144,6 +140,7 @@ export {
   colors,
   winner,
   winReason,
+  soundType,
   makeSound,
   getPieceImagePath,
   movingPieceTime,

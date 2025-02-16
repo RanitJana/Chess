@@ -7,7 +7,13 @@ import { socket } from "../socket.js";
 import GameSideSection from "../components/game/GameSideSection.jsx";
 import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
-import { colors, getScore, winReason } from "../constants.js";
+import {
+  colors,
+  getScore,
+  makeSound,
+  soundType,
+  winReason,
+} from "../constants.js";
 import Draw from "../components/draw/Draw.jsx";
 import rotateSquare from "../utils/game/rotateBoard.js";
 import { getThemeColor } from "../constants.js";
@@ -144,8 +150,10 @@ export default function Game() {
         );
         setScore(score);
       }
+      const lastMove = JSON.parse(info.lastMove);
 
-      setMoves((prev) => [...prev, JSON.parse(info.lastMove)]);
+      setMoves((prev) => [...prev, lastMove]);
+      makeSound(lastMove?.captured ? soundType.capture : soundType.move);
     };
 
     socket.emit("join-game", gameId);
