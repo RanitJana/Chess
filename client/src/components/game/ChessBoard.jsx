@@ -29,6 +29,7 @@ function ChessBoard() {
     setWinnerReason,
     setScore,
     moveIndex,
+    gameInfo,
   } = useGameContext();
   const { onlineUsers } = useSocketContext();
 
@@ -55,10 +56,11 @@ function ChessBoard() {
         const whoWon = users.you?.color;
         const winnerReason = winReason.byCheckmate;
 
-        let score;
-        if (users.you?.colors == colors.black)
-          score = getScore(users.you?.rating, users.opponent?.rating, 1);
-        else score = getScore(users.you?.rating, users.opponent?.rating, 0);
+        const score = getScore(
+          gameInfo.player1?.rating,
+          gameInfo.player2?.rating,
+          whoWon == colors.white
+        );
 
         const { data } = await gameEnd({
           gameId,

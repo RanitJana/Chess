@@ -53,7 +53,7 @@ export default function Game() {
       full: 1,
     },
   });
-  const [gameInfo, setGameInfo] = useState(null);
+  const [gameInfo, setGameInfo] = useState({});
   const [moves, setMoves] = useState([]);
   const [users, setusers] = useState({
     you: null,
@@ -114,7 +114,10 @@ export default function Game() {
         Toast.error("Unable to fetch games");
       }
     };
+    getGameInfo();
+  }, [gameId]);
 
+  useEffect(() => {
     const handleOpponentMove = (info) => {
       const boardInfo = info.fen.split(" ");
 
@@ -134,17 +137,16 @@ export default function Game() {
       if (newChess.isCheckmate()) {
         setCheckMate(boardInfo[1] == "w" ? colors.black : colors.white);
         setWinnerReason(winReason.byCheckmate);
-        let score;
-        if (users.you?.colors == colors.black)
-          score = getScore(users.you?.rating, users.opponent?.rating, 1);
-        else score = getScore(users.you?.rating, users.opponent?.rating, 0);
+        const score = getScore(
+          gameInfo.player1?.rating,
+          gameInfo.player2?.rating,
+          boardInfo[1] == "w"
+        );
         setScore(score);
       }
 
       setMoves((prev) => [...prev, JSON.parse(info.lastMove)]);
     };
-
-    getGameInfo();
 
     socket.emit("join-game", gameId);
     socket.on("opponent-move", handleOpponentMove);
@@ -152,7 +154,7 @@ export default function Game() {
       socket.off("join-game");
       socket.off("opponent-move", handleOpponentMove);
     };
-  }, [gameId, users.opponent?.rating, users.you?.colors, users.you?.rating]);
+  }, [gameId, gameInfo.player1?.rating, gameInfo.player2?.rating]);
 
   useEffect(() => {
     const handleEndGame = (info) => {
