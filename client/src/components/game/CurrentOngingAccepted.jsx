@@ -22,6 +22,7 @@ function CurrentOngingAccepted({ game, player, isOnline }) {
         )}
       <ChessBoardPreview
         board={game.board}
+        moves={game.moves}
         playerColor={game.player1 ? colors.black : colors.white}
       />
       <div className="flex items-center gap-1 p-2 bg-blackDark transition-all group-hover:bg-[rgb(58,56,54)]">

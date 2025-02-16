@@ -152,7 +152,7 @@ const gameOngoing = AsyncHandler(async (req, res, _) => {
     else if (game.player2._id.toString() == userId.toString())
       game.player2 = null;
 
-    game.moves = game.moves.length;
+    game.moves = game.moves.length > 0 ? game.moves[game.moves.length - 1] : [];
 
     return game;
   });

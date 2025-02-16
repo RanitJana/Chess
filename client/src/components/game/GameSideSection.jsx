@@ -28,7 +28,10 @@ function GameSideSection() {
 
   useEffect(() => {
     if (
-      !(playerInfo._id != users.you?._id && playerInfo._id != users.opponent?._id)
+      !(
+        playerInfo._id != users.you?._id &&
+        playerInfo._id != users.opponent?._id
+      )
     )
       setIsViewer(false);
   }, [users, playerInfo]);
