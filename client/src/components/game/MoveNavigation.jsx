@@ -1,5 +1,5 @@
 import { useGameContext } from "../../pages/Game.jsx";
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 
 function MoveNavigation() {
   const { setMoveIndex, moves, moveIndex, handleSeePreviousState } =
@@ -24,8 +24,36 @@ function MoveNavigation() {
     [handleSeePreviousState]
   );
 
+  const timeRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (moveIndex >= moves.length - 1) {
+      clearInterval(timeRef.current);
+      setIsPlaying(false);
+    }
+  }, [moveIndex, moves.length]);
+
+  const handlePlay = () => {
+    if (timeRef.current) clearInterval(timeRef.current);
+    setIsPlaying(true);
+
+    timeRef.current = setInterval(() => {
+      setMoveIndex((prevIndex) => {
+        const newIndex = Math.min(prevIndex + 1, moves.length - 1);
+        handleSeePreviousState(newIndex);
+        return newIndex;
+      });
+    }, 1000);
+  };
+
+  const handleStop = () => {
+    if (timeRef.current) clearInterval(timeRef.current);
+    setIsPlaying(false);
+  };
+
   return (
-    <div className="flex justify-between w-full">
+    <div className="flex justify-between items-center w-full">
       <div className="flex gap-1">
         <button
           className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] h-[2rem] text-white ${
@@ -55,6 +83,32 @@ function MoveNavigation() {
             className="w-4 invert brightness-0 rotate-180"
           />
         </button>
+      </div>
+      <div>
+        {isPlaying ? (
+          <button
+            onClick={handleStop}
+            className="hover:cursor-pointer hover:bg-red-700 bg-red-500 rounded-full h-[2.5rem] aspect-square flex justify-center items-center"
+          >
+            <img
+              src="/images/stop.png"
+              alt=""
+              className="w-4 invert brightness-0"
+            />
+          </button>
+        ) : (
+          <button
+            onClick={handlePlay}
+            disabled={moveIndex == moves.length - 1}
+            className="hover:cursor-pointer hover:bg-green-700 bg-green-500 rounded-full h-[2.5rem] aspect-square flex justify-center items-center"
+          >
+            <img
+              src="/images/play.png"
+              alt=""
+              className="w-4 invert brightness-0"
+            />
+          </button>
+        )}
       </div>
       <div className="flex gap-1">
         <button
