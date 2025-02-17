@@ -27,7 +27,6 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
     try {
       setLoading(true);
       const { data } = await gameOngoing(userId);
-      console.log(data);
 
       if (data?.success) setGames(data.info);
       else Toast.error("Please try to login again");
