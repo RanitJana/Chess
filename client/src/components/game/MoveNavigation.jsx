@@ -86,7 +86,7 @@ function MoveNavigation() {
           <img
             src="/images/arrow.png"
             alt=""
-            className="w-4 invert brightness-0 rotate-180"
+            className="w-3 invert brightness-0"
           />
         </button>
       </div>
@@ -131,7 +131,7 @@ function MoveNavigation() {
           <img
             src="/images/arrow.png"
             alt=""
-            className="w-4 invert brightness-0"
+            className="w-3 invert brightness-0 rotate-180"
           />
         </button>
         <button
