@@ -16,27 +16,9 @@ import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { colors, getScore, makeSound, winReason } from "../constants.js";
 import Draw from "../components/draw/Draw.jsx";
-import rotateSquare from "../utils/game/rotateBoard.js";
 import { getThemeColor } from "../constants.js";
 import { Chess } from "chess.js";
 import Toast from "../utils/Toast.js";
-
-Chess.prototype.revBoard = function () {
-  const rotated = this.board()
-    // .slice() // clone the outer array
-    .reverse() // reverse the rows (vertical flip)
-    .map((row) => row.slice().reverse()); // reverse each row (horizontal flip)
-
-  // Update the `square` property for each piece:
-  return rotated.map((row) =>
-    row.map((piece) => {
-      if (piece && piece.square) {
-        return { ...piece, square: rotateSquare(piece.square) };
-      }
-      return piece;
-    })
-  );
-};
 
 const GameContext = createContext();
 

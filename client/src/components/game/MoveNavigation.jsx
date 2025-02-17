@@ -38,6 +38,12 @@ function MoveNavigation() {
     if (timeRef.current) clearInterval(timeRef.current);
     setIsPlaying(true);
 
+    setMoveIndex((prevIndex) => {
+      const newIndex = Math.min(prevIndex + 1, moves.length - 1);
+      handleSeePreviousState(newIndex);
+      return newIndex;
+    });
+
     timeRef.current = setInterval(() => {
       setMoveIndex((prevIndex) => {
         const newIndex = Math.min(prevIndex + 1, moves.length - 1);
