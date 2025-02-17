@@ -115,6 +115,7 @@ export default function Game() {
           setWinnerReason(game.winReason);
           setCheckMate(game.winner);
           setMoves(game.moves.map((move) => JSON.parse(move)));
+          setMoveIndex(game.moves.length - 1);
         }
       } catch (error) {
         console.log(error);
@@ -147,7 +148,7 @@ export default function Game() {
         const score = getScore(
           gameInfo.player1?.rating,
           gameInfo.player2?.rating,
-          boardInfo[1] == "w"
+          boardInfo[1] == "b"
         );
         setScore(score);
       }
@@ -194,7 +195,9 @@ export default function Game() {
   }, [gameId]);
 
   const handleSeePreviousState = useCallback(
-    (move, moveIndex) => {
+    (moveIndex) => {
+      setMoveIndex(moveIndex);
+      const move = moveIndex === -1 ? moves[0] : moves[moveIndex];
       if (!move) return;
       const boardState = moveIndex === -1 ? moves[0].before : move.after;
 
@@ -214,10 +217,6 @@ export default function Game() {
     },
     [moves]
   );
-
-  useEffect(() => {
-    setMoveIndex(moves?.length - 1);
-  }, [moves?.length, setMoveIndex]);
 
   return (
     <GameContext.Provider

@@ -6,15 +6,6 @@ function MoveNavigation() {
     useGameContext();
 
   useEffect(() => {
-    if (moveIndex >= -1) {
-      handleSeePreviousState(
-        moveIndex === -1 ? moves[0] : moves[moveIndex],
-        moveIndex
-      );
-    }
-  }, [handleSeePreviousState, moveIndex, moves]);
-
-  useEffect(() => {
     setMoveIndex(moves?.length - 1);
   }, [moves?.length, setMoveIndex]);
 
@@ -27,17 +18,17 @@ function MoveNavigation() {
         clearTimeout(debounceRef.current);
       }
       debounceRef.current = setTimeout(() => {
-        setMoveIndex(newIndex);
+        handleSeePreviousState(newIndex);
       }, 150);
     },
-    [setMoveIndex]
+    [handleSeePreviousState]
   );
 
   return (
     <div className="flex justify-between w-full">
       <div className="flex gap-1">
         <button
-          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] text-white ${
+          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] h-[2rem] text-white ${
             moveIndex <= -1
               ? "hover:cursor-not-allowed brightness-50"
               : "hover:cursor-pointer active:brightness-75"
@@ -51,7 +42,7 @@ function MoveNavigation() {
           />
         </button>
         <button
-          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] text-white ${
+          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] h-[2rem] text-white ${
             moveIndex <= -1
               ? "hover:cursor-not-allowed brightness-50"
               : "hover:cursor-pointer active:brightness-75"
@@ -67,7 +58,7 @@ function MoveNavigation() {
       </div>
       <div className="flex gap-1">
         <button
-          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] text-white ${
+          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] h-[2rem] text-white ${
             moveIndex >= moves.length - 1
               ? "hover:cursor-not-allowed brightness-50"
               : "hover:cursor-pointer active:brightness-75"
@@ -84,7 +75,7 @@ function MoveNavigation() {
           />
         </button>
         <button
-          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] text-white ${
+          className={`bg-[rgb(71,70,71)] flex items-center justify-center transition-all p-2 rounded-md w-[4rem] h-[2rem] text-white ${
             moveIndex >= moves.length - 1
               ? "hover:cursor-not-allowed brightness-50"
               : "hover:cursor-pointer active:brightness-75"
