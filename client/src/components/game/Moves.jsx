@@ -1,6 +1,6 @@
-import { useCallback, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useGameContext } from "../../pages/Game.jsx";
-import { Chess } from "chess.js";
+import MoveNavigation from "./MoveNavigation.jsx";
 
 const pieceSymbols = {
   p: "♙",
@@ -18,44 +18,29 @@ const pieceSymbols = {
 };
 
 function Moves() {
-  const { moves, setBoardStates, setMoveIndex, moveIndex } = useGameContext();
+  const { moves, setMoveIndex, moveIndex } = useGameContext();
+  const navigationRef = useRef(null);
 
-  const handleSeePreviousState = useCallback(
-    (move, moveIndex) => {
-      if (!move) return;
-      const boardState = moveIndex === -1 ? moves[0].before : move.after;
-      const boardInfo = boardState.split(" ");
-
-      setBoardStates({
-        board: new Chess(boardState), // Creates a fresh instance
-        turn: boardInfo[1] === "w" ? "w" : "b",
-        castling: boardInfo[2],
-        enPassant: boardInfo[3],
-        move: {
-          half: parseInt(boardInfo[4]),
-          full: parseInt(boardInfo[5]),
-        },
-      });
-    },
-    [moves, setBoardStates]
-  );
+  const apprearance = () => {
+    const reference = navigationRef.current;
+    if (!reference) return;
+    if (window.innerWidth >= 767) {
+      reference.style.transform = "scale(1)";
+    } else reference.style.transform = "scale(0)";
+  };
 
   useEffect(() => {
-    setMoveIndex(moves?.length - 1);
-  }, [moves?.length, setMoveIndex]);
+    window.addEventListener("resize", apprearance);
+    return () => window.removeEventListener("resize", apprearance);
+  }, []);
 
   useEffect(() => {
-    if (moveIndex >= -1) {
-      handleSeePreviousState(
-        moveIndex === -1 ? moves[0] : moves[moveIndex],
-        moveIndex
-      );
-    }
-  }, [handleSeePreviousState, moveIndex, moves]);
+    apprearance();
+  }, [navigationRef]);
 
   return (
     <div className="relative w-full h-full text-sm flex flex-col justify-between">
-      <div>
+      <div className="flex flex-col overflow-y-scroll">
         <p className="w-full text-white px-4 py-2 border-b border-b-[rgba(255,255,255,0.19)]">
           Starting moves
         </p>
@@ -118,22 +103,11 @@ function Moves() {
       </div>
 
       {/* Previous / Next Buttons */}
-      <div className="flex justify-between px-4 py-2">
-        <button
-          className="bg-[rgb(71,70,71)] p-2 rounded-md w-[5rem] text-white"
-          onClick={() => setMoveIndex((prev) => Math.max(prev - 1, -1))}
-        >
-          Previous
-        </button>
-        <button
-          className="bg-[rgb(71,70,71)] p-2 rounded-md w-[5rem] text-white"
-          onClick={() =>
-            setMoveIndex((prev) => Math.min(prev + 1, moves.length - 1))
-          }
-          disabled={moveIndex >= moves.length - 1}
-        >
-          Next
-        </button>
+      <div
+        ref={navigationRef}
+        className="flex w-full justify-between px-4 py-2"
+      >
+        <MoveNavigation />
       </div>
     </div>
   );

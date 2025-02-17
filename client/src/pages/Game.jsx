@@ -1,5 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import ChessBoard from "../components/game/ChessBoard.jsx";
 import { useParams } from "react-router";
 import { gameSingle } from "../api/game.js";
@@ -7,13 +14,7 @@ import { socket } from "../socket.js";
 import GameSideSection from "../components/game/GameSideSection.jsx";
 import WinnerBoard from "../components/game/WinnerBoard.jsx";
 import NavBar from "../components/NavBar.jsx";
-import {
-  colors,
-  getScore,
-  makeSound,
-  soundType,
-  winReason,
-} from "../constants.js";
+import { colors, getScore, makeSound, winReason } from "../constants.js";
 import Draw from "../components/draw/Draw.jsx";
 import rotateSquare from "../utils/game/rotateBoard.js";
 import { getThemeColor } from "../constants.js";
@@ -153,7 +154,7 @@ export default function Game() {
       const lastMove = JSON.parse(info.lastMove);
 
       setMoves((prev) => [...prev, lastMove]);
-      makeSound(lastMove?.captured ? soundType.capture : soundType.move);
+      makeSound(lastMove);
     };
 
     socket.emit("join-game", gameId);
@@ -192,6 +193,32 @@ export default function Game() {
     };
   }, [gameId]);
 
+  const handleSeePreviousState = useCallback(
+    (move, moveIndex) => {
+      if (!move) return;
+      const boardState = moveIndex === -1 ? moves[0].before : move.after;
+
+      if (moveIndex != -1) makeSound(moves[moveIndex]);
+      const boardInfo = boardState.split(" ");
+
+      setBoardStates({
+        board: new Chess(boardState), // Creates a fresh instance
+        turn: boardInfo[1] === "w" ? colors.white : colors.black,
+        castling: boardInfo[2],
+        enPassant: boardInfo[3],
+        move: {
+          half: parseInt(boardInfo[4]),
+          full: parseInt(boardInfo[5]),
+        },
+      });
+    },
+    [moves]
+  );
+
+  useEffect(() => {
+    setMoveIndex(moves?.length - 1);
+  }, [moves?.length, setMoveIndex]);
+
   return (
     <GameContext.Provider
       value={{
@@ -210,6 +237,7 @@ export default function Game() {
         setScore,
         setMoveIndex,
         moveIndex,
+        handleSeePreviousState,
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">

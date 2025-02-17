@@ -1,4 +1,10 @@
-import { moveSound, captureSound } from "./utils/Sounds.js";
+import { Chess } from "chess.js";
+import {
+  moveSound,
+  captureSound,
+  checkSound,
+  checkMateSound,
+} from "./utils/Sounds.js";
 
 const colors = Object.freeze({
   white: "white",
@@ -22,6 +28,8 @@ const winReason = Object.freeze({
 const soundType = Object.freeze({
   capture: "capture",
   move: "move",
+  check: "check",
+  checkMate: "checkMate",
 });
 
 const getScore = function (whiteRating, blackRating, result) {
@@ -39,14 +47,26 @@ const getScore = function (whiteRating, blackRating, result) {
   return { white: whiteChange, black: blackChange };
 };
 
-const makeSound = (sound) => {
+const makeSound = (move) => {
+  const chess = new Chess(move.after);
+  let sound;
+  if (chess.isCheckmate()) sound = soundType.checkMate;
+  else if (chess?.isCheck()) sound = soundType.check;
+  else if (move?.captured) sound = soundType.capture;
+  else sound = soundType.move;
+
   switch (sound) {
-    case "move":
+    case soundType.move:
       moveSound();
       break;
-    case "capture":
+    case soundType.capture:
       captureSound();
       break;
+    case soundType.check:
+      checkSound();
+      break;
+    case soundType.checkMate:
+      checkMateSound();
   }
 };
 

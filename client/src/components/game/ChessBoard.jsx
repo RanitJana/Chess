@@ -1,14 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import EmptyBoard from "./EmptyBoard.jsx";
-import {
-  colors,
-  winReason,
-  getScore,
-  makeSound,
-  soundType,
-} from "../../constants.js";
+import { colors, winReason, getScore, makeSound } from "../../constants.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import {
   getSquareName,
@@ -18,6 +12,7 @@ import { socket } from "../../socket.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import { gameMove, gameEnd } from "../../api/game.js";
 import Toast from "../../utils/Toast.js";
+import MoveNavigation from "./MoveNavigation.jsx";
 
 function ChessBoard() {
   const {
@@ -44,6 +39,8 @@ function ChessBoard() {
   const [pawnPromotion, setPawnPromotion] = useState(false);
   const [pawnPieceDisplay, setPawnPieceDisplay] = useState(false);
 
+  const navigationRef = useRef(null);
+
   const updatePieceNewLocation = async (pieceMoveLocation) => {
     setPossibleMoves([]);
 
@@ -51,9 +48,7 @@ function ChessBoard() {
     const boardInfo = boardStates.board.fen().split(" ");
     const history = boardStates.board?.history({ verbose: true }) || [];
 
-    makeSound(
-      history[history.length - 1]?.captured ? soundType.capture : soundType.move
-    );
+    makeSound(history[history.length - 1]);
     try {
       gameMove({
         gameId,
@@ -133,6 +128,23 @@ function ChessBoard() {
     }
   };
 
+  const apprearance = () => {
+    const reference = navigationRef.current;
+    if (!reference) return;
+    if (window.innerWidth < 767) {
+      reference.style.transform = "scale(1)";
+    } else reference.style.transform = "scale(0)";
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", apprearance);
+    return () => window.removeEventListener("resize", apprearance);
+  }, []);
+
+  useEffect(() => {
+    apprearance();
+  }, [navigationRef]);
+
   return (
     <div className=" w-full flex items-center justify-center h-fit">
       <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
@@ -155,7 +167,7 @@ function ChessBoard() {
             </div>
           )}
           {boardStates.board?.board().map((row, rowIdx) => (
-            <div className="grid grid-cols-8 w-full" key={rowIdx}>
+            <div className="grid grid-cols-8 w-full gap-0" key={rowIdx}>
               {row.map((piece, colIdx) => {
                 const pieceColor = piece?.color;
                 const key = colIdx + rowIdx;
@@ -195,6 +207,9 @@ function ChessBoard() {
           points={points}
           setPoints={setPoints}
         />
+        <div ref={navigationRef} className="flex justify-between py-2">
+          <MoveNavigation />
+        </div>
       </div>
     </div>
   );
