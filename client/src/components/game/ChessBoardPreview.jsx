@@ -7,7 +7,6 @@ import { getSquareName } from "../../utils/game/getSquareNames.js";
 function ChessBoardPreview({ board, playerColor, moves }) {
   const themeColor = getThemeColor();
   moves = moves?.length > 0 ? JSON.parse(moves) : {};
-  console.log(moves);
 
   return (
     <div className="grid grid-cols-8 grid-rows-8 w-full aspect-square">
