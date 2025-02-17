@@ -18,7 +18,7 @@ const pieceSymbols = {
 };
 
 function Moves() {
-  const { moves, setMoveIndex, moveIndex } = useGameContext();
+  const { moves, handleSeePreviousState, moveIndex } = useGameContext();
   const navigationRef = useRef(null);
 
   const apprearance = () => {
@@ -70,7 +70,7 @@ function Moves() {
                             ? "bg-[rgb(72,70,68)] shadow-[0px_2px_0px_0px_white]"
                             : ""
                         }`}
-                        onClick={() => setMoveIndex(idx)}
+                        onClick={() => handleSeePreviousState(idx)}
                       >
                         {pieceSymbols[
                           move1.color === "w"
@@ -88,7 +88,7 @@ function Moves() {
                             ? "bg-[rgb(72,70,68)] shadow-[0px_2px_0px_0px_white]"
                             : ""
                         }`}
-                        onClick={() => setMoveIndex(idx + 1)}
+                        onClick={() => handleSeePreviousState(idx + 1)}
                       >
                         {pieceSymbols[move2.piece] || ""} {move2.san}
                       </span>
