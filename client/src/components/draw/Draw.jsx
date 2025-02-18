@@ -67,10 +67,14 @@ function Draw({ isOpen = false, setOpen, opponent }) {
         bottom: "25%",
       }}
     >
-      <p className="text-white pb-2 text-center font-bold">Draw?</p>
+      <p className="text-white pb-2 text-center text-sm">
+        <span className="text-gray-400">Your opponent</span>
+        <br />
+        <span className="text-xs">Offers a draw!!</span>
+      </p>
       <div className="flex gap-2">
         <button
-          className={`bg-red-500 px-8 py-2 rounded-md transition-all ${isDrawSubmit ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-red-600"}`}
+          className={`bg-red-500 px-8 py-2 rounded-full transition-all ${isDrawSubmit ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-red-600"}`}
           onClick={() => setOpen(false)}
           disabled={isDrawSubmit}
         >
@@ -81,7 +85,7 @@ function Draw({ isOpen = false, setOpen, opponent }) {
           />
         </button>
         <button
-          className={`bg-green-500 px-8 py-2 rounded-md transition-all ${isDrawSubmit ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-green-600"}`}
+          className={`bg-green-500 px-8 py-2 rounded-full transition-all ${isDrawSubmit ? "brightness-50 hover:cursor-not-allowed" : "hover:bg-green-600"}`}
           onClick={handleDraw}
           disabled={isDrawSubmit}
         >
