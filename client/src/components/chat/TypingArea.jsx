@@ -62,7 +62,8 @@ function MentionInText({ mentionText, setMentionText }) {
 }
 
 function TypingArea() {
-  const { opponent } = useGameContext();
+  const { users } = useGameContext();
+  const opponent = users.opponent;
   const {
     mentionText,
     setMentionText,
