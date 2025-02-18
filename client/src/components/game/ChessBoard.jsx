@@ -194,6 +194,8 @@ function ChessBoard() {
                 return (
                   <ChessBoardBox
                     key={key}
+                    rowIdx={rowIdx}
+                    colIdx={colIdx}
                     color={color}
                     piece={piece}
                     pieceColor={pieceColor}

@@ -6,12 +6,15 @@ import RecentMoveColor from "./RecentMoveColor.jsx";
 import pawnUpdatePieces from "../../utils/game/PawanUpdatePieces.js";
 import { getSquareFromMove } from "../../utils/game/getSquareNames.js";
 import KingSticker from "./KingSticker.jsx";
+import PrintBoxBumber from "./PrintBoxBumber.jsx";
 
 const pawnPromotionPieces = ["q", "r", "b", "n"];
 
 function ChessBoardBox({
   color,
   piece,
+  rowIdx,
+  colIdx,
   pieceColor,
   square,
   possibleMoves,
@@ -31,7 +34,9 @@ function ChessBoardBox({
     >
       <PossibleMoveBoxMark square={square} possibleMoves={possibleMoves} />
       <RecentMoveColor square={square} />
-      {<KingSticker pieceColor={pieceColor} piece={piece} />}
+      <KingSticker pieceColor={pieceColor} piece={piece} />
+
+      <PrintBoxBumber colIdx={colIdx} rowIdx={rowIdx} color={color} />
 
       {piece && (
         <img

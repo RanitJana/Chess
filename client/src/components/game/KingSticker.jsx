@@ -23,7 +23,12 @@ function KingSticker({ piece = "k", pieceColor }) {
       }}
     >
       {isDraw ? (
-        <div className="text-white font-bold">½</div>
+        <div
+          className="text-white font-bold"
+          style={{ transform: rotateBoard }}
+        >
+          ½
+        </div>
       ) : (
         <img
           src={
