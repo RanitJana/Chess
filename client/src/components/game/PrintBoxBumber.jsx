@@ -12,7 +12,7 @@ function PrintBoxBumber({ rowIdx, colIdx, color }) {
             rotateBoard === "rotate(0deg)"
               ? "top-0 left-0"
               : "bottom-0 right-0 rotate-180"
-          } text-sm font-bold p-1`}
+          } text-[10%] scale-[0.8] font-bold p-[0.05rem]`}
           style={{
             color:
               themeColor.dark === color ? themeColor.light : themeColor.dark,
@@ -29,7 +29,7 @@ function PrintBoxBumber({ rowIdx, colIdx, color }) {
             rotateBoard === "rotate(0deg)"
               ? "bottom-0 right-0"
               : "top-0 left-0 rotate-180"
-          } text-sm font-bold p-1`}
+          } text-[10%] scale-[0.8] font-bold p-[0.05rem]`}
           style={{
             color:
               themeColor.dark === color ? themeColor.light : themeColor.dark,
