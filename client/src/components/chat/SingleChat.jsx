@@ -69,13 +69,13 @@ function SingleChat({
       setMentionText(() => ({
         text: info.message,
         _id: info._id,
-        owner: info.senderId == userId ? "You" : "Opponent",
+        owner: info.senderId,
       }));
 
       allRefs.current.textareaRef?.focus();
       scrollChatElementBottom();
     },
-    [info, userId, allRefs, scrollChatElementBottom, setMentionText]
+    [info, allRefs, scrollChatElementBottom, setMentionText]
   );
 
   const handleMouseDown = useCallback((e) => {

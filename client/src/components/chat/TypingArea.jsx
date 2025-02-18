@@ -11,7 +11,7 @@ import { encryptMessage } from "../../utils/encryptDecryptMessage.js";
 import ScrollToBottom from "./ScrollToBottom.jsx";
 import Toast from "../../utils/Toast.js";
 
-function MentionInText({ mentionText, setMentionText }) {
+function MentionInText({ mentionText, setMentionText, userId }) {
   const [savedMention, setSavedMention] = useState(mentionText);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function MentionInText({ mentionText, setMentionText }) {
       <div className="text-sm border-l-4 pb-1 flex-col h-full border-[rgb(7,206,156)] flex items-center justify-center">
         <div className="flex items-center justify-between w-full px-2 py-1">
           <span className="text-[rgb(13,160,157)] font-bold transition-all">
-            {savedMention?.owner}
+            {savedMention?.owner == userId ? "You" : "Opponent"}
           </span>
           <span
             className="text-white hover:cursor-pointer"
@@ -219,6 +219,7 @@ function TypingArea() {
         >
           {/* mention text */}
           <MentionInText
+            userId={userId}
             mentionText={mentionText}
             setMentionText={setMentionText}
           />

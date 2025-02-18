@@ -65,15 +65,17 @@ function PlayerInfoInGame({
             <div className="absolute right-0 translate-x-[50%] bottom-0 w-3 aspect-square rounded-full bg-green-600"></div>
           )}
         </div>
-        <div className="w-full">
-          <p className="text-sm line-clamp-1 flex gap-1 overflow-hidden text-white">
-            <span
-              onClick={() => navigate(`/member/${player._id}`)}
-              className="text-white font-semibold hover:cursor-pointer"
-            >
-              {player.name || "Loading.."}
-            </span>
-            <span className="text-gray-400">({player.rating || "200"})</span>
+        <div className="w-full break-words overflow-hidden">
+          <div className="text-sm flex gap-1 overflow-hidden text-white">
+            <p className="line-clamp-1">
+              <span
+                onClick={() => navigate(`/member/${player._id}`)}
+                className="text-white font-semibold hover:cursor-pointer"
+              >
+                {player.name || "Loading.."}
+              </span>
+              <span className="text-gray-400">({player.rating || "200"})</span>
+            </p>
             {flagInfo && (
               <img
                 src={flagInfo.link}
@@ -82,7 +84,7 @@ function PlayerInfoInGame({
                 className="w-8 bg-gray-300"
               />
             )}
-          </p>
+          </div>
           <div className="flex justify-start relative">
             {opponentTakenPieces?.map((piece, idx) => (
               <img
@@ -116,7 +118,7 @@ function PlayerInfoInGame({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-evenly gap-1 w-[5rem] bg-white p-2 rounded-md">
+      <div className="flex ml-2 items-center justify-evenly gap-1 min-w-[5rem] bg-white p-2 rounded-md">
         <img src="/images/time.gif" alt="" className="w-4" />
         <span className="text-sm">3 days</span>
       </div>

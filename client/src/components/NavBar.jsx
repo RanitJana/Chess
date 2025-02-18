@@ -55,13 +55,15 @@ function NavBar() {
       >
         <div
           dangerouslySetInnerHTML={{ __html: GetAvatar(playerInfo?.name) }}
-          className="relative w-[2rem] rounded-md overflow-hidden"
+          className="relative min-w-[2rem] w-[2rem] rounded-md overflow-hidden"
         />
-        <div className="font-semibold flex gap-1 text-sm line-clamp-1 text-white">
-          <span>{playerInfo?.name}</span>
-          <span className="text-gray-400">
-            {" (" + playerInfo?.rating + ")"}
-          </span>
+        <div className="font-semibold flex gap-1 text-sm text-white">
+          <p className="line-clamp-1">
+            <span>{playerInfo?.name}</span>
+            <span className="text-gray-400">
+              {" (" + playerInfo?.rating + ")"}
+            </span>
+          </p>
           <img
             src={getCountryNameFlag(playerInfo?.nationality).link}
             alt=""
@@ -71,27 +73,39 @@ function NavBar() {
         </div>
       </div>
       {/* more options */}
-      <div className=" flex gap-3">
+      <div className=" flex gap-3 ml-2">
         {/* Home */}
         <div
           className=" hover:cursor-pointer brightness-50 invert hover:brightness-0 transition-all"
           onClick={() => navigate("/")}
         >
-          <img src="/images/Home.png" className="w-[1.5rem]" alt="" />
+          <img
+            src="/images/Home.png"
+            className="min-w-[1.5rem] w-[1.5rem]"
+            alt=""
+          />
         </div>
         {/* Friends */}
         <div
           className=" hover:cursor-pointer brightness-50 invert hover:brightness-0 transition-all"
           onClick={() => navigate("/friends/" + playerInfo?._id)}
         >
-          <img src="/images/friends.png" className="w-[1.6rem]" alt="" />
+          <img
+            src="/images/friends.png"
+            className="min-w-[1.6rem] w-[1.6rem]"
+            alt=""
+          />
         </div>
         {/* ranking */}
         <div
           className=" hover:cursor-pointer brightness-50 invert hover:brightness-0 transition-all"
           onClick={() => navigate("/rank?page=1&count=10")}
         >
-          <img src="/images/ranking.png" className="w-[1.6rem]" alt="" />
+          <img
+            src="/images/ranking.png"
+            className=" min-w-[1.6rem] w-[1.6rem]"
+            alt=""
+          />
         </div>
         {/* settings */}
         <div
@@ -101,7 +115,7 @@ function NavBar() {
           <img
             src="/images/settings.png"
             alt="Settings"
-            className="aspect-square w-[1.5rem] hover:cursor-pointer brightness-50 invert hover:brightness-0 transition-all"
+            className="aspect-square min-w-[1.5rem] w-[1.5rem] hover:cursor-pointer brightness-50 invert hover:brightness-0 transition-all"
           />
           {toggleSetting ? (
             <ul
@@ -110,45 +124,45 @@ function NavBar() {
             >
               <li
                 onClick={() => navigate("/member/" + playerInfo._id)}
-                className="flex justify-start items-center rounded-tl-md rounded-tr-md gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                className="flex justify-start min-h-[3rem] items-center rounded-tl-md rounded-tr-md gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
                 <img
                   src="/images/user.png"
                   alt=""
-                  className="w-[1.5rem] invert brightness-0"
+                  className="w-[1.5rem] min-w-[1.5rem] invert brightness-0"
                 />
                 <span>Profile</span>
               </li>
               <li
                 onClick={() => navigate("/member/edit/")}
-                className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                className="flex justify-start min-h-[3rem] items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
                 <img
                   src="/images/edit.png"
                   alt=""
-                  className="w-[1.5rem] invert brightness-0"
+                  className="w-[1.5rem] min-w-[1.5rem] invert brightness-0"
                 />
                 <span>Edit profile</span>
               </li>
               <li
                 onClick={() => navigate("/theme/")}
-                className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                className="flex justify-start min-h-[3rem] items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
                 <img
                   src="/images/theme.png"
                   alt=""
-                  className="w-[1.5rem] p-[0.15rem] invert brightness-0"
+                  className="w-[1.5rem] min-w-[1.5rem] p-[0.15rem] invert brightness-0"
                 />
                 <span>Board theme</span>
               </li>
               <li
                 onClick={handleLogOut}
-                className="flex justify-start items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
+                className="flex justify-start min-h-[3rem] items-center gap-3 py-3 px-4 text-sm hover:cursor-pointer bg-blackDarkest hover:bg-[rgb(58,56,54)] transition-all"
               >
                 <img
                   src="/images/exit.png"
                   alt=""
-                  className="w-[1.5rem] invert brightness-0"
+                  className="w-[1.5rem] min-w-[1.5rem] invert brightness-0"
                 />
                 <span>Log out</span>
               </li>
