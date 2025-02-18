@@ -23,6 +23,8 @@ const winReason = Object.freeze({
   byWhiteResigns: "by white resigns",
   byBlackResigns: "by black resigns",
   byStalemate: "by stalemate",
+  byInsufficientMaterial: "by insufficient material",
+  byThreefoldRepetition: "by threefold repetition",
 });
 
 const soundType = Object.freeze({

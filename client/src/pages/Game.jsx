@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
@@ -17,9 +18,10 @@ import NavBar from "../components/NavBar.jsx";
 import { colors, getScore, makeSound, winReason } from "../constants.js";
 import Draw from "../components/draw/Draw.jsx";
 import rotateSquare from "../utils/game/rotateBoard.js";
-import { getThemeColor } from "../constants.js";
+import { getThemeColor, winner } from "../constants.js";
 import { Chess } from "chess.js";
 import Toast from "../utils/Toast.js";
+import { gameEnd } from "../api/game.js";
 
 Chess.prototype.revBoard = function () {
   const rotated = this.board()
@@ -76,6 +78,26 @@ export default function Game() {
   const [moveIndex, setMoveIndex] = useState(null);
 
   const drawTimeRef = useRef(null);
+
+  const handleGameOver = async (whoWon, winnerReason, score) => {
+    try {
+      const { data } = await gameEnd({
+        gameId,
+        winner: whoWon,
+        reason: winnerReason,
+        score,
+      });
+
+      if (data?.success) {
+        setCheckMate(whoWon);
+        setWinnerReason(winnerReason);
+        setScore(score);
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.error("Unable to update the move");
+    }
+  };
 
   useEffect(() => {
     const getGameInfo = async () => {
@@ -143,15 +165,43 @@ export default function Game() {
       });
 
       if (newChess.isCheckmate()) {
-        setCheckMate(boardInfo[1] == "w" ? colors.black : colors.white);
-        setWinnerReason(winReason.byCheckmate);
+        const whoWon = boardInfo[1] == "w" ? colors.black : colors.white;
+        const winnerReason = winReason.byCheckmate;
         const score = getScore(
           gameInfo.player1?.rating,
           gameInfo.player2?.rating,
           boardInfo[1] == "b"
         );
-        setScore(score);
+        handleGameOver(whoWon, winnerReason, score);
+      } else if (newChess.isInsufficientMaterial()) {
+        const whoWon = winner.draw;
+        const winnerReason = winReason.byInsufficientMaterial;
+        const score = getScore(
+          gameInfo.player1?.rating,
+          gameInfo.player2?.rating,
+          0.5
+        );
+        handleGameOver(whoWon, winnerReason, score);
+      } else if (newChess.isStalemate()) {
+        const whoWon = winner.draw;
+        const winnerReason = winReason.byStalemate;
+        const score = getScore(
+          gameInfo.player1?.rating,
+          gameInfo.player2?.rating,
+          0.5
+        );
+        handleGameOver(whoWon, winnerReason, score);
+      } else if (newChess.isThreefoldRepetition()) {
+        const whoWon = winner.draw;
+        const winnerReason = winReason.byThreefoldRepetition;
+        const score = getScore(
+          gameInfo.player1?.rating,
+          gameInfo.player2?.rating,
+          0.5
+        );
+        handleGameOver(whoWon, winnerReason, score);
       }
+
       const lastMove = JSON.parse(info.lastMove);
 
       setMoves((prev) => [...prev, lastMove]);
@@ -164,7 +214,12 @@ export default function Game() {
       socket.off("join-game");
       socket.off("opponent-move", handleOpponentMove);
     };
-  }, [gameId, gameInfo.player1?.rating, gameInfo.player2?.rating]);
+  }, [
+    boardStates.board,
+    gameId,
+    gameInfo.player1?.rating,
+    gameInfo.player2?.rating,
+  ]);
 
   useEffect(() => {
     const handleEndGame = (info) => {
@@ -237,6 +292,7 @@ export default function Game() {
         setMoveIndex,
         moveIndex,
         handleSeePreviousState,
+        handleGameOver,
       }}
     >
       <div className="relative w-full h-dvh overflow-scroll flex flex-col gap-4">

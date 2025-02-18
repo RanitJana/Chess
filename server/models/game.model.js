@@ -49,6 +49,8 @@ const gameSchema = new Schema(
         "by white resigns",
         "by black resigns",
         "by stalemate",
+        "by insufficient material",
+        "by threefold repetition",
         null,
       ],
       default: null,

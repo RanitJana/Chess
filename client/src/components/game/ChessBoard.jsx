@@ -2,7 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import PlayerInfoInGame from "./PlayerInfoInGame.jsx";
 import ChessBoardBox from "./ChessBoardBox.jsx";
 import EmptyBoard from "./EmptyBoard.jsx";
-import { colors, winReason, getScore, makeSound } from "../../constants.js";
+import {
+  colors,
+  winReason,
+  getScore,
+  makeSound,
+  winner,
+} from "../../constants.js";
 import { useGameContext } from "../../pages/Game.jsx";
 import {
   getSquareName,
@@ -10,8 +16,7 @@ import {
 } from "../../utils/game/getSquareNames.js";
 import { socket } from "../../socket.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
-import { gameMove, gameEnd } from "../../api/game.js";
-import Toast from "../../utils/Toast.js";
+import { gameMove } from "../../api/game.js";
 import MoveNavigation from "./MoveNavigation.jsx";
 
 function ChessBoard() {
@@ -26,11 +31,9 @@ function ChessBoard() {
     rotateBoard,
     gameId,
     isCheckMate,
-    setCheckMate,
-    setWinnerReason,
-    setScore,
     moveIndex,
     gameInfo,
+    handleGameOver,
   } = useGameContext();
   const { onlineUsers } = useSocketContext();
 
@@ -49,39 +52,47 @@ function ChessBoard() {
     const history = boardStates.board?.history({ verbose: true }) || [];
 
     makeSound(history[history.length - 1]);
-    try {
-      gameMove({
-        gameId,
-        board: boardStates.board.fen(),
-        moves: [...moves, history[history.length - 1]],
-      });
-
-      if (boardStates.board.isCheckmate()) {
-        const whoWon = users.you?.color;
-        const winnerReason = winReason.byCheckmate;
-
-        const score = getScore(
-          gameInfo.player1?.rating,
-          gameInfo.player2?.rating,
-          whoWon == colors.white
-        );
-
-        const { data } = await gameEnd({
-          gameId,
-          winner: whoWon,
-          reason: winnerReason,
-          score,
-        });
-
-        if (data?.success) {
-          setCheckMate(whoWon);
-          setWinnerReason(winnerReason);
-          setScore(score);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      Toast.error("Unable to update the move");
+    gameMove({
+      gameId,
+      board: boardStates.board.fen(),
+      moves: [...moves, history[history.length - 1]],
+    });
+    if (boardStates.board.isCheckmate()) {
+      const whoWon = users.you?.color;
+      const winnerReason = winReason.byCheckmate;
+      const score = getScore(
+        gameInfo.player1?.rating,
+        gameInfo.player2?.rating,
+        whoWon == colors.white
+      );
+      handleGameOver(whoWon, winnerReason, score);
+    } else if (boardStates.board.isInsufficientMaterial()) {
+      const whoWon = winner.draw;
+      const winnerReason = winReason.byInsufficientMaterial;
+      const score = getScore(
+        gameInfo.player1?.rating,
+        gameInfo.player2?.rating,
+        0.5
+      );
+      handleGameOver(whoWon, winnerReason, score);
+    } else if (boardStates.board.isStalemate()) {
+      const whoWon = winner.draw;
+      const winnerReason = winReason.byStalemate;
+      const score = getScore(
+        gameInfo.player1?.rating,
+        gameInfo.player2?.rating,
+        0.5
+      );
+      handleGameOver(whoWon, winnerReason, score);
+    } else if (boardStates.board.isThreefoldRepetition()) {
+      const whoWon = winner.draw;
+      const winnerReason = winReason.byThreefoldRepetition;
+      const score = getScore(
+        gameInfo.player1?.rating,
+        gameInfo.player2?.rating,
+        0.5
+      );
+      handleGameOver(whoWon, winnerReason, score);
     }
 
     setMoves((prev) => [...prev, history[history.length - 1]]);

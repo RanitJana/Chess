@@ -94,7 +94,7 @@ function MoveNavigation() {
         {isPlaying ? (
           <button
             onClick={handleStop}
-            className="hover:cursor-pointer hover:bg-red-700 bg-red-500 rounded-full h-[2.5rem] aspect-square flex justify-center items-center"
+            className="transition-all hover:cursor-pointer active:brightness-75 hover:brightness-90 bg-red-500 rounded-full h-[2.5rem] aspect-square flex justify-center items-center"
           >
             <img
               src="/images/stop.png"
@@ -106,7 +106,7 @@ function MoveNavigation() {
           <button
             onClick={handlePlay}
             disabled={moveIndex == moves.length - 1}
-            className="hover:cursor-pointer hover:bg-green-700 bg-green-500 rounded-full h-[2.5rem] aspect-square flex justify-center items-center"
+            className="transition-all hover:cursor-pointer active:brightness-75 hover:brightness-90 bg-green-500 rounded-full h-[2.5rem] aspect-square flex justify-center items-center"
           >
             <img
               src="/images/play.png"
