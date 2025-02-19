@@ -113,9 +113,8 @@ export default function Game() {
             });
           else {
             setusers({
-              you: { ...game.player2, color: colors.black },
-              opponent: game.player1,
-              color,
+              you: { ...game.player2, color },
+              opponent: { ...game.player1, color: colors.white },
             });
             setRotateboard("rotate(180deg)");
           }

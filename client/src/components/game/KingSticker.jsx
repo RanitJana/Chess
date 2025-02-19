@@ -16,10 +16,10 @@ function KingSticker({ piece = "k", pieceColor }) {
 
   return (
     <div
-      className={`absolute w-6 h-6 flex justify-center transition-all items-center p-1 rounded-full z-20 shadow-[3px_1px_3px_1px_rgba(0,0,0,0.5)] ${positionClass}`}
+      className={`absolute w-6 h-6 flex justify-center transition-all items-center p-1 rounded-full z-20 ${positionClass}`}
       style={{
         backgroundColor: isDraw ? "gray" : isWinner ? "green" : "red",
-        scale: moveIndex == moves.length - 1 ? "1" : "0",
+        opacity: moveIndex == moves.length - 1 ? "1" : "0",
       }}
     >
       {isDraw ? (

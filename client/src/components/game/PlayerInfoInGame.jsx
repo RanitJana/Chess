@@ -65,7 +65,7 @@ function PlayerInfoInGame({
             <div className="absolute right-0 translate-x-[50%] bottom-0 w-3 aspect-square rounded-full bg-green-600"></div>
           )}
         </div>
-        <div className="w-full break-words overflow-hidden">
+        <div className="w-full break-words">
           <div className="text-sm flex gap-1 overflow-hidden text-white">
             <p className="line-clamp-1">
               <span
@@ -85,29 +85,24 @@ function PlayerInfoInGame({
               />
             )}
           </div>
-          <div className="flex justify-start relative">
-            {opponentTakenPieces?.map((piece, idx) => (
+          <div
+            className="flex justify-start relative"
+            style={{ maxWidth: `${(opponentTakenPieces.length + 1) * 12}px` }}
+          >
+            {opponentTakenPieces.map((piece, idx) => (
               <img
                 key={idx}
                 src={getPieceImagePath(piece)}
-                alt=""
-                className="w-5"
+                alt={piece}
+                className="w-6"
                 style={{
-                  position: "absolute",
-                  left: `${idx * 1.1}rem`,
                   zIndex: idx,
-                  transform: `translateX(-${idx * 8}px)`,
+                  transform: `translateX(-${idx * 12}px) rotate(${Math.floor(Math.random() * 31) - 15}deg)`,
                 }}
               />
             ))}
 
-            <div
-              className="absolute h-5 flex items-center justify-center text-white text-xs"
-              style={{
-                left: `${opponentTakenPieces.length * 1.3}rem`,
-                transform: `translateX(-${opponentTakenPieces.length * 8}px)`,
-              }}
-            >
+            <div className="absolute right-0 translate-x-[102%] h-full flex items-center justify-center text-white text-xs">
               {opponentColor == colors.black && points.black < points.white ? (
                 <div>+{points.white - points.black}</div>
               ) : null}
