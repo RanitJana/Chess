@@ -1,3 +1,4 @@
+import { useState } from "react";
 import NavBar from "../components/NavBar.jsx";
 import {
   themes,
@@ -7,8 +8,18 @@ import {
 import Toast from "../utils/Toast.js";
 
 function Themes() {
+  const [theme, setTheme] = useState(() => {
+    const storeTheme = localStorage.getItem("chess-theme");
+    return Object.keys(themes).sort((a, b) =>
+      a === storeTheme ? -1 : b === storeTheme ? 1 : 0
+    );
+  });
+
   const handleChangeTheme = (theme) => {
     try {
+      setTheme((prev) =>
+        [...prev].sort((a, b) => (a === theme ? -1 : b === theme ? 1 : 0))
+      );
       localStorage.setItem("chess-theme", theme);
       Toast.success("Theme changed");
     } catch {
@@ -30,7 +41,7 @@ function Themes() {
         </p>
 
         <div className="rounded-md bg-blackDark sm:p-4 p-2 py-4 grid sm:grid-cols-2 grid-cols-1 gap-1">
-          {Object.keys(themes).map((theme, idx) => {
+          {theme.map((theme, idx) => {
             return (
               <div
                 key={idx}
@@ -40,7 +51,20 @@ function Themes() {
                   background: `url(${getThemeBackground(theme)})  ${themeChessboardBoxColor[theme].light} center top / cover no-repeat`,
                 }}
               >
-                <span className="z-10 capitalize">{theme}</span>
+                <span className="z-10 capitalize flex gap-2">
+                  {idx == 0 ? (
+                    <div className="bg-green-600 w-5 h-5 rounded-full p-1">
+                      <img
+                        src="/images/tick.png"
+                        className="w-5 invert brightness-0"
+                        alt=""
+                      />
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {theme}
+                </span>
                 <div className="grid grid-cols-2 grid-rows-2 w-[6.5rem] h-[6.5rem] z-10 shadow-md">
                   <div
                     style={{
