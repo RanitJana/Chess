@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { colors, getPieceImagePath } from "../../constants.js";
 import getCountryNameFlag from "../../utils/getCountryNameFlag.js";
 import piecePoint from "../../utils/PiecePoints.js";
+import { useGameContext } from "../../pages/Game.jsx";
 
 function PlayerInfoInGame({
   player = {},
@@ -15,6 +16,7 @@ function PlayerInfoInGame({
   points,
   setPoints,
 }) {
+  const { moveIndex } = useGameContext();
   const navigate = useNavigate();
   const [opponentTakenPieces, setOpponentTakenPieces] = useState([]);
   const [flagInfo, setFlagInfo] = useState({});
@@ -22,13 +24,17 @@ function PlayerInfoInGame({
   const getAllPieces = () => {
     // Calculate which pieces have been taken by the opponent
     const takenPieces = [];
-    allMoves.forEach((move) => {
+    for (
+      let index = 0;
+      index < Math.min(allMoves.length,moveIndex+1);
+      index++
+    ) {
+      const move = allMoves[index];
       if (move.color != opponentColor?.[0] && move.captured)
         takenPieces.push(
           move.color == "w" ? move.captured : move.captured.toUpperCase()
         );
-    });
-
+    }
     const sum = takenPieces.reduce((sum, piece) => sum + piecePoint(piece), 0);
 
     if (opponentColor == colors.black)
@@ -40,7 +46,7 @@ function PlayerInfoInGame({
 
   useEffect(() => {
     getAllPieces();
-  }, [allMoves]);
+  }, [allMoves, moveIndex]);
 
   useEffect(() => {
     if (player.nationality == null || player.nationality == undefined) return;
@@ -86,18 +92,18 @@ function PlayerInfoInGame({
             )}
           </div>
           <div
-            className="flex justify-start relative"
-            style={{ maxWidth: `${(opponentTakenPieces.length + 1) * 12}px` }}
+            className="flex justify-start relative h-5"
+            style={{ maxWidth: `${(opponentTakenPieces.length + 1) * 8}px` }}
           >
             {opponentTakenPieces.map((piece, idx) => (
               <img
                 key={idx}
                 src={getPieceImagePath(piece)}
                 alt={piece}
-                className="w-6"
+                className="w-5"
                 style={{
                   zIndex: idx,
-                  transform: `translateX(-${idx * 12}px) rotate(${Math.floor(Math.random() * 31) - 15}deg)`,
+                  transform: `translateX(-${idx * 12}px)`,
                 }}
               />
             ))}
