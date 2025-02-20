@@ -46,9 +46,14 @@ function ChessBoard() {
 
   const [selectedSquare, setSelectedSquare] = useState("");
 
-  const updatePieceNewLocation = async (pieceMoveLocation) => {
+  const updatePieceNewLocation = async (from, to, promotion) => {
     if (!selectedSquare) return;
-    boardStates.board.move({ from: selectedSquare, to: pieceMoveLocation });
+
+    try {
+      boardStates.board.move({ from, to, promotion });
+    } catch {
+      return;
+    }
     setPossibleMoves([]);
     setSelectedSquare("");
     const boardInfo = boardStates.board.fen().split(" ");
@@ -133,7 +138,8 @@ function ChessBoard() {
       if (pawnPromotion && !pawnPieceDisplay)
         return setPawnPieceDisplay(square);
 
-      updatePieceNewLocation(square);
+      if (selectedSquare != "")
+        updatePieceNewLocation(selectedSquare, square, undefined);
     } else {
       setSelectedSquare(square);
       const tempMoves = boardStates.board?.moves({ square });
@@ -209,6 +215,7 @@ function ChessBoard() {
                     pawnPieceDisplay={pawnPieceDisplay}
                     setPawnPieceDisplay={setPawnPieceDisplay}
                     setPawnPromotion={setPawnPromotion}
+                    selectedSquare={selectedSquare}
                     updatePieceNewLocation={updatePieceNewLocation}
                   />
                 );

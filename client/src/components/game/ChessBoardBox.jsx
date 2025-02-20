@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useGameContext } from "../../pages/Game.jsx";
-import { colors, getPieceImagePath } from "../../constants.js";
+import { getPieceImagePath } from "../../constants.js";
 import PossibleMoveBoxMark from "./PossibleMoveBoxMark.jsx";
 import RecentMoveColor from "./RecentMoveColor.jsx";
 import pawnUpdatePieces from "../../utils/game/PawanUpdatePieces.js";
-import { getSquareFromMove } from "../../utils/game/getSquareNames.js";
 import KingSticker from "./KingSticker.jsx";
 import PrintBoxBumber from "./PrintBoxBumber.jsx";
 
@@ -22,6 +21,7 @@ function ChessBoardBox({
   pawnPieceDisplay,
   setPawnPromotion,
   setPawnPieceDisplay,
+  selectedSquare,
   updatePieceNewLocation,
 }) {
   const { rotateBoard, themeColor, users } = useGameContext();
@@ -58,19 +58,11 @@ function ChessBoardBox({
           {pawnUpdatePieces(users.you?.color).map((val, idx) => (
             <li
               onClick={() => {
-                const pieceMoveLocation = possibleMoves.filter((val) => {
-                  return getSquareFromMove(val, users.you?.color) == square;
-                });
-
-                const name =
-                  users.you?.color == colors.white
-                    ? pawnPromotionPieces[idx].toUpperCase()
-                    : pawnPromotionPieces[idx];
-
                 updatePieceNewLocation(
-                  `${pieceMoveLocation[0]?.split("=")[0] + "=" + name}`
+                  selectedSquare,
+                  square,
+                  pawnPromotionPieces[idx]
                 );
-
                 setPawnPromotion(false);
                 setPawnPieceDisplay(false);
               }}
