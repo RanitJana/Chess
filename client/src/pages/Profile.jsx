@@ -17,6 +17,7 @@ import AllFriends from "../components/profile/AllFriends.jsx";
 import Toast from "../utils/Toast.js";
 import Loader from "../components/Loader.jsx";
 import getCountryNameFlag from "../utils/getCountryNameFlag.js";
+import QRcodeGenerator from "../components/profile/QRcodeGenerator.jsx";
 
 const ActionButton = ({ onClick, text, icon, disabled = false }) => (
   <button
@@ -162,13 +163,32 @@ function Profile() {
     }
   };
 
+  const [isOpenQr, setIsOpenQr] = useState(false);
+
   if (!user) return <Loader />;
 
   return (
     <div className="flex flex-col items-center sm:p-8 p-0">
       <div className="max-w-[970px] w-full flex flex-col gap-5">
         <NavBar />
-        <div className="bg-blackDark p-4 rounded-md">
+        <div className="bg-blackDark p-4 rounded-md relative">
+          {isOpenQr && (
+            <QRcodeGenerator
+              setIsOpenQr={setIsOpenQr}
+              userId={userId}
+              username={user?.name || "Guest"}
+            />
+          )}
+          <button
+            onClick={() => setIsOpenQr(true)}
+            className="bg-blackLight w-8 h-8 flex justify-center items-center absolute right-4 top-4"
+          >
+            <img
+              src="/images/qr-code.png"
+              alt=""
+              className="invert brightness-0 w-6"
+            />
+          </button>
           <div className=" flex flex-wrap sm:flex-nowrap gap-5">
             <div className="relative">
               <div className="max-h-[12rem] flex justify-center items-center sm:w-fit w-full left-1/2 rounded-sm overflow-hidden aspect-square">
