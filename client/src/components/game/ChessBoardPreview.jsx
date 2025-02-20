@@ -9,11 +9,14 @@ function ChessBoardPreview({ board, playerColor, moves }) {
   moves = moves?.length > 0 ? JSON.parse(moves) : {};
 
   return (
-    <div className="grid grid-cols-8 grid-rows-8 w-full aspect-square">
-      {(playerColor == colors.black
-        ? new Chess(board).revBoard()
-        : new Chess(board).board()
-      ).map((row, rowIdx) => {
+    <div
+      className="grid grid-cols-8 grid-rows-8 w-full aspect-square"
+      style={{
+        transform:
+          playerColor == colors.black ? "rotate(180deg)" : "rotate(0deg)",
+      }}
+    >
+      {new Chess(board).board().map((row, rowIdx) => {
         return row.map((piece, colIdx) => {
           piece = piece
             ? piece.color == "w"
@@ -40,8 +43,14 @@ function ChessBoardPreview({ board, playerColor, moves }) {
               )}
               <img
                 src={getPieceImagePath(piece)}
-                style={{ userSelect: "none" }}
-                className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+                style={{
+                  userSelect: "none",
+                  transform:
+                    playerColor == colors.black
+                      ? "rotate(180deg)"
+                      : "rotate(0deg)",
+                }}
+                className=""
                 draggable={false}
                 alt=""
               />

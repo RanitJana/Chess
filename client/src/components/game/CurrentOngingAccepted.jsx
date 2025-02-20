@@ -5,8 +5,9 @@ import { useNavigate } from "react-router";
 import ChessBoardPreview from "./ChessBoardPreview.jsx";
 import WaitingForOpponent from "./WaitingForOpponent.jsx";
 
-function CurrentOngingAccepted({ game, player, isOnline }) {
+function CurrentOngingAccepted({ game, player, blur, isOnline }) {
   const navigate = useNavigate();
+
   return (
     <div
       key={game._id}
@@ -15,11 +16,9 @@ function CurrentOngingAccepted({ game, player, isOnline }) {
     >
       {/* new game */}
       <WaitingForOpponent player={player} />
-      {player &&
-        ((!game.player1 && parseInt(game.moves[0]) % 2 != 0) ||
-          (!game.player2 && parseInt(game.moves[0]) % 2 == 0)) && (
-          <div className="absolute inset-0 bg-black opacity-40 flex justify-center items-center z-10"></div>
-        )}
+      {blur && (
+        <div className="absolute inset-0 bg-black opacity-40 flex justify-center items-center z-10"></div>
+      )}
       <ChessBoardPreview
         board={game.board}
         moves={game.moves}

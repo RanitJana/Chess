@@ -42,6 +42,8 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
       try {
         const { data } = await gameSingle(gameId);
         if (data?.success) {
+          console.log(data);
+          
           setGames((prev) =>
             prev.map((game) =>
               game._id === gameId
@@ -85,12 +87,16 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
 
     return (
       <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 p-4">
-        {games?.map((game) => {
+        {games.map((game) => {
           const player = game.player1 || game.player2;
+          const turn = game.board.split(" ")[1];
           return (
             <CurrentOngingAccepted
               key={game._id}
               game={game}
+              blur={
+                (turn == "w" && game.player1) || (turn == "b" && game.player2)
+              }
               player={player}
               isOnline={onlineUsers[player?._id]}
             />
