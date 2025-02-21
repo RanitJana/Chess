@@ -19,6 +19,55 @@ import { useSocketContext } from "../../context/SocketContext.jsx";
 import { gameMove } from "../../api/game.js";
 import MoveNavigation from "./MoveNavigation.jsx";
 
+const getEvalBarPercentage = (evalScore, isWhiteToMove) => {
+  // console.log(evalScore);
+
+  if (typeof evalScore === "string" && evalScore.includes("Mate")) {
+    const mateInMoves = parseInt(evalScore.match(/-?\d+/)[0], 10);
+
+    if (mateInMoves > 0) {
+      return isWhiteToMove ? 100 : 0; // White to move → White wins → 100%. Black to move → Black wins → 0%.
+    } else {
+      return isWhiteToMove ? 0 : 100; // White to move → White gets mated → 0%. Black to move → Black gets mated → 100%.
+    }
+  }
+
+  const maxEval = 10; // Cap at ±10 pawns for better scaling
+  let normalized = Math.max(-maxEval, Math.min(maxEval, evalScore));
+
+  // Sigmoid-like transformation for better scaling
+  const percentage = 50 + (50 * Math.atan(normalized) * 2) / Math.PI;
+
+  return Math.round(percentage);
+};
+
+const getEvaluationFromFEN = (fen, callback) => {
+  const engine = new Worker("/stockfish.js");
+
+  engine.onmessage = (event) => {
+    if (event.data.startsWith("info depth")) {
+      const match = event.data.match(/score (cp|mate) (-?\d+)/);
+      if (match) {
+        let evalScore;
+        if (match[1] === "cp") {
+          evalScore = parseInt(match[2], 10) / 100; // Convert centipawns to pawn units
+        } else {
+          evalScore =
+            match[2] > 0 ? "Mate in " + match[2] : "Mated in " + -match[2];
+        }
+        callback(evalScore);
+        engine.terminate();
+      }
+    }
+  };
+
+  engine.postMessage("uci");
+  setTimeout(() => {
+    engine.postMessage(`position fen ${fen}`);
+    engine.postMessage("go depth 15"); // Adjust depth as needed
+  }, 500);
+};
+
 function ChessBoard() {
   const {
     boardStates,
@@ -171,6 +220,24 @@ function ChessBoard() {
     apprearance();
   }, [navigationRef]);
 
+  const [evaluation, setEvaluation] = useState(50); // Start at neutral
+
+  const timeRef = useRef(null);
+  useEffect(() => {
+    const fen = boardStates.board?.fen();
+    if (timeRef.current) clearTimeout(timeRef.current);
+    timeRef.current = setTimeout(
+      getEvaluationFromFEN(fen, (evalScore) => {
+        const evalPercentage = getEvalBarPercentage(
+          evalScore,
+          fen?.split(" ")[1] === "w"
+        );
+        setEvaluation(evalPercentage);
+      }),
+      500
+    );
+  }, [boardStates.board]);
+
   return (
     <div className=" w-full flex items-center justify-center h-fit">
       <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
@@ -182,52 +249,64 @@ function ChessBoard() {
           points={points}
           setPoints={setPoints}
         />
-        <div
-          className="relative w-full h-fit items-center justify-center flex flex-col"
-          style={{ transform: rotateBoard }}
-        >
-          {/* empty chessboard */}
-          {!boardStates.board && (
-            <div className="relative w-full h-fit">
-              <EmptyBoard />
-            </div>
-          )}
-          {boardStates.board?.board().map((row, rowIdx) => (
-            <div className="grid grid-cols-8 w-full gap-0" key={rowIdx}>
-              {row.map((piece, colIdx) => {
-                const pieceColor = piece?.color;
-                const key = colIdx + rowIdx;
-                const color = key & 1 ? themeColor.dark : themeColor.light;
-                const square = piece
-                  ? piece.square
-                  : getSquareName(rowIdx, colIdx);
-                piece = piece
-                  ? piece.color == "w"
-                    ? piece.type.toUpperCase()
-                    : piece.type
-                  : null;
-                return (
-                  <ChessBoardBox
-                    key={key}
-                    rowIdx={rowIdx}
-                    colIdx={colIdx}
-                    color={color}
-                    piece={piece}
-                    pieceColor={pieceColor}
-                    square={square}
-                    possibleMoves={possibleMoves}
-                    handleChessBoxClick={handleChessBoxClick}
-                    pawnPieceDisplay={pawnPieceDisplay}
-                    setPawnPieceDisplay={setPawnPieceDisplay}
-                    setPawnPromotion={setPawnPromotion}
-                    selectedSquare={selectedSquare}
-                    updatePieceNewLocation={updatePieceNewLocation}
-                  />
-                );
-              })}
-            </div>
-          ))}
+        <div className="flex gap-1">
+          <div className="w-3 h-full bg-gray-700 relative rounded-sm overflow-hidden">
+            <div
+              className="absolute bottom-0 w-full bg-white"
+              style={{
+                transition: "height 0.3s ease",
+                height: `${evaluation}%`,
+              }}
+            />
+          </div>
+          <div
+            className="relative w-full h-fit items-center justify-center flex flex-col"
+            style={{ transform: rotateBoard }}
+          >
+            {/* empty chessboard */}
+            {!boardStates.board && (
+              <div className="relative w-full h-fit">
+                <EmptyBoard />
+              </div>
+            )}
+            {boardStates.board?.board().map((row, rowIdx) => (
+              <div className="grid grid-cols-8 w-full gap-0" key={rowIdx}>
+                {row.map((piece, colIdx) => {
+                  const pieceColor = piece?.color;
+                  const key = colIdx + rowIdx;
+                  const color = key & 1 ? themeColor.dark : themeColor.light;
+                  const square = piece
+                    ? piece.square
+                    : getSquareName(rowIdx, colIdx);
+                  piece = piece
+                    ? piece.color == "w"
+                      ? piece.type.toUpperCase()
+                      : piece.type
+                    : null;
+                  return (
+                    <ChessBoardBox
+                      key={key}
+                      rowIdx={rowIdx}
+                      colIdx={colIdx}
+                      color={color}
+                      piece={piece}
+                      pieceColor={pieceColor}
+                      square={square}
+                      possibleMoves={possibleMoves}
+                      handleChessBoxClick={handleChessBoxClick}
+                      pawnPieceDisplay={pawnPieceDisplay}
+                      setPawnPieceDisplay={setPawnPieceDisplay}
+                      setPawnPromotion={setPawnPromotion}
+                      selectedSquare={selectedSquare}
+                      updatePieceNewLocation={updatePieceNewLocation}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
+
         <PlayerInfoInGame
           player={users.you || {}}
           isOnline={onlineUsers[users.you?._id]}
