@@ -103,10 +103,12 @@ To run the application using Docker, ensure Docker is installed on your local sy
 4. Access the application at `http://localhost:5173`
 
 ## **🔮 Future Improvements**
-
-- **End-to-End Encryption** – Secure communication for chats
-- **Game Analysis** – Review and analyze past games for improvement
-- **Play with Bot** – Practice against AI opponents
-- **Daily Puzzle** – Solve a new chess puzzle every day
+- **Time limit** – Game over when Time limit exceeds.
+- **Repeatation draw** – 3  times move repeat to draw.
+- **Drag and Drop piece** – Drag pieces and drop.
+- **Game Analysis** – Review and analyze past games for improvement.
+- **Play with Bot** – Practice against AI opponents.
+- **Daily Puzzle** – Solve a new chess puzzle every day.
+- **End-to-End Encryption** – Secure communication for chats.
 
 Stay tuned for updates! 🚀♟️
