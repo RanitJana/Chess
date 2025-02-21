@@ -11,8 +11,8 @@ function KingSticker({ piece = "k", pieceColor }) {
   const isWinner = isCheckMate[0] === pieceColor;
   const positionClass =
     rotateBoard === "rotate(180deg)"
-      ? "bottom-0 left-0 translate-x-[-50%]"
-      : "top-0 right-0 translate-x-[50%]";
+      ? "bottom-0 left-0 "
+      : "top-0 right-0 ";
 
   return (
     <div
