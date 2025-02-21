@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
 import { useContext, createContext, useState, useEffect } from "react";
-import { useLocation, Navigate } from "react-router-dom"; // Import useLocation
+import { useLocation } from "react-router-dom"; // Import useLocation
 import { verify } from "../api/auth";
 import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
@@ -59,7 +59,7 @@ export default function AuthContext({ children }) {
           ) : isAuth ? (
             children
           ) : (
-            <Navigate to={"/login"} />
+            <Login />
           )}
         </div>
       </div>
