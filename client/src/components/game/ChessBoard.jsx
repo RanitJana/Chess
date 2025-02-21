@@ -18,28 +18,7 @@ import { socket } from "../../socket.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import { gameMove } from "../../api/game.js";
 import MoveNavigation from "./MoveNavigation.jsx";
-
-const getEvalBarPercentage = (evalScore, isWhiteToMove) => {
-  // console.log(evalScore);
-
-  if (typeof evalScore === "string" && evalScore.includes("Mate")) {
-    const mateInMoves = parseInt(evalScore.match(/-?\d+/)[0], 10);
-
-    if (mateInMoves > 0) {
-      return isWhiteToMove ? 100 : 0; // White to move → White wins → 100%. Black to move → Black wins → 0%.
-    } else {
-      return isWhiteToMove ? 0 : 100; // White to move → White gets mated → 0%. Black to move → Black gets mated → 100%.
-    }
-  }
-
-  const maxEval = 10; // Cap at ±10 pawns for better scaling
-  let normalized = Math.max(-maxEval, Math.min(maxEval, evalScore));
-
-  // Sigmoid-like transformation for better scaling
-  const percentage = 50 + (50 * Math.atan(normalized) * 2) / Math.PI;
-
-  return Math.round(percentage);
-};
+import getEvalBarPercentage from "../../utils/game/getEvalBarPercentage.js";
 
 const getEvaluationFromFEN = (fen, callback) => {
   const engine = new Worker("/stockfish.js");
@@ -236,7 +215,7 @@ function ChessBoard() {
       }),
       500
     );
-  }, [boardStates.board]);
+  }, [boardStates.board, moves]);
 
   return (
     <div className=" w-full flex items-center justify-center h-fit">
@@ -250,6 +229,7 @@ function ChessBoard() {
           setPoints={setPoints}
         />
         <div className="flex gap-1">
+          {/* evaluation bar */}
           <div className="w-3 h-full bg-gray-700 relative rounded-sm overflow-hidden">
             <div
               className="absolute bottom-0 w-full bg-white"
