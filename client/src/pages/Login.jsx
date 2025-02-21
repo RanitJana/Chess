@@ -1,6 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { login } from "../api/auth.js";
 import Button from "../components/Button.jsx";
 import InputField from "../components/InputField.jsx";
@@ -15,6 +15,7 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const location = useLocation();
 
   const { setAuth, setPlayerInfo } = useAuthContext();
 
@@ -45,7 +46,8 @@ export default function Login() {
         Toast.success(message);
         setAuth(true);
         setPlayerInfo(player);
-        navigate("/");
+        if (location.pathname == "/login") navigate("/");
+        else navigate(location.pathname);
       } else {
         Toast.error(message);
       }
