@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { gameOngoing, gameSingle } from "../../api/game.js";
+import { gameOngoing } from "../../api/game.js";
 import { socket } from "../../socket.js";
 import MemoEmptyDailyGames from "./EmptyDailyGames.jsx";
 import { useSocketContext } from "../../context/SocketContext.jsx";
@@ -37,33 +37,20 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
     }
   }, [userId]);
 
-  const handleUpdateGamePreview = useCallback(
-    async (gameId) => {
-      try {
-        const { data } = await gameSingle(gameId);
-        if (data?.success) {
-          console.log(data);
-          
-          setGames((prev) =>
-            prev.map((game) =>
-              game._id === gameId
-                ? {
-                    ...game,
-                    moves: data.info.game.moves,
-                    board: data.info.game.board,
-                  }
-                : game
-            )
-          );
-        } else {
-          Toast.error("Failed to fetch game updates.");
-        }
-      } catch {
-        Toast.error("Something went wrong while updating game preview.");
-      }
-    },
-    [setGames]
-  );
+  const handleUpdateGamePreview = async (info) => {
+    const { board, gameId, moves } = info;
+    setGames((prev) =>
+      prev.map((game) => {
+        return game._id == gameId
+          ? {
+              ...game,
+              board,
+              moves,
+            }
+          : game;
+      })
+    );
+  };
 
   useEffect(() => {
     fetchOngoingGames();
@@ -79,7 +66,7 @@ function CurrentGamePreview({ userId, addNewGame = null, setAddNewGame }) {
   useEffect(() => {
     socket.on("update-game-preview", handleUpdateGamePreview);
     return () => socket.off("update-game-preview", handleUpdateGamePreview);
-  }, [handleUpdateGamePreview]);
+  }, []);
 
   const content = useMemo(() => {
     if (isLoading) return <MemoDailyGamesLoading />;

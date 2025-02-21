@@ -120,6 +120,11 @@ function ChessBoard() {
       fen: boardStates.board.fen(),
       lastMove: JSON.stringify(history[history.length - 1]),
     });
+    socket.emit("game-move", {
+      gameId,
+      board: boardStates.board.fen(),
+      moves: JSON.stringify(history[history.length - 1]),
+    });
   };
 
   const handleChessBoxClick = (square) => {

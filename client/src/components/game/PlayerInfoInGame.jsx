@@ -26,7 +26,7 @@ function PlayerInfoInGame({
     const takenPieces = [];
     for (
       let index = 0;
-      index < Math.min(allMoves.length,moveIndex+1);
+      index < Math.min(allMoves.length, moveIndex + 1);
       index++
     ) {
       const move = allMoves[index];

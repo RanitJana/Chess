@@ -68,8 +68,8 @@ const ongoingGameSection = function (socket, games) {
     socket.to(gameId).emit("accept-resign", info);
   });
 
-  socket.on("game-move", (gameId) => {
-    socket.to(gameId).emit("update-game-preview", gameId);
+  socket.on("game-move", (info) => {
+    socket.to(info.gameId).emit("update-game-preview", info);
   });
 };
 
