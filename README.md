@@ -4,7 +4,7 @@
 
 ## **🖼️ Preview**
 
-<img src="images/6(1).png" width="500">
+<img src="images/6(1).png" width="800">
 
 ## **🌟 Features**
 
