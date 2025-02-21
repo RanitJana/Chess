@@ -3,24 +3,35 @@
 🚀 **Welcome to my Chess Website!** This is an interactive platform where people can play chess and chat in real time.
 
 ## **🖼️ Preview**
-<img src="images/6(1).png" width="500">
 
+<img src="images/6(1).png" width="500">
 
 ## **🌟 Features**
 
+### **♟️ Game Features**
+
 ✅ **Play Chess Live** – Challenge friends or random opponents  
-✅ **Live Chat** – Talk to your opponent while playing  
 ✅ **Real-Time Challenge** – Instantly challenge online players  
 ✅ **Evaluation Bar** – Displays real-time game evaluation  
 ✅ **Smooth Gameplay** – Fast and responsive moves  
 ✅ **Game Moves Navigation** – Navigate through previous moves with an auto-play feature  
-✅ **Scan to Get User Info** – Scan and retrieve player details  
-✅ **User Accounts** – Track games and history  
-✅ **Friends System** – Add and play with friends  
+✅ **Change Board Theme** – Customize the board appearance with different themes
 
-## **🧩 Tech Stack**
+### **💬 Chat Features**
+
+✅ **Live Chat** – Talk to your opponent while playing  
+✅ **Reactions & Replies** – React to messages and drag to reply
+
+### **👤 Other Features**
+
+✅ **Scan to Get User Info** – Scan and retrieve player details
+✅ **User Accounts** – Track games and history  
+✅ **Friends System** – Add and play with friends
+
+## **🥧 Tech Stack**
 
 ### **Frontend:**
+
 - React : `react`
 - Routing: `react-router-dom`
 - State Management: `react-infinite-scroll-component`
@@ -31,6 +42,7 @@
 - Avatar Generation: `dicebear`
 
 ### **Backend:**
+
 - Routing: `express`
 - Authentication: `jsonwebtoken`, `bcryptjs`
 - Database: `mongoose`
@@ -41,15 +53,18 @@
 ## **📌 How to Run the Project**
 
 ### **1️⃣ Clone the Repository**
+
 ```sh
  git clone https://github.com/RanitJana/Chess.git
  cd Chess
 ```
 
 ### **2️⃣ Run the Project**
+
 You have two options to start the application:
 
 #### **🔹 Manually Start Both Servers**
+
 1. Open two terminals, one for the frontend and one for the backend.
 2. Start the backend server:
    ```sh
@@ -65,6 +80,7 @@ You have two options to start the application:
    ```
 
 #### **🔹 Use `start.sh` Script**
+
 1. Ensure you have execution permission:
    ```sh
    chmod +x start.sh
@@ -75,6 +91,7 @@ You have two options to start the application:
    ```
 
 #### **🔹 Run with Docker**
+
 To run the application using Docker, ensure Docker is installed on your local system.
 
 1. Install [Docker](https://www.docker.com/) if not already installed.
@@ -87,10 +104,9 @@ To run the application using Docker, ensure Docker is installed on your local sy
 
 ## **🔮 Future Improvements**
 
-- **End-to-End Encryption** – Secure communication for chats 
-- **Game Analysis** – Review and analyze past games for improvement  
-- **Play with Bot** – Practice against AI opponents  
-- **Daily Puzzle** – Solve a new chess puzzle every day  
-- **Drag and Drop Pieces** – Intuitive piece movement for better gameplay experience  
+- **End-to-End Encryption** – Secure communication for chats
+- **Game Analysis** – Review and analyze past games for improvement
+- **Play with Bot** – Practice against AI opponents
+- **Daily Puzzle** – Solve a new chess puzzle every day
 
 Stay tuned for updates! 🚀♟️
