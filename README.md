@@ -104,6 +104,7 @@ To run the application using Docker, ensure Docker is installed on your local sy
 
 ## **🔮 Future Improvements**
 
+- **React virtualization in chat** - It'll help to render chat content most efficiently
 - **Time limit** – Game over when Time limit exceeds.
 - **Repeatation draw** – 3 times move repeat to draw.
 - **Drag and Drop piece** – Drag pieces and drop.
