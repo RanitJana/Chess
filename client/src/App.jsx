@@ -65,7 +65,7 @@ export default function App() {
         />
         <Route
           path="/member/:userId"
-          element={isAuth ? <Profile /> : <Navigate to={"/login"} />}
+          element={isAuth ? <Profile /> : <Login />}
         />
         <Route
           path="/member/edit"

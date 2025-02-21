@@ -30,12 +30,17 @@ function QRcodeGenerator({ userId, username, setIsOpenQr }) {
   return (
     <div className="flex items-center justify-center fixed top-0 left-0 w-dvw h-dvh bg-[rgba(0,0,0,0.5)] z-[9999]">
       <div className="p-4 bg-blackDarkest rounded-md flex flex-col items-end gap-3">
-        <button className="h-6 w-6" onClick={() => setIsOpenQr(false)}>
-          <img src="/images/cross.png" alt="" className="w-6" />
-        </button>
+        <div className="flex justify-center items-center w-full">
+          <span className="text-white font-bold text-sm w-full text-center">
+            Scan to get user&apos;s details
+          </span>
+          <button className="h-6 w-6" onClick={() => setIsOpenQr(false)}>
+            <img src="/images/cross.png" alt="X" className="w-6" />
+          </button>
+        </div>
         <div className="flex flex-col gap-4">
           <div className="relative w-[15rem] h-[15rem] overflow-hidden flex items-center justify-center bg-white p-2 rounded-md">
-            <div className="absolute z-10 bg-black p-3 rounded-md">
+            <div className="absolute z-10 bg-blackDarkest p-2 rounded-md">
               <div
                 dangerouslySetInnerHTML={{ __html: GetAvatar(username) }}
                 className="w-10 overflow-hidden rounded-md"
