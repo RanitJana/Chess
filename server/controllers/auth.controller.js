@@ -135,6 +135,7 @@ const verify = AsyncHandler(async (req, res, _) => {
     views,
     lastSeen,
     nationality,
+    isOAuthUser,
   } = req.player;
 
   const info = {
@@ -149,6 +150,7 @@ const verify = AsyncHandler(async (req, res, _) => {
     views,
     lastSeen,
     nationality,
+    isOAuthUser,
   };
 
   const friendsCount = await friendSchema.countDocuments({

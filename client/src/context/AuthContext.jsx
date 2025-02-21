@@ -26,6 +26,8 @@ export default function AuthContext({ children }) {
         let response = await verify();
         if (response?.data.success) {
           const info = response.data.player;
+          console.log(info);
+
           setPlayerInfo(info);
           setAuth(true);
         }

@@ -40,6 +40,7 @@ const handlePlayerDetails = AsyncHandler(async (req, res, _) => {
       views: player.views,
       lastSeen: player.lastSeen,
       nationality: player.nationality,
+      isOAuthUser: player.isOAuthUser,
     },
   });
 });
@@ -63,6 +64,12 @@ const handleUpdatePlayer = AsyncHandler(async (req, res, _) => {
     return res.status(400).json({
       success: false,
       message: "Email is already being by another user",
+    });
+
+  if (player.isOAuthUser)
+    return res.status(400).json({
+      success: false,
+      message: "You can't change your email!",
     });
 
   player.name = name;

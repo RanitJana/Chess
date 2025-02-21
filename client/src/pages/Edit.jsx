@@ -120,15 +120,17 @@ function Edit() {
               instruction={"Your Name"}
             />
             {/* email */}
-            <EditInput
-              type={"email"}
-              value={userInfo.email}
-              placeholder={"Your email"}
-              setInfo={setUserInfo}
-              infoName={"email"}
-              imgPath={"/images/user.png"}
-              instruction={"Your email"}
-            />
+            {!playerInfo?.isOAuthUser && (
+              <EditInput
+                type={"email"}
+                value={userInfo.email}
+                placeholder={"Your email"}
+                setInfo={setUserInfo}
+                infoName={"email"}
+                imgPath={"/images/user.png"}
+                instruction={"Your email"}
+              />
+            )}
             {/* about */}
             <EditInput
               type={"text"}
