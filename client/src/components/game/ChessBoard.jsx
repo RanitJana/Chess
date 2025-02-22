@@ -25,7 +25,6 @@ function ChessBoard() {
     boardStates,
     setBoardStates,
     users,
-    opponent,
     moves,
     setMoves,
     themeColor,
@@ -177,7 +176,7 @@ function ChessBoard() {
       <div className="grid grid-cols-1 gap-0 md:w-full w-[min(100%,80dvh)] h-fit">
         <PlayerInfoInGame
           player={users.opponent || {}}
-          isOnline={onlineUsers[opponent?._id]}
+          isOnline={onlineUsers[users.opponent?._id]}
           opponentColor={users.you?.color}
           allMoves={moves}
           points={points}
